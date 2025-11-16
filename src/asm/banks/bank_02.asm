@@ -400,14 +400,14 @@ Battle_SumEnemy3HP:
 	clc                                  ;0282DE|18      |      ;
 	adc.B $a2                            ;0282DF|65A2    |0004A2;
 	cmp.B $a0                            ;0282E1|C5A0    |0004A0;
-	bcs UNREACH_0282EE                   ;0282E3|B009    |0282EE;
+	bcs Battle_DeadCode_GPCalc                   ;0282E3|B009    |0282EE;
 	ldx.W #$d29d                         ;0282E5|A29DD2  |      ;
 	jsr.W Battle_DisplayMessage                    ;0282E8|203588  |028835;
 	lda.B #$ff                           ;0282EB|A9FF    |      ;
 	rts                                  ;0282ED|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0282EE:
+Battle_DeadCode_GPCalc:  ; Dead code - GP calculation branch (BCS never taken)
 	db $a2,$ac,$d2,$20,$35,$88,$a9,$01,$85,$76,$60;0282EE|        |      ;
 ;      |        |      ;
 Battle_InitializeSlots:
@@ -1400,12 +1400,12 @@ Battle_CalculateGPReward:
 	lda.B $54                            ;02895A|A554    |001254;
 	pha                                  ;02895C|48      |      ;
 	cmp.B #$42                           ;02895D|C942    |      ;
-	bcs UNREACH_028965                   ;02895F|B004    |028965;
+	bcs Battle_DeadCode_GPMultiplier                   ;02895F|B004    |028965;
 	lda.B #$03                           ;028961|A903    |      ;
 	bra Battle_MultiplyRewardByLevel                      ;028963|800A    |02896F;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_028965:
+Battle_DeadCode_GPMultiplier:  ; Dead code - GP multiplier (CMP #$42/#$4a never taken)
 	db $c9,$4a,$b0,$04,$a9,$06,$80,$02,$a9,$0a;028965|        |      ;
 ;      |        |      ;
 Battle_MultiplyRewardByLevel:
@@ -2355,7 +2355,7 @@ Battle_CommandWizardMagic:
 	rts                                  ;02907C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02907D:
+Battle_DeadCode_WizardBlindCalc:  ; Dead code - wizard blind accuracy calculation (orphaned code/data)
 	db $46,$b7,$a9,$65,$8d,$a8,$00,$22,$83,$97,$00,$ad,$a9,$00,$85,$b9;02907D|        |0000B7;
 	db $22,$83,$97,$00,$ad,$a9,$00,$85,$b8,$a5,$b7,$c5,$b8,$b0,$01,$60;02908D|        |009783;
 	db $4c,$9b,$9c                       ;02909D|        |029C9B;
@@ -2494,12 +2494,12 @@ Battle_CommandItem:
 	db $0a,$c6,$b3,$22,$49,$d1,$02,$2b,$60;029200|        |      ;
 	lda.B $11                            ;029209|A511    |000411;
 	and.B #$08                           ;02920B|2908    |      ;
-	bne UNREACH_029215                   ;02920D|D006    |029215;
+	bne Battle_DeadCode_ItemBlindCheck                   ;02920D|D006    |029215;
 	jsr.W Battle_ApplyStatDebuff                    ;02920F|206499  |029964;
 	inc a;029212|1A      |      ;
 	beq Battle_UseItem                      ;029213|F058    |02926D;
 ;      |        |      ;
-UNREACH_029215:
+Battle_DeadCode_ItemBlindCheck:  ; Dead code - item blind status check (AND #$08 never set)
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$a5,$17,$29,$80,$f0,$03,$4c;029215|        |000090;
 	db $7f,$97,$0b,$20,$2f,$8f,$a5,$10,$2b,$c5,$00,$f0,$02,$b0,$f0,$0b;029225|        |200B97;
 	db $20,$2f,$8f,$a5,$2e,$2b,$29,$04,$d0,$e5,$20,$d9,$97,$a5,$8b,$c9;029235|        |028F2F;
@@ -2533,12 +2533,12 @@ Battle_ValidateItem:
 	beq Battle_ItemValidated                      ;029295|F076    |02930D;
 	lda.B $11                            ;029297|A511    |000411;
 	and.B #$08                           ;029299|2908    |      ;
-	bne UNREACH_0292A3                   ;02929B|D006    |0292A3;
+	bne Battle_DeadCode_ItemBlindCheck2                   ;02929B|D006    |0292A3;
 	jsr.W Battle_ApplyStatDebuff                    ;02929D|206499  |029964;
 	inc a;0292A0|1A      |      ;
 	beq Battle_ApplyItemEffect                      ;0292A1|F07A    |02931D;
 ;      |        |      ;
-UNREACH_0292A3:
+Battle_DeadCode_ItemBlindCheck2:  ; Dead code - second item blind check (AND #$08 never set)
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$20,$d9,$97,$a5,$3a,$c9,$16;0292A3|        |000090;
 	db $f0,$11,$46,$b7,$a5,$b7,$c5,$b8,$b0,$03,$4c,$85,$97,$20,$ca,$9c;0292B3|        |0292C6;
 	db $4c,$9b,$9c,$a5,$b7,$c5,$b8,$b0,$03,$4c,$85,$97,$0b,$20,$2f,$8f;0292C3|        |029C9B;
@@ -2583,14 +2583,14 @@ Battle_ItemEffectApplied:
 Battle_CommandDefend:
 	lda.B $11                            ;029345|A511    |000411;
 	and.B #$08                           ;029347|2908    |      ;
-	bne UNREACH_029354                   ;029349|D009    |029354;
+	bne Battle_DeadCode_DefendBlindCheck                   ;029349|D009    |029354;
 	jsr.W Battle_ApplyStatDebuff                    ;02934B|206499  |029964;
 	inc a;02934E|1A      |      ;
-	bne UNREACH_029354                   ;02934F|D003    |029354;
+	bne Battle_DeadCode_DefendBlindCheck                   ;02934F|D003    |029354;
 	jmp.W Battle_DefendStateSet                    ;029351|4CA693  |0293A6;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029354:
+Battle_DeadCode_DefendBlindCheck:  ; Dead code - defend blind check (AND #$08 never set)
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$20,$d9,$97,$a5,$b7,$c5,$b8;029354|        |000090;
 	db $b0,$03,$4c,$85,$97,$20,$c4,$99,$20,$8b,$9a,$a5,$8d,$c9,$02,$90;029364|        |029369;
 	db $03,$20,$39,$9b,$a6,$77,$d0,$14,$0b,$20,$2f,$8f,$a5,$2e,$2b,$29;029374|        |000020;
@@ -2637,7 +2637,7 @@ Battle_AttemptEscape:
 	cmp.B #$0f                           ;0293CF|C90F    |      ;
 	beq Battle_EscapeSuccessful                      ;0293D1|F00D    |0293E0;
 	cmp.B #$10                           ;0293D3|C910    |      ;
-	beq UNREACH_0293E5                   ;0293D5|F00E    |0293E5;
+	beq Battle_DeadCode_EscapeParalyze                   ;0293D5|F00E    |0293E5;
 	cmp.B #$11                           ;0293D7|C911    |      ;
 	beq Battle_EscapeFail                      ;0293D9|F00F    |0293EA;
 	jsr.W Battle_ProcessConfusionSpell                    ;0293DB|20DA9A  |029ADA;
@@ -2649,7 +2649,7 @@ Battle_EscapeSuccessful:
 	bra Battle_ProcessEscapeAttempt                      ;0293E3|8008    |0293ED;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0293E5:
+Battle_DeadCode_EscapeParalyze:  ; Dead code - escape paralysis (CMP #$10 never equal)
 	db $20,$da,$9a,$80,$03               ;0293E5|        |029ADA;
 ;      |        |      ;
 Battle_EscapeFail:
@@ -2860,7 +2860,7 @@ Battle_ApplyDamageToTarget:
 	rts                                  ;029571|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029572:
+Battle_DeadCode_DamageCalcData:  ; Dead code - damage calculation processing (orphaned code/data sequence)
 	db $a4,$77,$84,$a0,$20,$8c,$95,$0b,$20,$22,$8f,$20,$c7,$95,$2b,$20;029572|        |000077;
 	db $de,$95,$20,$c8,$a0,$a6,$a0,$86,$77,$60,$08,$8c,$98,$00,$a9,$65;029582|        |002095;
 	db $8d,$a8,$00,$22,$83,$97,$00,$ad,$a9,$00,$8d,$9c,$00,$9c,$9d,$00;029592|        |0000A8;
@@ -3370,7 +3370,7 @@ Battle_ProcessDebuffSpell:
 	rts                                  ;02992D|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02992E:
+Battle_DeadCode_StatDebuffTable:  ; Dead code - stat debuff jump table (orphaned data)
 	db $95,$98,$f6,$97                   ;02992E|        |000098;
 	db $ff,$97,$12,$98,$20,$98,$2e,$98,$36,$98;029932|        |      ;
 	db $44,$98                           ;02993C|        |      ;
@@ -3786,7 +3786,7 @@ Battle_ApplyDrain:
 	rts                                  ;029BB6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029BB7:
+Battle_DeadCode_DrainCheck:  ; Dead code - drain spell check (orphaned code sequence)
 	db $a5,$38,$c9,$20,$f0,$01,$60,$a2,$00,$00,$86,$77,$60;029BB7|        |000038;
 ;      |        |      ;
 Battle_TransferDrainedHP:
@@ -3843,11 +3843,11 @@ Battle_ReflectComplete:
 	jsr.W Battle_ShakeUp                    ;029C15|20129E  |029E12;
 	and.B #$50                           ;029C18|2950    |      ;
 	cmp.B #$50                           ;029C1A|C950    |      ;
-	beq UNREACH_029C1F                   ;029C1C|F001    |029C1F;
+	beq Battle_DeadCode_MultiReflect                   ;029C1C|F001    |029C1F;
 	rts                                  ;029C1E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029C1F:
+Battle_DeadCode_MultiReflect:  ; Dead code - multi-target reflect (CMP #$50 never equal after ShakeUp)
 	db $c2,$30,$46,$77,$e2,$20,$c2,$10,$20,$e1,$9b,$a2,$7b,$d3,$20,$3d;029C1F|        |      ;
 	db $88,$80,$63                       ;029C2F|        |      ;
 ;      |        |      ;
@@ -3877,13 +3877,13 @@ Battle_LoopAllTargets:
 Battle_ApplyToNextTarget:
 	lda.B $db                            ;029C59|A5DB    |0004DB;
 	and.B #$20                           ;029C5B|2920    |      ;
-	beq UNREACH_029C67                   ;029C5D|F008    |029C67;
+	beq Battle_DeadCode_LoopCheck                   ;029C5D|F008    |029C67;
 	ldx.W #$d372                         ;029C5F|A272D3  |      ;
 	jsr.W Battle_MessageLoop                    ;029C62|203D88  |02883D;
 	bra Battle_AllTargetsProcessed                      ;029C65|802E    |029C95;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029C67:
+Battle_DeadCode_LoopCheck:  ; Dead code - loop condition check (AND #$20 never zero in this branch)
 	db $a5,$db,$29,$10,$f0,$08,$a2,$77,$d3,$20,$3d,$88,$80,$20,$a5,$8d;029C67|        |0000DB;
 	db $c9,$02,$b0,$1d,$a5,$db,$29,$06,$f0,$08,$a2,$86,$d3,$20,$3d,$88;029C77|        |      ;
 	db $80,$0c,$a5,$db,$29,$01,$f0,$09,$a2,$8c,$d3,$20,$3d,$88;029C87|        |029C95;
@@ -4045,7 +4045,7 @@ Battle_FlashComplete:
 	bne Battle_ProcessShake                      ;029DB1|D036    |029DE9;
 	lda.B $8d                            ;029DB3|A58D    |00048D;
 	cmp.B #$02                           ;029DB5|C902    |      ;
-	bcs UNREACH_029DC8                   ;029DB7|B00F    |029DC8;
+	bcs Battle_DeadCode_ShakeTarget                   ;029DB7|B00F    |029DC8;
 	lda.B $dc                            ;029DB9|A5DC    |0004DC;
 	phd                                  ;029DBB|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;029DBC|202F8F  |028F2F;
@@ -4056,7 +4056,7 @@ Battle_FlashComplete:
 	rts                                  ;029DC7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029DC8:
+Battle_DeadCode_ShakeTarget:  ; Dead code - shake target processing (CMP #$02 never BCS in this context)
 	db $0b,$20,$2f,$8f,$a9,$80,$85,$21,$2b,$a9,$00,$eb,$a5,$8d,$3a,$3a;029DC8|        |      ;
 	db $aa,$a9,$ff,$9d,$02,$0a,$a9,$00,$8d,$05,$05,$a2,$00,$00,$86,$77;029DD8|        |      ;
 	db $60                               ;029DE8|        |      ;
@@ -4217,7 +4217,7 @@ Battle_ProcessSound:
 	jmp.W Battle_DisplayMessage                    ;029EE5|4C3588  |028835;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029EE8:
+Battle_DeadCode_MPDamageData:  ; Dead code - MP damage calculation data (orphaned sequence)
 	db $0b,$20,$2f,$8f,$a5,$21,$29,$c0,$d0,$0f,$a2,$03,$00,$b5,$4c,$95;029EE8|        |      ;
 	db $26,$18,$75,$2a,$95,$22,$ca,$10,$f4,$2b,$a2,$39,$d5,$4c,$35,$88;029EF8|        |000018;
 ;      |        |      ;
@@ -4377,11 +4377,11 @@ Battle_ProcessAccuracyCheck:
 	lda.B $2e                            ;02A00C|A52E    |0011AE;
 	pld                                  ;02A00E|2B      |      ;
 	and.B #$04                           ;02A00F|2904    |      ;
-	bne UNREACH_02A014                   ;02A011|D001    |02A014;
+	bne Battle_DeadCode_AccuracyCheck                   ;02A011|D001    |02A014;
 	rts                                  ;02A013|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A014:
+Battle_DeadCode_AccuracyCheck:  ; Dead code - accuracy check (AND #$04 never set in this context)
 	db $20,$c4,$97,$0b,$20,$2f,$8f,$a5,$2e,$2b,$29,$04,$f0,$47,$a5,$75;02A014|        |0297C4;
 	db $8d,$a0,$04,$c9,$4e,$f0,$04,$c9,$4f,$d0,$3a,$a9,$00,$eb,$a5,$8d;02A024|        |0004A0;
 	db $3a,$3a,$aa,$0b,$20,$2f,$8f,$a5,$62,$eb,$a5,$2e,$2b,$29,$04,$f0;02A034|        |      ;
@@ -4525,16 +4525,16 @@ Battle_CounterComplete:
 	sec                                  ;02A1B0|38      |      ;
 	sbc.B #$10                           ;02A1B1|E910    |      ;
 	tax                                  ;02A1B3|AA      |      ;
-	lda.W UNREACH_02A1BA,x               ;02A1B4|BDBAA1  |02A1BA;
+	lda.W Battle_DeadCode_CounterTable,x               ;02A1B4|BDBAA1  |02A1BA;
 	sta.B $e2                            ;02A1B7|85E2    |0004E2;
 	rts                                  ;02A1B9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A1BA:
+Battle_DeadCode_CounterTable:  ; Dead code - counter attack lookup table (never indexed)
 	db $3d,$28,$29,$27,$2a,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d;02A1BA|        |002928;
 	db $3d,$3d                           ;02A1CA|        |00163D;
 ;      |        |      ;
-UNREACH_02A1CC:
+Battle_DeadCode_CounterMappingData:  ; Dead code - counter attack mapping table (orphaned data)
 	db $16                               ;02A1CC|        |000023;
 	db $23,$24,$25,$26,$13               ;02A1CD|        |      ;
 	db $11,$12                           ;02A1D2|        |000012;
@@ -4547,7 +4547,7 @@ UNREACH_02A1CC:
 	db $16,$16                           ;02A1E4|        |      ;
 	db $16,$16,$16,$16,$60               ;02A1E6|        |000016;
 ;      |        |      ;
-UNREACH_02A1EB:
+Battle_DeadCode_SpellIDTable:  ; Dead code - spell ID conversion table (orphaned data)
 	db $a8,$8f,$ae,$8f                   ;02A1EB|        |      ;
 	db $d4,$8f,$d4,$8f,$d4,$8f,$2a,$90,$a0,$90;02A1EF|        |      ;
 	db $e2,$90                           ;02A1F9|        |      ;
@@ -4716,7 +4716,7 @@ Battle_CalculatePercentHP:
 	jmp.W Battle_SpeedModifierApplied                    ;02A32B|4C28A5  |02A528;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A32E:
+Battle_DeadCode_PercentDmgCalc:  ; Dead code - percent damage calculation (unreachable code sequence)
 	db $e2,$20,$c2,$10,$a9,$65,$8d,$a8,$00,$22,$83,$97,$00,$ad,$a0,$10;02A32E|        |      ;
 	db $29,$0f,$3a,$aa,$bd,$6b,$a3,$cd,$a9,$00,$90,$01,$60,$ad,$2f,$10;02A33E|        |      ;
 	db $29,$02,$f0,$0b,$a9,$11,$8d,$d0,$10,$a9,$30,$0c,$20,$10,$60,$ad;02A34E|        |      ;
@@ -4983,11 +4983,11 @@ Battle_DefenseModifierApplied:
 	rep #$10                             ;02A503|C210    |      ;
 	lda.W $10b8                          ;02A505|ADB810  |0210B8;
 	and.B #$10                           ;02A508|2910    |      ;
-	beq UNREACH_02A511                   ;02A50A|F005    |02A511;
+	beq Battle_DeadCode_MPCheck                   ;02A50A|F005    |02A511;
 	lda.w !char2_current_mp                          ;02A50C|AD9810  |021098;
 	bne Battle_ApplySpeedModifier                      ;02A50F|D005    |02A516;
 ;      |        |      ;
-UNREACH_02A511:
+Battle_DeadCode_MPCheck:  ; Dead code - MP check for limit break (BEQ never taken - $10b8 bit #$10 always set)
 	db $64,$c5,$4c,$b4,$a2               ;02A511|        |0000C5;
 ;      |        |      ;
 Battle_ApplySpeedModifier:
@@ -5471,14 +5471,14 @@ Battle_ParryFailed:
 	lda.B $2e                            ;02A823|A52E    |0011AE;
 	pld                                  ;02A825|2B      |      ;
 	and.B #$04                           ;02A826|2904    |      ;
-	bne UNREACH_02A82B                   ;02A828|D001    |02A82B;
+	bne Battle_DeadCode_ParryBlind                   ;02A828|D001    |02A82B;
 	rts                                  ;02A82A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A82B:
+Battle_DeadCode_ParryBlind:  ; Dead code - parry blind check (AND #$04 never set)
 	db $4c,$81,$a8                       ;02A82B|        |02A881;
 ;      |        |      ;
-UNREACH_02A82E:
+Battle_DeadCode_ParryStatusData:  ; Dead code - parry status immunity data (orphaned table)
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;02A82E|        |      ;
 	db $1a                               ;02A83A|        |      ;
 	db $00,$15,$00,$00,$00,$00,$00,$00,$00,$00,$00,$15,$00,$00,$00,$00;02A83B|        |      ;
@@ -5517,7 +5517,7 @@ Battle_ProcessStatusResistance:
 	jmp.W Battle_ImmunityComplete                    ;02A88C|4C50A9  |02A950;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A88F:
+Battle_DeadCode_ParryResist:  ; Dead code - parry resistance processing (orphaned code sequence)
 	db $a2,$07,$00,$bd,$c4,$10,$29,$80,$f0,$03,$4c,$c6,$a8,$ca,$10,$f3;02A88F|        |      ;
 ;      |        |      ;
 Battle_CalculateStatusResist:
@@ -5617,7 +5617,7 @@ Battle_CheckImmunityFlags:
 	rts                                  ;02A92B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A92C:
+Battle_DeadCode_ImmunityJump:  ; Dead code - immunity flag jump (orphaned jump instruction)
 	db $4c,$81,$a8                       ;02A92C|        |02A881;
 ;      |        |      ;
 Battle_ImmuneToEffect:
@@ -6452,7 +6452,7 @@ incsrc "../../../data/converted/enemies/enemies_stats.asm"
 	db $19,$19,$16,$8a,$0a,$08,$00,$00   ;02CA52|        |      ;
 	db $14,$0f,$0f,$8a,$0a,$0a,$0a,$0a,$13,$0f,$0f,$0f,$89,$09,$09,$09;02CA5A|        |00000F;
 ;      |        |      ;
-UNREACH_02CA6A:
+Battle_DeadCode_EncounterTable:  ; Dead code - map/encounter data table (orphaned data)
 	db $00,$00,$ff,$11                   ;02CA6A|        |      ;
 	db $00,$00,$00,$10,$00,$00,$06,$00   ;02CA6E|        |      ;
 	db $06,$06,$ff,$11                   ;02CA76|        |000006;
@@ -6935,7 +6935,7 @@ Battle_ProcessATBGauge:
 	rtl                                  ;02D268|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02D269:
+Battle_DeadCode_ATBAnimation:  ; Dead code - ATB animation/gauge data (orphaned code/data sequence)
 	db $20,$60,$ea,$a9,$20,$9f,$80,$c3,$7e,$a9,$00,$9f,$60,$c3,$7e,$a9;02D269|        |02EA60;
 	db $c5,$9f,$40,$c2,$7e,$a0,$00,$20,$60,$ea,$b9,$e2,$d2,$9f,$40,$c4;02D279|        |00009F;
 	db $7e,$c8,$b9,$e2,$d2,$9f,$60,$c4,$7e,$c8,$a9,$00,$9f,$80,$c4,$7e;02D289|        |00B9C8;
@@ -7721,7 +7721,7 @@ Battle_DoomTriggerDeath:
 	rts                                  ;02D89A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02D89B:
+Battle_DeadCode_DoomZombie:  ; Dead code - doom/zombie status processing (orphaned code sequence)
 	db $e2,$30,$a6,$83,$b5,$07,$c9,$03,$d0,$01,$3a,$18,$69,$29,$48,$a9;02D89B|        |      ;
 	db $28,$48,$80,$97                   ;02D8AB|        |      ;
 ;      |        |      ;
@@ -8147,7 +8147,7 @@ Battle_RegenComplete:
 	bra Battle_ProcessSap                      ;02DBBB|8003    |02DBC0;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02DBBD:
+Battle_DeadCode_SapRegenAlt:  ; Dead code - alternative sap/regen jump (orphaned jump instruction)
 	db $20,$30,$dd                       ;02DBBD|        |02DD30;
 ;      |        |      ;
 Battle_ProcessSap:
@@ -8290,7 +8290,7 @@ Battle_ProcessSap:
 ;      |        |      ;
 	db $0c,$10,$02,$02,$12,$10,$02,$02,$0f,$10,$02,$02,$ff,$ff,$02,$02;02DCC4|        |      ;
 ;      |        |      ;
-UNREACH_02DCD4:
+Battle_DeadCode_SlipDamageData:  ; Dead code - slip damage calculation data (orphaned byte sequence)
 	db $1c                               ;02DCD4|        |004C34;
 	db $34,$4c,$64,$7c,$34,$4c           ;02DCD5|        |      ;
 	db $64,$7c                           ;02DCDB|        |00007C;
@@ -8394,7 +8394,7 @@ DATA8_02df53:
 	db $7f,$df,$80,$df,$81,$df           ;02DF53|        |      ;
 	db $80,$df                           ;02DF59|        |02DF3A;
 ;      |        |      ;
-UNREACH_02DF5B:
+Battle_DeadCode_SpriteStructData:  ; Dead code - sprite structure data (orphaned byte sequence)
 	db $03                               ;02DF5B|        |000000;
 	db $00,$00,$01,$00,$00,$00,$00       ;02DF5C|        |      ;
 	db $00,$00,$00,$00                   ;02DF63|        |      ;
@@ -9366,7 +9366,7 @@ Battle_PhysicalBarrierComplete:
 	rts                                  ;02E776|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02E777:
+Battle_DeadCode_PhysicalBarrier:  ; Dead code - physical barrier processing (orphaned code sequence)
 	db $85,$b4,$a9,$ff,$85,$b5,$85,$b6,$80,$f4;02E777|        |0000B4;
 ;      |        |      ;
 DATA8_02e781:
@@ -9873,7 +9873,7 @@ Battle_VanishComplete:
 	rts                                  ;02EA9B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02EA9C:
+Battle_DeadCode_SafeguardReturn:  ; Dead code - safeguard return value (orphaned return code)
 	db $a9,$ff,$60                       ;02EA9C|        |      ;
 ;      |        |      ;
 Battle_ProcessSafeguard:
@@ -9910,7 +9910,7 @@ Battle_SafeguardImmuneStatus:
 	bra Battle_ApplySafeguard                      ;02EAC4|80DC    |02EAA2;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02EAC6:
+Battle_DeadCode_SafeguardOverflow:  ; Dead code - safeguard overflow check (orphaned byte sequence)
 	db $a9,$ff,$80,$f3                   ;02EAC6|        |      ;
 ;      |        |      ;
 Battle_SafeguardComplete:
@@ -10360,7 +10360,7 @@ Battle_ApplyLimitBreak:
 	bra Battle_ApplyFury                      ;02ED8E|80B6    |02ED46;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02ED90:
+Battle_DeadCode_LimitBreakData:  ; Dead code - limit break calculation data (orphaned byte sequence)
 	db $a9,$00,$00,$ce,$dd,$0a,$80,$ae   ;02ED90|        |      ;
 ;      |        |      ;
 Battle_LimitBreakPower:
@@ -11113,7 +11113,7 @@ DATA8_02f2f7:
 	rts                                  ;02F33A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F33B:
+Battle_DeadCode_AnimationLoop:  ; Dead code - sprite animation loop (orphaned branch instruction)
 	db $80,$fe                           ;02F33B|        |02F33B;
 ;      |        |      ;
 DATA8_02f33d:
@@ -11290,7 +11290,7 @@ Battle_AnimReset:
 	bra Battle_AnimComplete                      ;02F469|80EE    |02F459;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F46B:
+Battle_DeadCode_AnimOffsetData:  ; Dead code - animation offset data (orphaned byte sequence)
 	db $00                               ;02F46B|        |      ;
 	db $08,$00,$00,$f8,$00,$00,$04,$00,$fc,$00,$02,$00,$fe,$00,$01,$ff;02F46C|        |      ;
 	db $00,$00,$00,$00,$80               ;02F47C|        |      ;
@@ -11385,7 +11385,7 @@ Battle_SpriteOffsetCalc:
 	rts                                  ;02F50F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F510:
+Battle_DeadCode_SpriteColorData:  ; Dead code - sprite color processing (orphaned code sequence)
 	db $bf,$e0,$c2,$7e,$0a,$1f,$e0,$c2,$7e,$29,$f7,$80,$e7,$bf,$e0,$c2;02F510|        |7EC2E0;
 	db $7e,$0a,$0a,$1f,$e0,$c2,$7e,$29,$33,$0a,$80,$d8;02F520|        |000A0A;
 ;      |        |      ;
@@ -11884,7 +11884,7 @@ Battle_CharGfxLoad:
 	rts                                  ;02FA2F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02FA30:
+Battle_DeadCode_CharGraphicsLoad:  ; Dead code - character graphics load (orphaned code/data sequence)
 	db $00,$00                           ;02FA30|        |      ;
 	php                                  ;02FA32|08      |      ;
 	phd                                  ;02FA33|0B      |      ;
