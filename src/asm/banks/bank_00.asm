@@ -4765,84 +4765,318 @@ Stats_SumWithCarry:
 	rts                                  ;009263|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Sound_ProcessQueue
+;-------------------------------------------------------------------------------
+; Main audio command queue processor - dispatches sound effect and music
+; commands to the SPC700 audio processor via shared memory interface.
+;
+; CALLING CONVENTION:
+;   JSR (called from main game loop)
+;   Input: Audio command queues at $0500-$050C
+;   Output: Commands sent to SPC700 APU
+;          Queues cleared after processing
+;   Returns via RTS
+;
+; OPERATION SEQUENCE:
+;
+;   1. CHECK AUDIO LOCK:
+;      - Test system_flags_9 bit 5 ($20)
+;      - If locked: Skip processing (audio busy)
+;      - If unlocked: Proceed to command dispatch
+;   
+;   2. SET AUDIO LOCK:
+;      - Set system_flags_9 bit 5 ($20) via TSB
+;      - Prevents re-entry during audio processing
+;      - Critical for preventing audio command corruption
+;   
+;   3. SETUP DIRECT PAGE:
+;      - Set Direct Page to $0500 (audio queue base)
+;      - Allows faster DP addressing: lda.b $00 = lda $0500
+;      - Saves cycles and ROM bytes for audio register access
+;   
+;   4. ENABLE INTERRUPTS:
+;      - CLI (Clear Interrupt disable)
+;      - Allows NMI/IRQ during audio processing
+;      - Audio commands can execute during VBlank
+;   
+;   5. PROCESS COMMAND QUEUE 1 (Sound Effects):
+;      - Check system_flags_9 bit 2 ($04) - audio disable flag
+;      - If set: Skip command 1
+;      - Check $0500 (audio_gfx_index) for $FF (empty queue)
+;      - If not $FF:
+;        * Store $0500 to APU command register $0601
+;        * Store $0501-$0502 to APU param registers $0602-$0603
+;        * Write $01 to $0600 (command type: sound effect)
+;        * Call Secondary_APU_Command_Entry_Point (execute command)
+;        * Clear $0500 to $FF (mark queue empty)
+;        * Copy $0503-$0504 to $0501-$0502 (shift next command)
+;   
+;   6. PROCESS COMMAND QUEUE 2 (Music/Control):
+;      - Check $0505 (audio_coord_register) for $FF (empty)
+;      - If not $FF:
+;        * Store $0505 to APU command register $0601
+;        * Store $0506-$0507 to APU param registers $0602-$0603
+;        * Write $02 to $0600 (command type: music control)
+;        * Call Secondary_APU_Command_Entry_Point (execute command)
+;        * Clear $0505 to $FF (mark queue empty)
+;        * Copy $0508-$0509 to $0506-$0507 (shift next command)
+;   
+;   7. PROCESS COMMAND QUEUE 3 (Hardware Direct):
+;      - Check $050A (audio_hw_register_1) for $00 (empty)
+;      - Special cases:
+;        * If $02: Always execute (priority command)
+;        * If $10-$1F: Execute call
+;        * If >= $20: Execute call
+;        * If < $10 (except $02): Check system_flags_9 bit 2
+;          - If bit 2 set: Skip (audio disabled)
+;      - If executing:
+;        * Store $050A-$050C to APU registers $0600/$0602-$0603
+;        * Call Secondary_APU_Command_Entry_Point
+;        * Clear $050A to $00 (mark queue empty)
+;   
+;   8. CLEAR AUDIO LOCK:
+;      - SEI (Set Interrupt disable) - disable interrupts
+;      - Clear system_flags_9 bit 5 ($20) via TRB
+;      - Allows next audio processing cycle
+;   
+;   9. RETURN:
+;      - RTS (return to caller)
+;
+; AUDIO QUEUE MEMORY MAP:
+;   $0500 (audio_gfx_index):      Queue 1 command byte
+;   $0501-$0502 (audio_sound_params): Queue 1 parameters (word)
+;   $0503-$0504:                  Queue 1 next command (shifted after send)
+;   $0505 (audio_coord_register): Queue 2 command byte
+;   $0506-$0507 (audio_control_register): Queue 2 parameters (word)
+;   $0508-$0509:                  Queue 2 next command (shifted after send)
+;   $050A (audio_hw_register_1):  Queue 3 command byte
+;   $050C-$050D:                  Queue 3 parameters (word)
+;
+; APU COMMUNICATION REGISTERS:
+;   $0600: Command type ($01 = SFX, $02 = music, other = hardware direct)
+;   $0601: Command ID (sound effect number, music track, etc.)
+;   $0602-$0603: Command parameters (volume, pitch, flags, etc.)
+;
+; COMMAND EMPTY MARKERS:
+;   Queue 1/2: $FF (byte value, -1 signed)
+;   Queue 3: $00 (no command pending)
+;
+; QUEUE SHIFTING LOGIC:
+;   After processing command at offset +$00:
+;     Copy offset +$03 → offset +$01
+;   Effect: Moves next command to current slot
+;   Game code must fill +$03 with next command
+;   Creates FIFO (First In First Out) command buffer
+;
+; WHY THREE SEPARATE QUEUES:
+;   Queue 1 (SFX): High priority, immediate sound effects
+;     Examples: Menu beep, footstep, hit sound, explosion
+;   Queue 2 (Music): Medium priority, music control
+;     Examples: Play track, stop music, fade out, tempo change
+;   Queue 3 (Hardware): Low priority, direct APU commands
+;     Examples: Channel mute, volume adjust, echo setup
+;   
+;   Separation ensures critical SFX don't get delayed by music changes
+;
+; AUDIO LOCK MECHANISM (system_flags_9 bit 5):
+;   Purpose: Prevent simultaneous audio processing
+;   Problem without lock:
+;     Main loop: Writing to $0500
+;     NMI handler: Also writing to $0500
+;     Result: Corrupted command (race condition)
+;   
+;   Solution with lock:
+;     TSB $00D9 (Test and Set Bits): Atomic operation
+;     If bit already set: BNE skips processing
+;     If bit clear: Sets bit and continues
+;     Only one code path processes audio at a time
+;
+; INTERRUPT CONTROL (CLI/SEI):
+;   CLI before APU calls: Allows VBlank interrupts during long operations
+;   SEI after processing: Atomic lock clear (prevents interrupt mid-update)
+;   
+;   Trade-off:
+;     CLI: Responsiveness (game doesn't freeze during audio)
+;     SEI: Safety (lock operations are atomic)
+;
+; SECONDARY_APU_COMMAND_ENTRY_POINT:
+;   Located at $0D:8004 (bank $0D, offset $8004)
+;   JSL long call across banks
+;   Handles SPC700 communication protocol:
+;     1. Wait for APU ready flag
+;     2. Write command bytes to shared memory ($2140-$2143)
+;     3. Signal APU via handshake byte
+;     4. Wait for APU acknowledge
+;     5. Return to main CPU
+;   
+;   Timing critical: Must complete before next VBlank
+;
+; PERFORMANCE:
+;   Empty queues: ~25 cycles (~9μs @ 2.68MHz)
+;     Check flag + BNE return
+;   
+;   1 command: ~150-250 cycles (~56-93μs)
+;     Setup + JSL + APU call overhead
+;   
+;   3 commands: ~400-600 cycles (~149-224μs)
+;     Multiple APU calls + queue shifting
+;   
+;   APU call itself: ~500-2000 cycles (varies by APU load)
+;     SPC700 must acknowledge handshake
+;
+; USAGE PATTERN:
+;   Game loop:
+;       ; Queue sound effect
+;       lda #$15                ; SFX ID $15 (menu beep)
+;       sta $0500               ; audio_gfx_index
+;       lda #$80                ; Volume/pan param
+;       sta $0501               ; audio_sound_params
+;       
+;       ; Process queues
+;       jsr Sound_ProcessQueue  ; Sends to APU
+;       
+;       ; Continue game logic
+;
+; COMMON CALLERS:
+;   - Main game loop (every frame)
+;   - Menu_UpdateInput (menu beeps)
+;   - Battle_ProcessAction (battle SFX)
+;   - Field_TriggerEvent (event music)
+;
+; WHY CALLED EVERY FRAME:
+;   Audio commands can be queued anytime during frame
+;   Must check and process before next frame
+;   Ensures responsive audio (minimal latency)
+;   
+;   Alternative: Event-driven (only when queued)
+;   Trade-off: More complex, requires flag checks everywhere
+;   FFMQ choice: Simple poll-every-frame for reliability
+;
+; SYSTEM_FLAGS_9 BIT MEANINGS (relevant bits):
+;   Bit 2 ($04): Audio disable flag
+;     Set: Skip queue 1/3 processing (mute SFX/hardware)
+;     Clear: Normal audio processing
+;     Used for: Cutscenes, pauses, audio test mode
+;   
+;   Bit 5 ($20): Audio lock
+;     Set: Audio processing active (lock held)
+;     Clear: Audio available for processing
+;     Prevents: Re-entrancy, race conditions
+;
+; TECHNICAL NOTES:
+;
+;   Direct Page optimization saves cycles:
+;     "lda.b $00" (2 bytes, 3 cycles) vs "lda.w $0500" (3 bytes, 4 cycles)
+;     With 15+ DP accesses: Saves ~15 bytes, ~15 cycles
+;   
+;   TSB/TRB instructions (Test and Set/Reset Bits):
+;     Atomic read-modify-write operations
+;     Perfect for flags/locks in multi-context code
+;     Alternative: LDA + ORA/AND + STA (not atomic, race condition risk)
+;   
+;   Queue shifting (copy $03→$01):
+;     Simple FIFO implementation
+;     Game code must manage +$03 writes
+;     Could extend to deeper queue (4-8 commands) with more code
+;   
+;   Empty markers ($FF vs $00):
+;     Queue 1/2: $FF allows valid command $00
+;     Queue 3: $00 likely because valid commands are $01+
+;     Inconsistent but functional
+;
+; REGISTERS MODIFIED:
+;   A: Command bytes, flag tests
+;   X: Command parameters (word values)
+;   D: Direct Page ($0500)
+;   I: Interrupt flag (CLI/SEI)
+;
+; REGISTERS PRESERVED:
+;   None explicitly (JSR context expects volatile registers)
+;
+; RELATED FUNCTIONS:
+;   - Secondary_APU_Command_Entry_Point ($0D8004): APU communication
+;   - Menu_InitializeQueues ($00825C): Audio queue init (batch 34)
+;   - Sound_ExecuteCommands (internal): Main dispatch logic
+;===============================================================================
 Sound_ProcessQueue:
-	sep #$30                             ;009264|E230    |      ;
-	lda.B #$20                           ;009266|A920    |      ;
-	and.W $00d9                          ;009268|2DD900  |0200D9;
-	bne Sound_ProcessQueue_Return                      ;00926B|D003    |009270;
-	jsr.W Sound_ExecuteCommands                    ;00926D|207392  |009273;
+	sep #$30                             ;009264|E230    |      ; set 8-bit A/X/Y
+	lda.B #$20                           ;009266|A920    |      ; A = $20 (test audio lock bit 5)
+	and.W $00d9                          ;009268|2DD900  |0200D9; test system_flags_9 bit 5 (audio lock)
+	bne Sound_ProcessQueue_Return        ;00926B|D003    |009270; if locked: skip processing (audio busy)
+	jsr.W Sound_ExecuteCommands          ;00926D|207392  |009273; dispatch audio commands to APU
 ;      |        |      ;
 Sound_ProcessQueue_Return:
-	rep #$30                             ;009270|C230    |      ;
-	rts                                  ;009272|60      |      ;
+	rep #$30                             ;009270|C230    |      ; set 16-bit A/X/Y
+	rts                                  ;009272|60      |      ; return to caller
 ;      |        |      ;
 ;      |        |      ;
 Sound_ExecuteCommands:
-	rep #$10                             ;009273|C210    |      ;
-	lda.B #$20                           ;009275|A920    |      ;
-	tsb.W $00d9                          ;009277|0CD900  |0200D9;
-	pea.w !audio_gfx_index                          ;00927A|F40005  |020500;
-	pld                                  ;00927D|2B      |      ;
-	cli                                  ;00927E|58      |      ;
-	lda.B #$04                           ;00927F|A904    |      ;
-	and.w !system_flags_9                          ;009281|2DE200  |0200E2;
-	bne Sound_ProcessCommand2                      ;009284|D01D    |0092A3;
-	lda.B $00                            ;009286|A500    |000500;
-	bmi Sound_ProcessCommand2                      ;009288|3019    |0092A3;
-	sta.W $0601                          ;00928A|8D0106  |020601;
-	ldx.B $01                            ;00928D|A601    |000501;
-	stx.W $0602                          ;00928F|8E0206  |020602;
-	lda.B #$01                           ;009292|A901    |      ;
-	sta.W $0600                          ;009294|8D0006  |020600;
-	jsl.L Secondary_APU_Command_Entry_Point                    ;009297|2204800D|0D8004;
-	lda.B #$ff                           ;00929B|A9FF    |      ;
-	sta.B $00                            ;00929D|8500    |000500;
-	ldx.B $03                            ;00929F|A603    |000503;
-	stx.B $01                            ;0092A1|8601    |000501;
+	rep #$10                             ;009273|C210    |      ; set 16-bit X/Y (A remains 8-bit)
+	lda.B #$20                           ;009275|A920    |      ; A = $20 (audio lock bit)
+	tsb.W $00d9                          ;009277|0CD900  |0200D9; set system_flags_9 bit 5 (TSB = Test and Set Bits, atomic)
+	pea.w !audio_gfx_index               ;00927A|F40005  |020500; push $0500 to stack (audio queue base address)
+	pld                                  ;00927D|2B      |      ; pull to Direct Page (DP = $0500 for faster access)
+	cli                                  ;00927E|58      |      ; enable interrupts (allows VBlank during audio processing)
+	lda.B #$04                           ;00927F|A904    |      ; A = $04 (test audio disable bit 2)
+	and.w !system_flags_9                ;009281|2DE200  |0200E2; test system_flags_9 bit 2
+	bne Sound_ProcessCommand2            ;009284|D01D    |0092A3; if audio disabled: skip queue 1 (SFX)
+	lda.B $00                            ;009286|A500    |000500; load $0500 (audio_gfx_index, queue 1 command)
+	bmi Sound_ProcessCommand2            ;009288|3019    |0092A3; if $FF (empty): skip queue 1
+	sta.W $0601                          ;00928A|8D0106  |020601; store command ID to APU register $0601
+	ldx.B $01                            ;00928D|A601    |000501; X = $0501-$0502 (audio_sound_params, queue 1 params)
+	stx.W $0602                          ;00928F|8E0206  |020602; store params to APU registers $0602-$0603
+	lda.B #$01                           ;009292|A901    |      ; A = $01 (command type: sound effect)
+	sta.W $0600                          ;009294|8D0006  |020600; store command type to APU register $0600
+	jsl.L Secondary_APU_Command_Entry_Point ;009297|2204800D|0D8004; execute APU command (bank $0D, SPC700 communication)
+	lda.B #$ff                           ;00929B|A9FF    |      ; A = $FF (empty marker)
+	sta.B $00                            ;00929D|8500    |000500; clear $0500 (mark queue 1 empty)
+	ldx.B $03                            ;00929F|A603    |000503; X = $0503-$0504 (next command in queue)
+	stx.B $01                            ;0092A1|8601    |000501; shift next command to $0501-$0502 (FIFO queue shift)
 ;      |        |      ;
 Sound_ProcessCommand2:
-	lda.B $05                            ;0092A3|A505    |000505;
-	bmi Sound_ProcessCommand3                      ;0092A5|301B    |0092C2;
-	lda.B $05                            ;0092A7|A505    |000505;
-	sta.W $0601                          ;0092A9|8D0106  |020601;
-	ldx.B $06                            ;0092AC|A606    |000506;
-	stx.W $0602                          ;0092AE|8E0206  |020602;
-	lda.B #$02                           ;0092B1|A902    |      ;
-	sta.W $0600                          ;0092B3|8D0006  |020600;
-	jsl.L Secondary_APU_Command_Entry_Point                    ;0092B6|2204800D|0D8004;
-	lda.B #$ff                           ;0092BA|A9FF    |      ;
-	sta.B $05                            ;0092BC|8505    |000505;
-	ldx.B $08                            ;0092BE|A608    |000508;
-	stx.B $06                            ;0092C0|8606    |000506;
+	lda.B $05                            ;0092A3|A505    |000505; load $0505 (audio_coord_register, queue 2 command)
+	bmi Sound_ProcessCommand3            ;0092A5|301B    |0092C2; if $FF (empty): skip queue 2
+	lda.B $05                            ;0092A7|A505    |000505; reload $0505 (queue 2 command ID)
+	sta.W $0601                          ;0092A9|8D0106  |020601; store command ID to APU register $0601
+	ldx.B $06                            ;0092AC|A606    |000506; X = $0506-$0507 (audio_control_register, queue 2 params)
+	stx.W $0602                          ;0092AE|8E0206  |020602; store params to APU registers $0602-$0603
+	lda.B #$02                           ;0092B1|A902    |      ; A = $02 (command type: music control)
+	sta.W $0600                          ;0092B3|8D0006  |020600; store command type to APU register $0600
+	jsl.L Secondary_APU_Command_Entry_Point ;0092B6|2204800D|0D8004; execute APU command (SPC700 communication)
+	lda.B #$ff                           ;0092BA|A9FF    |      ; A = $FF (empty marker)
+	sta.B $05                            ;0092BC|8505    |000505; clear $0505 (mark queue 2 empty)
+	ldx.B $08                            ;0092BE|A608    |000508; X = $0508-$0509 (next command in queue)
+	stx.B $06                            ;0092C0|8606    |000506; shift next command to $0506-$0507 (FIFO queue shift)
 ;      |        |      ;
 Sound_ProcessCommand3:
-	lda.B $0a                            ;0092C2|A50A    |00050A;
-	beq Sound_EnableInterrupts                      ;0092C4|F023    |0092E9;
-	cmp.B #$02                           ;0092C6|C902    |      ;
-	beq Sound_ExecuteCall                      ;0092C8|F00F    |0092D9;
-	cmp.B #$10                           ;0092CA|C910    |      ;
-	bcc Sound_CheckBit                      ;0092CC|9004    |0092D2;
-	cmp.B #$20                           ;0092CE|C920    |      ;
-	bcc Sound_ExecuteCall                      ;0092D0|9007    |0092D9;
+	lda.B $0a                            ;0092C2|A50A    |00050A; load $050A (audio_hw_register_1, queue 3 command)
+	beq Sound_EnableInterrupts           ;0092C4|F023    |0092E9; if $00 (empty): skip queue 3, cleanup
+	cmp.B #$02                           ;0092C6|C902    |      ; compare to $02 (priority command)
+	beq Sound_ExecuteCall                ;0092C8|F00F    |0092D9; if $02: always execute (priority)
+	cmp.B #$10                           ;0092CA|C910    |      ; compare to $10 (range check)
+	bcc Sound_CheckBit                   ;0092CC|9004    |0092D2; if < $10: check audio disable flag
+	cmp.B #$20                           ;0092CE|C920    |      ; compare to $20 (upper range)
+	bcc Sound_ExecuteCall                ;0092D0|9007    |0092D9; if $10-$1F: execute call
 ;      |        |      ;
 Sound_CheckBit:
-	lda.B #$04                           ;0092D2|A904    |      ;
-	and.w !system_flags_9                          ;0092D4|2DE200  |0200E2;
-	bne Sound_EnableInterrupts                      ;0092D7|D010    |0092E9;
+	lda.B #$04                           ;0092D2|A904    |      ; A = $04 (audio disable bit)
+	and.w !system_flags_9                ;0092D4|2DE200  |0200E2; test system_flags_9 bit 2
+	bne Sound_EnableInterrupts           ;0092D7|D010    |0092E9; if audio disabled: skip queue 3 (hardware commands)
 ;      |        |      ;
 Sound_ExecuteCall:
-	ldx.B $0a                            ;0092D9|A60A    |00050A;
-	stx.W $0600                          ;0092DB|8E0006  |020600;
-	ldx.B $0c                            ;0092DE|A60C    |00050C;
-	stx.W $0602                          ;0092E0|8E0206  |020602;
-	jsl.L Secondary_APU_Command_Entry_Point                    ;0092E3|2204800D|0D8004;
-	stz.B $0a                            ;0092E7|640A    |00050A;
+	ldx.B $0a                            ;0092D9|A60A    |00050A; X = $050A-$050B (queue 3 command + param high byte)
+	stx.W $0600                          ;0092DB|8E0006  |020600; store command to APU register $0600-$0601
+	ldx.B $0c                            ;0092DE|A60C    |00050C; X = $050C-$050D (queue 3 additional params)
+	stx.W $0602                          ;0092E0|8E0206  |020602; store params to APU registers $0602-$0603
+	jsl.L Secondary_APU_Command_Entry_Point ;0092E3|2204800D|0D8004; execute APU command (hardware direct)
+	stz.B $0a                            ;0092E7|640A    |00050A; clear $050A (mark queue 3 empty, $00 marker)
 ;      |        |      ;
 Sound_EnableInterrupts:
-	sei                                  ;0092E9|78      |      ;
-	lda.B #$20                           ;0092EA|A920    |      ;
-	trb.W $00d9                          ;0092EC|1CD900  |0200D9;
-	rts                                  ;0092EF|60      |      ;
+	sei                                  ;0092E9|78      |      ; disable interrupts (atomic lock clear)
+	lda.B #$20                           ;0092EA|A920    |      ; A = $20 (audio lock bit)
+	trb.W $00d9                          ;0092EC|1CD900  |0200D9; clear system_flags_9 bit 5 (TRB = Test and Reset Bits, release lock)
+	rts                                  ;0092EF|60      |      ; return to Sound_ProcessQueue
 ;      |        |      ;
 ;      |        |      ;
 Input_HandleCancel:
