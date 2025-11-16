@@ -20607,7 +20607,7 @@ Item_ItemUsable:
 	lda.B $58                            ;00DC67|A558    |0000B6;
 	sbc.B $5c                            ;00DC69|E55C    |0000BA;
 	tax                                  ;00DC6B|AA      |      ;
-	lda.W DATA8_00ddb3,x                 ;00DC6C|BDB3DD  |00DDB3;
+	lda.W Item_ProcessingJumpTable,x    ;00DC6C|BDB3DD  |00DDB3; Load handler address by index
 	sta.B $6e                            ;00DC6F|856E    |0000CC;
 	lda.B $55                            ;00DC71|A555    |0000B3;
 	and.W #$00ff                         ;00DC73|29FF00  |      ;
@@ -20696,8 +20696,9 @@ Graphics_RenderTile:
 	plp                                  ;00DDB1|28      |      ;
 	rts                                  ;00DDB2|60      |      ;
 ;      |        |      ;
-;      |        |      ;
-DATA8_00ddb3:
+; Item processing jump table (30 entries)
+; Indexed by ($58 - $5c) to dispatch item handler routines
+Item_ProcessingJumpTable:
 	db $98,$dd,$8f,$dd,$86,$dd,$7d,$dd,$74,$dd,$6b,$dd,$62,$dd,$59,$dd;00DDB3|        |      ;
 	db $50,$dd,$47,$dd,$3e,$dd,$35,$dd,$2c,$dd,$23,$dd,$1a,$dd,$11,$dd;00DDC3|        |      ;
 	db $08,$dd,$ff,$dc                   ;00DDD3|        |      ;
@@ -20776,7 +20777,7 @@ Graphics_ProcessSprite:
 	lda.W $00b8                          ;00DE6D|ADB800  |0000B8;
 	asl a;00DE70|0A      |      ;
 	tax                                  ;00DE71|AA      |      ;
-	lda.W DATA8_00df15,x                 ;00DE72|BD15DF  |00DF15;
+	lda.W Graphics_TileBitmaskTable,x    ;00DE72|BD15DF  |00DF15; Load 16-bit bitmask
 	sta.B $07                            ;00DE75|8507    |001F9D;
 	eor.W #$ffff                         ;00DE77|49FFFF  |      ;
 	sta.B $05                            ;00DE7A|8505    |001F9B;
@@ -20876,7 +20877,9 @@ Graphics_TileDrawComplete:
 	db $80                               ;00DF0E|        |00DED0;
 	db $c0,$e0,$f0,$f8,$fc,$fe           ;00DF0F|        |      ;
 ;      |        |      ;
-DATA8_00df15:
+; Graphics tile bitmask lookup table (16 entries)
+; 16-bit masks indexed by tile position, used for bitwise operations
+Graphics_TileBitmaskTable:
 	db $ff,$ff,$7f,$7f,$3f,$3f,$1f,$1f,$0f,$0f,$07,$07,$03,$03,$01,$01;00DF15|        |      ;
 ;      |        |      ;
 Graphics_TileJumpTable:
@@ -21101,7 +21104,7 @@ Dialog_CheckCommand:
 Dialog_DispatchCommand:
 	asl a;00E092|0A      |      ;
 	tax                                  ;00E093|AA      |      ;
-	jsr.W (DATA8_00e1ca,x)               ;00E094|FCCAE1  |00E1CA;
+	jsr.W (Dialog_CommandJumpTable1,x)   ;00E094|FCCAE1  |00E1CA; Dispatch to command handler
 	rep #$30                             ;00E097|C230    |      ;
 	rts                                  ;00E099|60      |      ;
 ;      |        |      ;
@@ -21275,8 +21278,9 @@ Dialog_ClearQueue:
 	tcd                                  ;00E1C8|5B      |      ;
 	rts                                  ;00E1C9|60      |      ;
 ;      |        |      ;
-;      |        |      ;
-DATA8_00e1ca:
+; Dialog command dispatch jump table (used with JSR)
+; Indexed by command × 2, dispatches to command handler routines
+Dialog_CommandJumpTable1:
 	db $78,$a3,$9f,$e0,$9a,$e0,$9c,$a3   ;00E1CA|        |      ;
 	db $54,$b3                           ;00E1D2|        |      ;
 	db $56,$e4,$62,$e4,$08,$a7,$55,$a7,$3f,$a8,$19,$a5,$f5,$a3,$58,$a9;00E1D4|        |      ;
@@ -21294,7 +21298,9 @@ DATA8_00e1ca:
 	db $a9,$a0                           ;00E21A|        |      ;
 	db $b5,$ae,$79,$b3,$c7,$ae,$55,$b3,$74,$a0,$63,$a5,$6e,$a0;00E21C|        |      ;
 ;      |        |      ;
-DATA8_00e22a:
+; Dialog command dispatch jump table (used with JMP)
+; Indexed by command × 2, dispatches to command handler routines
+Dialog_CommandJumpTable2:
 	db $42,$a3                           ;00E22A|        |      ;
 	db $ab,$a3                           ;00E22C|        |      ;
 	db $1e,$a5                           ;00E22E|        |      ;
@@ -21394,7 +21400,7 @@ DATA8_00e22a:
 	and.W #$00ff                         ;00E45A|29FF00  |      ;
 	asl a;00E45D|0A      |      ;
 	tax                                  ;00E45E|AA      |      ;
-	jmp.W (DATA8_00e22a,x)               ;00E45F|7C2AE2  |00E22A;
+	jmp.W (Dialog_CommandJumpTable2,x)   ;00E45F|7C2AE2  |00E22A; Indexed jump to command handler
 ;      |        |      ;
 	lda.W #$0020                         ;00E462|A92000  |      ;
 	and.w !system_flags_5                          ;00E465|2DDA00  |0000DA;
