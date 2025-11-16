@@ -21783,10 +21783,10 @@ Graphics_DrawPixel:
 	lda.B $60                            ;00E963|A560    |0000BE;
 	asl a;00E965|0A      |      ;
 	tay                                  ;00E966|A8      |      ;
-	lda.W DATA8_00eac1,x                 ;00E967|BDC1EA  |00EAC1;
-	and.W DATA8_00eb5a,y                 ;00E96A|395AEB  |00EB5A;
+	lda.W Graphics_PixelMask_Set,x       ;00E967|BDC1EA  |00EAC1; Load pixel set mask
+	and.W Graphics_Line_ColorMask,y      ;00E96A|395AEB  |00EB5A; Mask with color
 	sta.B $06                            ;00E96D|8506    |000064;
-	lda.W DATA8_00eab1,x                 ;00E96F|BDB1EA  |00EAB1;
+	lda.W Graphics_PixelMask_Clear,x     ;00E96F|BDB1EA  |00EAB1; Load pixel clear mask
 	sta.B $04                            ;00E972|8504    |000062;
 	jsr.W Graphics_CalcScreenAddr                    ;00E974|2062EB  |00EB62;
 	tax                                  ;00E977|AA      |      ;
@@ -21854,10 +21854,10 @@ Graphics_Pixel_CalcAddr:
 	lda.B $60                            ;00EA81|A560    |0000BE;
 	asl a;00EA83|0A      |      ;
 	tay                                  ;00EA84|A8      |      ;
-	lda.W DATA8_00eac1,x                 ;00EA85|BDC1EA  |00EAC1;
-	and.W DATA8_00eb5a,y                 ;00EA88|395AEB  |00EB5A;
+	lda.W Graphics_PixelMask_Set,x       ;00EA85|BDC1EA  |00EAC1; Load pixel set mask
+	and.W Graphics_Line_ColorMask,y      ;00EA88|395AEB  |00EB5A; Mask with color
 	sta.B $06                            ;00EA8B|8506    |000064;
-	lda.W DATA8_00eab1,x                 ;00EA8D|BDB1EA  |00EAB1;
+	lda.W Graphics_PixelMask_Clear,x     ;00EA8D|BDB1EA  |00EAB1; Load pixel clear mask
 	sta.B $04                            ;00EA90|8504    |000062;
 	jsr.W Graphics_CalcScreenAddr                    ;00EA92|2062EB  |00EB62;
 	tax                                  ;00EA95|AA      |      ;
@@ -21879,11 +21879,12 @@ Graphics_Pixel_Store:
 	bpl Graphics_Pixel_Store                      ;00EAAE|10ED    |00EA9D;
 	rts                                  ;00EAB0|60      |      ;
 ;      |        |      ;
-;      |        |      ;
-DATA8_00eab1:
+; Graphics pixel bitmask tables (16 entries each)
+; Used for line drawing operations - indexed by pixel position (0-7) × 2
+Graphics_PixelMask_Clear:
 	db $7f,$7f,$bf,$bf,$df,$df,$ef,$ef,$f7,$f7,$fb,$fb,$fd,$fd,$fe,$fe;00EAB1|        |      ;
 ;      |        |      ;
-DATA8_00eac1:
+Graphics_PixelMask_Set:
 	db $80,$80,$40,$40,$20,$20,$10,$10,$08,$08,$04,$04,$02,$02,$01,$01;00EAC1|        |      ;
 ;      |        |      ;
 Graphics_Line_Vertical:
@@ -21892,7 +21893,7 @@ Graphics_Line_Vertical:
 	lda.B $60                            ;00EAD5|A560    |0000BE;
 	asl a;00EAD7|0A      |      ;
 	tax                                  ;00EAD8|AA      |      ;
-	lda.W DATA8_00eb5a,x                 ;00EAD9|BD5AEB  |00EB5A;
+	lda.W Graphics_Line_ColorMask,x      ;00EAD9|BD5AEB  |00EB5A; Load color mask
 	sta.B $04                            ;00EADC|8504    |000062;
 	jsr.W Graphics_CalcScreenAddr                    ;00EADE|2062EB  |00EB62;
 	tax                                  ;00EAE1|AA      |      ;
@@ -21900,10 +21901,10 @@ Graphics_Line_Vertical:
 	and.W #$0007                         ;00EAE4|290700  |      ;
 	asl a;00EAE7|0A      |      ;
 	tay                                  ;00EAE8|A8      |      ;
-	lda.W DATA8_00eb36,y                 ;00EAE9|B936EB  |00EB36;
+	lda.W Graphics_Line_LeftMask,y       ;00EAE9|B936EB  |00EB36; Load left edge mask
 	and.B $04                            ;00EAEC|2504    |000062;
 	sta.B $06                            ;00EAEE|8506    |000064;
-	lda.W DATA8_00eb48,y                 ;00EAF0|B948EB  |00EB48;
+	lda.W Graphics_Line_LeftInvert,y     ;00EAF0|B948EB  |00EB48; Load left invert mask
 	and.L $7f2000,x                      ;00EAF3|3F00207F|7F2000;
 	ora.B $06                            ;00EAF7|0506    |000064;
 	sta.L $7f2000,x                      ;00EAF9|9F00207F|7F2000;
@@ -21931,29 +21932,30 @@ Graphics_Line_PlotPixel:
 	and.W #$0007                         ;00EB1C|290700  |      ;
 	asl a;00EB1F|0A      |      ;
 	tay                                  ;00EB20|A8      |      ;
-	lda.W DATA8_00eb4a,y                 ;00EB21|B94AEB  |00EB4A;
+	lda.W Graphics_Line_RightMask,y      ;00EB21|B94AEB  |00EB4A; Load right edge mask
 	and.B $04                            ;00EB24|2504    |000062;
 	sta.B $06                            ;00EB26|8506    |000064;
-	lda.W DATA8_00eb38,y                 ;00EB28|B938EB  |00EB38;
+	lda.W Graphics_Line_RightInvert,y    ;00EB28|B938EB  |00EB38; Load right invert mask
 	and.L $7f2000,x                      ;00EB2B|3F00207F|7F2000;
 	ora.B $06                            ;00EB2F|0506    |000064;
 	sta.L $7f2000,x                      ;00EB31|9F00207F|7F2000;
 	rts                                  ;00EB35|60      |      ;
 ;      |        |      ;
-;      |        |      ;
-DATA8_00eb36:
+; Graphics line drawing edge bitmask tables
+; Used for vertical line rendering - indexed by pixel position (0-7) × 2
+Graphics_Line_LeftMask:
 	db $ff,$ff                           ;00EB36|        |      ;
 ;      |        |      ;
-DATA8_00eb38:
+Graphics_Line_RightInvert:
 	db $7f,$7f,$3f,$3f,$1f,$1f,$0f,$0f,$07,$07,$03,$03,$01,$01,$00,$00;00EB38|        |      ;
 ;      |        |      ;
-DATA8_00eb48:
+Graphics_Line_LeftInvert:
 	db $00,$00                           ;00EB48|        |      ;
 ;      |        |      ;
-DATA8_00eb4a:
+Graphics_Line_RightMask:
 	db $80,$80,$c0,$c0,$e0,$e0,$f0,$f0,$f8,$f8,$fc,$fc,$fe,$fe,$ff,$ff;00EB4A|        |      ;
 ;      |        |      ;
-DATA8_00eb5a:
+Graphics_Line_ColorMask:
 	db $00,$00,$ff,$00,$00,$ff,$ff,$ff   ;00EB5A|        |      ;
 ;      |        |      ;
 Graphics_CalcScreenAddr:
