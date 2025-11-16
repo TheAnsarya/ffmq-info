@@ -837,7 +837,7 @@ Sprite_UpdatePalette:
 	rts                                  ;0C8658|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0c8659:
+Animation_OAMConfigTable:
 	db $00,$04,$04,$00,$00,$08,$08,$08,$0c,$40,$40,$44,$44,$00,$00,$00;0C8659|        |      ;
 	db $06,$00,$02,$00,$08,$00,$04,$00,$02,$08,$01,$68,$80,$01,$80,$01;0C8669|        |      ;
 	db $80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01;0C8679|        |      ;
@@ -984,7 +984,7 @@ Decompress_LiteralMode:
 	rts                                  ;0C88AF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0c88b0:
+Mode7_TileIndexTable:
 	db $11,$15,$15,$11,$11,$19,$19,$19,$1d,$51,$51,$55,$55,$11;0C88B0|        |      ;
 ;      |        |      ;
 LoadWorldMapTiles:
@@ -1680,10 +1680,10 @@ HDMA_Complete:
 	db $a2,$a7,$ad,$9e,$a7,$9d,$a8,$00   ;0C8F0B|        |      ;
 	db $00                               ;0C8F13|        |      ;
 ;      |        |      ;
-DATA8_0c8f14:
+WorldMap_NintendoLogo1:
 	db $01                               ;0C8F14|        |      ;
 ;      |        |      ;
-DATA8_0c8f15:
+WorldMap_NintendoLogoData:
 	db $00,$02,$01,$01,$02,$01,$02,$02,$01,$03,$02,$01,$04,$02,$01,$05;0C8F15|        |      ;
 	db $02,$01,$06,$02,$01,$07,$02,$01,$08,$02,$01,$09,$02,$01,$0a,$02;0C8F25|        |      ;
 	db $01,$0b,$02,$01,$0c,$02,$01,$09,$02,$01,$0d,$02,$01,$0e,$0e,$03;0C8F35|        |      ;
@@ -3347,7 +3347,7 @@ Animation_DeadCode_GraphicsLoad:  ; Dead code - graphics loading sequence (orpha
 	db $0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a,$0a;0CD4D0|        |      ;
 	db $0a,$0a,$0a,$0a                   ;0CD4E0|        |      ;
 ;      |        |      ;
-DATA8_0cd4e4:
+Animation_FrameOffsetTable:
 	db $00,$00,$01,$00,$02,$00,$17,$00,$35,$00,$47,$00,$55,$00,$63,$00;0CD4E4|        |      ;
 	db $75,$00,$83,$00,$91,$00,$22,$01,$42,$01,$58,$01;0CD4F4|        |      ;
 ;      |        |      ;
@@ -3397,15 +3397,15 @@ Animation_DeadCode_SequenceOffset2:  ; Dead code - animation sequence offset (or
 	db $01,$00,$02                       ;0CD681|        |000000;
 	db $00,$03                           ;0CD684|        |      ;
 ;      |        |      ;
-DATA8_0cd686:
+Animation_SequenceOffsetTable:
 	db $00,$00,$07,$00,$26,$00,$3d,$00   ;0CD686|        |      ;
 	db $55,$00                           ;0CD68E|        |000000;
 	db $6d,$00,$84,$00                   ;0CD690|        |      ;
 ;      |        |      ;
-DATA8_0cd694:
+Animation_SequenceTerminator1:
 	db $ff                               ;0CD694|        |      ;
 ;      |        |      ;
-DATA8_0cd695:
+Animation_SequenceData:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$0c,$05,$00,$00,$00,$01,$00,$00,$ff;0CD695|        |      ;
 	db $0c,$05,$00,$00,$01,$02,$01,$00,$ff,$0c,$05,$00,$01,$02,$03,$02;0CD6A5|        |      ;
 	db $01,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$0a,$0d,$08,$09,$0a;0CD6B5|        |      ;
@@ -3418,15 +3418,15 @@ DATA8_0cd695:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$04,$05,$0c;0CD711|        |      ;
 	db $0d,$0e,$0f,$0e,$0d,$ff           ;0CD721|        |      ;
 ;      |        |      ;
-DATA8_0cd727:
+Animation_PatternOffsetTable:
 	db $00,$00,$07,$00                   ;0CD727|        |      ;
 	db $26,$00                           ;0CD72B|        |000000;
 	db $3f,$00                           ;0CD72D|        |      ;
 ;      |        |      ;
-DATA8_0cd72f:
+Animation_PatternTerminator:
 	db $ff                               ;0CD72F|        |      ;
 ;      |        |      ;
-DATA8_0cd730:
+Animation_PatternData:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$14,$01,$21,$31,$ff,$14,$01,$22,$32,$ff;0CD730|        |      ;
 	db $ff,$14,$01,$24,$34,$ff,$14,$01,$25,$35,$ff,$14,$01,$26,$36,$ff;0CD740|        |      ;
 	db $14,$01,$27,$37,$ff               ;0CD750|        |      ;
@@ -3824,10 +3824,10 @@ DATA8_0cd730:
 	db $61,$b1,$50,$1e,$0c,$2a,$ad,$a5,$20,$a8,$00,$88,$82,$d2,$06,$56;0CEF65|        |      ;
 	db $54,$54,$50,$d0,$42,$4a,$aa,$8a,$53,$73,$25,$a1,$aa,$2f,$b5,$55;0CEF75|        |      ;
 ;      |        |      ;
-DATA8_0cef85:
+Animation_TilePatternDefault:
 	db $d7,$d7,$d7,$d7                   ;0CEF85|        |      ;
 ;      |        |      ;
-DATA8_0cef89:
+Animation_TilePatternTable:
 	db $55                               ;0CEF89|        |      ;
 	db $00                               ;0CEF8A|        |      ;
 	db $20,$21,$22,$23,$55               ;0CEF8B|        |      ;
