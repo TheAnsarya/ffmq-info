@@ -7684,32 +7684,444 @@ Stack_IndirectJump:
 	plb                                  ;0097D8|AB      |      ; restore Data Bank register from stack
 	rti                                  ;0097D9|40      |      ; return from interrupt (pops P, PC low/mid/bank from stack → jump to target)
 ;      |        |      ;
-;      |        |      ;
+;===============================================================================
+; Bitfield_PrepareAccess - Convert Bit Index to Byte Offset + Inverted Bit Position
+;===============================================================================
+; ADDRESS:  $0097DA (Bank $00)
+; LENGTH:   24 bytes ($0097F2 - $0097DA = $18 bytes = 24 decimal)
+; TYPE:     Subroutine (PHP/PLP bracketed, returns via fall-through to caller)
+;
+; PURPOSE:
+;   Helper function for bitfield operations that converts a linear bit index
+;   (0-255) into byte offset + bit position within byte. Updates Direct Page
+;   register to point to the target byte and returns inverted bit position
+;   (0-7, inverted) for use with bit manipulation instructions.
+;   
+;   Used by bitfield manipulation functions:
+;   - Bitfield_SetBits: Set bits to 1 using TSB
+;   - Bitfield_ClearBits: Clear bits to 0 using TRB
+;   - Bitfield_TestBits: Test if bits are set using AND
+;   
+;   This function provides the address calculation and bit position lookup
+;   needed for atomic bit operations on large bitfields (quest flags, character
+;   progression, feature unlocks, etc.)
+;
+; ALGORITHM: Divide Bit Index into Byte Offset + Bit Position
+;
+;   Input: A = bit index (0-255, which bit in the bitfield)
+;          D = base address of bitfield
+;   
+;   Steps:
+;   1. Extract byte offset: bit_index ÷ 8 (shift right 3 positions)
+;   2. Extract bit position: bit_index mod 8 (mask lowest 3 bits)
+;   3. Invert bit position: 7 - bit_pos (for SNES bit numbering)
+;   4. Update Direct Page: D = D + byte_offset (point to target byte)
+;   5. Return inverted bit position in A
+;   
+;   Example: Bit index 19
+;     Byte offset: 19 ÷ 8 = 2 (third byte, offset +2)
+;     Bit position: 19 mod 8 = 3 (bit 3 within byte)
+;     Inverted: 7 - 3 = 4 (SNES bit numbering)
+;     Direct Page: D + 2 (points to byte containing bit 19)
+;     Return: A = 4 (inverted bit position for bitmask lookup)
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     A: Bit index (8-bit, range 0-255)
+;       Example: 19 = bit 19 in the bitfield (byte 2, bit 3)
+;     
+;     D: Direct Page = Base address of bitfield
+;       Example: $1000 = bitfield starts at $1000
+;   
+;   OUTPUT:
+;     A: Inverted bit position within byte (0-7, inverted for SNES)
+;       Formula: 7 - (bit_index mod 8)
+;       Example: bit 19 → (19 mod 8) = 3 → 7-3 = 4
+;     
+;     D: Direct Page = Base address + byte offset
+;       Formula: original_D + (bit_index ÷ 8)
+;       Example: $1000 + (19 ÷ 8) = $1000 + 2 = $1002
+;     
+;     P: Preserved via PHP/PLP (processor status restored)
+;     X, Y: Not modified (preserved implicitly)
+;
+; CALL SEQUENCE EXAMPLE:
+;
+;   ; Set bit 19 in quest flags bitfield at $7E1000
+;   lda #19                  ; A = bit index 19
+;   ldy #$1000              ; D will be set to $1000 (base address)
+;   tyd                      ; Transfer Y to Direct Page
+;   jsr Bitfield_PrepareAccess
+;   ; Returns: D = $1002 (points to byte 2)
+;   ;          A = 4 (inverted bit position)
+;   jsr Bitfield_GetBitmask  ; Get bitmask for bit position 4
+;   ; Returns: A = $0010 (bitmask for bit 4)
+;   tsb $00                  ; Set bit in byte at D+$00 (atomic)
+;
+; WHY INVERT BIT POSITION (7 - bit_pos):
+;
+;   SNES bit numbering convention:
+;     Bit 0 = rightmost (LSB, least significant bit)
+;     Bit 7 = leftmost (MSB, most significant bit)
+;   
+;   Bitfield layout in memory (byte 0):
+;     Bit index:  7  6  5  4  3  2  1  0
+;     Position:  [7][6][5][4][3][2][1][0]
+;     Bitmask:   $80$40$20$10$08$04$02$01
+;   
+;   Without inversion:
+;     Bit index 0 → bit position 0 → bitmask $01 ✓
+;     Bit index 7 → bit position 7 → bitmask $80 ✓
+;   
+;   With inversion (this function):
+;     Bit index 0 → 7-0=7 → lookup[7] = $80 (incorrect!)
+;     Purpose unclear, may be for specific FFMQ bitfield layout
+;   
+;   Actually, the inversion likely compensates for a reversed bitfield
+;   storage order in FFMQ's data structures. The game may store bitfields
+;   with bit 0 on the left (MSB position) instead of right (LSB position).
+;
+; PERFORMANCE:
+;
+;   Total: ~55 cycles (~20μs @ 2.68MHz)
+;     - PHP: 3 cycles
+;     - REP #$30: 3 cycles
+;     - AND #$00FF: 3 cycles
+;     - PHA: 4 cycles
+;     - LSR × 3: 6 cycles (3× 2 cycles)
+;     - PHD: 4 cycles
+;     - CLC: 2 cycles
+;     - ADC: 4 cycles
+;     - TCD: 2 cycles
+;     - PLA × 2: 10 cycles (2× 5 cycles)
+;     - AND #$0007: 3 cycles
+;     - EOR #$0007: 3 cycles
+;     - PLP: 4 cycles
+;     Total: ~51 cycles
+;   
+;   Compared to manual calculation:
+;     This function: ~51 cycles (reusable helper)
+;     Manual inline: ~30 cycles (but duplicated code)
+;     Trade-off: Simplicity and code reuse vs raw speed
+;
+; STACK MANIPULATION DETAILS:
+;
+;   Stack usage pattern:
+;     1. PHP: Save P register (3 bytes)
+;     2. PHA: Save original A (bit index, 2 bytes in 16-bit mode)
+;     3. PHD: Save original D (Direct Page, 2 bytes)
+;     4. ...calculations...
+;     5. PLA: Discard saved D (we modified D intentionally)
+;     6. PLA: Restore original A (need for bit position calculation)
+;     7. PLP: Restore P register
+;   
+;   Why save then discard D?
+;     PHD saves original D for potential restoration
+;     But function intentionally modifies D (output parameter)
+;     PLA discards saved D (we want modified D to persist)
+;   
+;   Why save A twice (PHA before PHD)?
+;     First PHA: Save bit index for byte offset calculation
+;     After LSR×3: A contains byte offset
+;     ADC with saved value: byte_offset + original_D = new_D
+;     Second PLA: Restore original bit index for bit position calc
+;
+; BYTE OFFSET CALCULATION (LSR × 3):
+;
+;   Goal: Calculate bit_index ÷ 8 (which byte in bitfield)
+;   
+;   Bit index to byte offset mapping:
+;     Bits 0-7   → Byte 0 (offset 0)
+;     Bits 8-15  → Byte 1 (offset 1)
+;     Bits 16-23 → Byte 2 (offset 2)
+;     Bits 24-31 → Byte 3 (offset 3)
+;     ...etc...
+;   
+;   Division by 8 = shift right 3 positions:
+;     LSR A (shift right 1) ÷ 2
+;     LSR A (shift right 2) ÷ 4
+;     LSR A (shift right 3) ÷ 8
+;   
+;   Example: bit_index = 19 = %00010011
+;     After LSR: %00001001 (÷ 2 = 9)
+;     After LSR: %00000100 (÷ 4 = 4)
+;     After LSR: %00000010 (÷ 8 = 2) → byte offset = 2 ✓
+;
+; BIT POSITION CALCULATION (AND + EOR):
+;
+;   Goal: Calculate (bit_index mod 8), then invert
+;   
+;   Modulo 8 = mask lowest 3 bits:
+;     AND #$0007 extracts bits 0-2 (range 0-7)
+;   
+;   Example: bit_index = 19 = %00010011
+;     AND #$0007 = %00000011 = 3 (bit position within byte)
+;   
+;   Inversion (7 - bit_pos):
+;     EOR #$0007 flips lowest 3 bits
+;     Example: 3 = %011, EOR %111 = %100 = 4
+;     Verification: 7 - 3 = 4 ✓
+;   
+;   Why EOR instead of subtract?
+;     EOR #$0007 is equivalent to (7 - x) for x in range 0-7
+;     Faster than SEC + SBC (2 cycles vs 4 cycles)
+;     No carry flag manipulation needed
+;
+; DIRECT PAGE UPDATE (TCD):
+;
+;   Direct Page (D register) = base address for zero-page-like access
+;   
+;   Before: D = $1000 (bitfield base address)
+;   After:  D = $1002 (points to byte containing target bit)
+;   
+;   Allows caller to use zero-page addressing:
+;     LDA $00  ; Loads from address D+$00 = $1002
+;     TSB $00  ; Test and Set Bits at D+$00
+;   
+;   Advantage: Fast 8-bit addressing mode (5 cycles vs 6 for absolute)
+;
+; COMMON USE CASES:
+;
+;   1. Quest Flag Manipulation:
+;      ; Set quest flag 42 (completed tutorial)
+;      lda #42; tyd #quest_flags_base
+;      jsr Bitfield_PrepareAccess
+;      jsr Bitfield_GetBitmask
+;      tsb $00  ; Set flag atomically
+;   
+;   2. Character Progression:
+;      ; Check if ability 15 unlocked
+;      lda #15; tyd #abilities_base
+;      jsr Bitfield_PrepareAccess
+;      jsr Bitfield_GetBitmask
+;      and $00  ; Test flag
+;      beq not_unlocked
+;   
+;   3. Enemy Defeat Tracking:
+;      ; Mark enemy 78 as defeated
+;      lda #78; tyd #enemies_defeated_base
+;      jsr Bitfield_PrepareAccess
+;      jsr Bitfield_GetBitmask
+;      tsb $00  ; Set defeat flag
+;
+; RELATED FUNCTIONS:
+;   - Bitfield_GetBitmask ($0097F2): Converts bit position to bitmask
+;   - Bitfield_SetBits ($00974E): Set bits using TSB (OR operation)
+;   - Bitfield_ClearBits ($009754): Clear bits using TRB (AND NOT)
+;   - Bitfield_TestBits ($00975A): Test bits using AND
+;   - Math_CountSetBits ($009730): Find first set bit position
+;
+; REGISTERS MODIFIED:
+;   A: Inverted bit position (0-7)
+;   D: Direct Page updated to point to target byte
+;
+; REGISTERS PRESERVED:
+;   X, Y: Not accessed (preserved implicitly)
+;   P: Preserved via stack (PHP/PLP)
+;
+; TECHNICAL NOTES:
+;
+;   TCD (Transfer C accumulator to Direct page):
+;     Updates Direct Page register from 16-bit accumulator
+;     Allows dynamic base address for zero-page-style access
+;     Critical for this function's bitfield addressing
+;   
+;   Stack manipulation order:
+;     LIFO (Last In First Out) requires careful PHA/PLA sequencing
+;     This function uses stack for temporary storage
+;     Must PLA in reverse order of PHA
+;   
+;   16-bit mode requirement:
+;     REP #$30 ensures A and X are 16-bit
+;     Needed for Direct Page calculation (16-bit address)
+;     Bit position result is 8-bit but returned in 16-bit A
+;
+;===============================================================================
 Bitfield_PrepareAccess:
-	php                                  ;0097DA|08      |      ;
-	rep #$30                             ;0097DB|C230    |      ;
-	and.W #$00ff                         ;0097DD|29FF00  |      ;
-	pha                                  ;0097E0|48      |      ;
-	lsr a;0097E1|4A      |      ;
-	lsr a;0097E2|4A      |      ;
-	lsr a;0097E3|4A      |      ;
-	phd                                  ;0097E4|0B      |      ;
-	clc                                  ;0097E5|18      |      ;
-	adc.B $01,s                          ;0097E6|6301    |000001;
-	tcd                                  ;0097E8|5B      |      ;
-	pla                                  ;0097E9|68      |      ;
-	pla                                  ;0097EA|68      |      ;
-	and.W #$0007                         ;0097EB|290700  |      ;
-	eor.W #$0007                         ;0097EE|490700  |      ;
-	plp                                  ;0097F1|28      |      ;
+	php                                  ;0097DA|08      |      ;	[3 cycles] Save processor status (preserve A/X size mode for caller)
+	rep #$30                             ;0097DB|C230    |      ;	[3 cycles] Set 16-bit A and X mode (need 16-bit for Direct Page calculation)
+	and.W #$00ff                         ;0097DD|29FF00  |      ;	[3 cycles] Mask to 8-bit bit index (clear high byte, ensure A = 0-255)
+	pha                                  ;0097E0|48      |      ;	[4 cycles] Save original bit index on stack (needed later for bit position calculation)
+	lsr a                                ;0097E1|4A      |      ;	[2 cycles] Shift right 1 (÷ 2, first step of ÷ 8 for byte offset)
+	lsr a                                ;0097E2|4A      |      ;	[2 cycles] Shift right 2 (÷ 4, second step of ÷ 8)
+	lsr a                                ;0097E3|4A      |      ;	[2 cycles] Shift right 3 (÷ 8, A now contains byte offset 0-31)
+	phd                                  ;0097E4|0B      |      ;	[4 cycles] Save original Direct Page on stack (will discard, but stack protocol)
+	clc                                  ;0097E5|18      |      ;	[2 cycles] Clear carry flag (prepare for addition)
+	adc.B $01,s                          ;0097E6|6301    |000001;	[4 cycles] Add original D from stack (byte_offset + base_address = target_byte_address)
+	tcd                                  ;0097E8|5B      |      ;	[2 cycles] Transfer A to Direct Page (D now points to byte containing target bit)
+	pla                                  ;0097E9|68      |      ;	[5 cycles] Discard saved D from stack (we modified D intentionally, don't restore)
+	pla                                  ;0097EA|68      |      ;	[5 cycles] Restore original bit index from stack (need for bit position calculation)
+	and.W #$0007                         ;0097EB|290700  |      ;	[3 cycles] Mask to bit position within byte (bit_index mod 8, range 0-7)
+	eor.W #$0007                         ;0097EE|490700  |      ;	[3 cycles] Invert bit position (7 - bit_pos, compensate for FFMQ bitfield layout)
+	plp                                  ;0097F1|28      |      ;	[4 cycles] Restore processor status (return to caller's A/X size mode)
 ;      |        |      ;
+;===============================================================================
+; Bitfield_GetBitmask - Convert Bit Position to Bitmask via Lookup Table
+;===============================================================================
+; ADDRESS:  $0097F2 (Bank $00)
+; LENGTH:   9 bytes ($0097FB - $0097F2 = $09 bytes = 9 decimal)
+; TYPE:     Subroutine (RTS return, typically called after Bitfield_PrepareAccess)
+;
+; PURPOSE:
+;   Converts a bit position (0-15) into corresponding bitmask for bit manipulation.
+;   Uses lookup table with 16 entries (one for each bit position in 16-bit word).
+;   Returns single-bit mask ready for TSB/TRB/AND operations.
+;   
+;   Bitmask mapping:
+;     Position 0  → $0001 (bit 0 set)
+;     Position 1  → $0002 (bit 1 set)
+;     Position 2  → $0004 (bit 2 set)
+;     Position 3  → $0008 (bit 3 set)
+;     ...
+;     Position 15 → $8000 (bit 15 set)
+;
+; ALGORITHM: Table Lookup
+;
+;   1. Save X register (will use as table index)
+;   2. Shift bit position left (× 2, because table entries are 16-bit = 2 bytes)
+;   3. Use as index into DATA8_0097fb table
+;   4. Load 16-bit bitmask from table
+;   5. Restore X register
+;   6. Return with bitmask in A
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     A: Bit position (0-15, which bit within 16-bit word)
+;       Typically from Bitfield_PrepareAccess (inverted bit position 0-7)
+;   
+;   OUTPUT:
+;     A: 16-bit bitmask with single bit set
+;       Example: A=3 → returns $0008 (bit 3 set)
+;     
+;     X: Preserved via stack (PHX/PLX)
+;     Y: Not accessed (preserved implicitly)
+;
+; LOOKUP TABLE (DATA8_0097fb):
+;
+;   32 bytes total, 16 entries × 2 bytes each (16-bit values)
+;   
+;   Table layout:
+;     Offset  Value   Binary              Bit Position
+;     +$00    $0001   %0000000000000001   0
+;     +$02    $0002   %0000000000000010   1
+;     +$04    $0004   %0000000000000100   2
+;     +$06    $0008   %0000000000001000   3
+;     +$08    $0010   %0000000000010000   4
+;     +$0A    $0020   %0000000000100000   5
+;     +$0C    $0040   %0000000001000000   6
+;     +$0E    $0080   %0000000010000000   7
+;     +$10    $0100   %0000000100000000   8
+;     +$12    $0200   %0000001000000000   9
+;     +$14    $0400   %0000010000000000   10
+;     +$16    $0800   %0000100000000000   11
+;     +$18    $1000   %0001000000000000   12
+;     +$1A    $2000   %0010000000000000   13
+;     +$1C    $4000   %0100000000000000   14
+;     +$1E    $8000   %1000000000000000   15
+;   
+;   Formula: bitmask = 1 << bit_position
+;
+; PERFORMANCE:
+;
+;   Total: ~20 cycles (~7μs @ 2.68MHz)
+;     - PHX: 4 cycles
+;     - ASL A: 2 cycles
+;     - TAX: 2 cycles
+;     - LDA long,X: 6 cycles
+;     - PLX: 5 cycles
+;     - RTS: 6 cycles
+;     Total: 25 cycles
+;   
+;   Compared to shift-based calculation:
+;     Table lookup: ~25 cycles (constant time)
+;     Shift loop: 10 + (position × 3) cycles (variable, up to 55 cycles)
+;     Trade-off: 32 bytes ROM for guaranteed speed
+;
+; WHY TABLE LOOKUP INSTEAD OF SHIFT LOOP:
+;
+;   Advantages:
+;     - Constant time: Always 25 cycles regardless of bit position
+;     - Simple code: 6 instructions vs ~10 for shift loop
+;     - Predictable: No branch misprediction penalty
+;   
+;   Disadvantages:
+;     - ROM usage: 32 bytes for table vs ~10 bytes for shift code
+;     - Cache pressure: Table must be in ROM
+;   
+;   FFMQ choice: Table lookup (speed consistency prioritized)
+;   
+;   Alternative shift loop approach:
+;     LDX bit_position
+;     LDA #$0001
+;     Loop: ASL A; DEX; BNE Loop
+;     Variable time: Fast for low positions, slow for high
+;
+; CALL SEQUENCE EXAMPLE:
+;
+;   ; Complete bitfield set operation
+;   lda #19                      ; Bit index 19
+;   ldy #$1000; tyd             ; Base address $1000
+;   jsr Bitfield_PrepareAccess   ; D→$1002, A→4 (inverted)
+;   jsr Bitfield_GetBitmask      ; A→$0010 (bitmask for bit 4)
+;   tsb $00                      ; Set bit in byte at D+$00
+;
+; COMMON USE CASES:
+;
+;   1. Quest Flag Set:
+;      ; After Bitfield_PrepareAccess returns bit position
+;      jsr Bitfield_GetBitmask  ; Get bitmask
+;      tsb $00                  ; Set bit (OR operation)
+;   
+;   2. Quest Flag Clear:
+;      jsr Bitfield_GetBitmask  ; Get bitmask
+;      trb $00                  ; Clear bit (AND NOT operation)
+;   
+;   3. Quest Flag Test:
+;      jsr Bitfield_GetBitmask  ; Get bitmask
+;      and $00                  ; Test bit (AND operation)
+;      beq bit_not_set          ; Branch if result is 0
+;
+; RELATED FUNCTIONS:
+;   - Bitfield_PrepareAccess ($0097DA): Calculates byte offset + bit position
+;   - Bitfield_SetBits ($00974E): Set bits using TSB
+;   - Bitfield_ClearBits ($009754): Clear bits using TRB
+;   - Bitfield_TestBits ($00975A): Test bits using AND
+;
+; REGISTERS MODIFIED:
+;   A: 16-bit bitmask (single bit set)
+;
+; REGISTERS PRESERVED:
+;   X: Preserved via stack (PHX/PLX)
+;   Y: Not accessed (preserved implicitly)
+;   P: Not saved (caller manages processor status)
+;
+; TECHNICAL NOTES:
+;
+;   ASL A (Arithmetic Shift Left):
+;     Multiplies A by 2 (converts bit position to table offset)
+;     Example: bit position 3 → table offset 6 (3 × 2)
+;     Required because table entries are 2 bytes each (16-bit)
+;   
+;   LDA long,X indexed addressing:
+;     Loads from 24-bit address: table_base + X
+;     Allows access across banks (long addressing)
+;     Returns 16-bit value from table
+;   
+;   Why preserve X but not P?
+;     X might contain important caller data
+;     P (processor status) assumed managed by caller
+;     Bitfield_PrepareAccess handles PHP/PLP
+;
+;===============================================================================
 Bitfield_GetBitmask:
-	phx                                  ;0097F2|DA      |      ;
-	asl a;0097F3|0A      |      ;
-	tax                                  ;0097F4|AA      |      ;
-	lda.L DATA8_0097fb,x                 ;0097F5|BFFB9700|0097FB;
-	plx                                  ;0097F9|FA      |      ;
-	rts                                  ;0097FA|60      |      ;
+	phx                                  ;0097F2|DA      |      ;	[4 cycles] Save X register (will use as table index, must preserve for caller)
+	asl a                                ;0097F3|0A      |      ;	[2 cycles] Multiply A by 2 (bit_position × 2 = table offset, because entries are 16-bit = 2 bytes)
+	tax                                  ;0097F4|AA      |      ;	[2 cycles] Transfer A to X (use as index for table lookup)
+	lda.L DATA8_0097fb,x                 ;0097F5|BFFB9700|0097FB;	[6 cycles] Load 16-bit bitmask from table (table[$0097FB + X] → A, single bit set at position)
+	plx                                  ;0097F9|FA      |      ;	[5 cycles] Restore X register (return caller's X value)
+	rts                                  ;0097FA|60      |      ;	[6 cycles] Return to caller (A contains bitmask ready for TSB/TRB/AND operations)
 ;      |        |      ;
 ;      |        |      ;
 DATA8_0097fb:
