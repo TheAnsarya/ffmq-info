@@ -542,7 +542,7 @@ ScreenOffset_AdjustY:
 	bra ScreenOffset_CheckRange                      ;0C83E6|8013    |0C83FB;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0C83E8:
+Animation_DeadCode_ScreenOffset:  ; Dead code - screen offset calculation (orphaned code sequence)
 	db $c0,$98,$00,$90,$0e,$c0,$a9,$00,$b0,$09,$bd,$01,$00,$6d,$00,$02;0C83E8|        |      ;
 	db $9d,$01,$00                       ;0C83F8|        |000001;
 ;      |        |      ;
@@ -2333,7 +2333,7 @@ Tilesets_Return:
 	db $00,$a2,$72,$bb,$a0,$0e,$00,$22,$df,$8d,$00,$a2,$c0,$68,$8e,$16;0C9871|        |      ;
 	db $21,$a2,$c2,$bc                   ;0C9881|        |0000A2;
 ;      |        |      ;
-UNREACH_0C9885:
+Animation_DeadCode_GraphicsLoad:  ; Dead code - graphics loading sequence (orphaned code/data)
 	db $a0,$07,$00,$5c,$df,$8d,$00,$a2,$b4,$98,$8e,$58,$00,$a9,$40,$0c;0C9885|        |      ;
 	db $e2,$00,$4b,$ab,$a9,$80,$8d,$15,$21,$a2,$00,$68,$8e,$16,$21,$a2;0C9895|        |      ;
 	db $00,$00,$8e,$f0,$00,$a2,$a2,$bd,$a0,$0c,$00,$5c,$df,$8d,$00,$a2;0C98A5|        |      ;
@@ -3351,10 +3351,10 @@ DATA8_0cd4e4:
 	db $00,$00,$01,$00,$02,$00,$17,$00,$35,$00,$47,$00,$55,$00,$63,$00;0CD4E4|        |      ;
 	db $75,$00,$83,$00,$91,$00,$22,$01,$42,$01,$58,$01;0CD4F4|        |      ;
 ;      |        |      ;
-UNREACH_0CD500:
+Animation_DeadCode_TileIndices1:  ; Dead code - tile index data (orphaned byte)
 	db $ff                               ;0CD500|        |FF96FF;
 ;      |        |      ;
-UNREACH_0CD501:
+Animation_DeadCode_TileIndices2:  ; Dead code - tile index data (orphaned byte sequence)
 	db $ff                               ;0CD501|        |03FF96;
 	db $96,$ff,$03,$04,$ff,$03,$04,$ff,$06,$04,$ff,$03,$00,$01,$9a,$99;0CD502|        |      ;
 	db $ff,$ff,$ff,$ff,$ff               ;0CD512|        |      ;
@@ -3384,10 +3384,10 @@ UNREACH_0CD501:
 	db $ff                               ;0CD657|        |0FFF77;
 	db $77,$ff,$0f,$01,$ff,$0f,$01,$ff,$ff,$ff,$ff,$ff,$ff,$ff;0CD658|        |      ;
 ;      |        |      ;
-UNREACH_0CD666:
+Animation_DeadCode_SequenceOffset1:  ; Dead code - animation sequence offset (orphaned byte)
 	db $00                               ;0CD666|        |      ;
 ;      |        |      ;
-UNREACH_0CD667:
+Animation_DeadCode_SequenceOffset2:  ; Dead code - animation sequence offset (orphaned byte sequence)
 	db $00                               ;0CD667|        |      ;
 	db $01,$00,$02,$00,$03,$00,$04       ;0CD668|        |      ;
 	db $00                               ;0CD66F|        |      ;
@@ -4016,7 +4016,7 @@ DATA8_0cef89:
 	db $00,$00,$91,$5e,$11,$6c,$6d,$18,$08,$14,$84,$4c,$04,$34,$42,$18;0CF405|        |      ;
 	db $00,$00,$d5,$6a,$0f,$56,$49,$3d,$a4,$28,$20,$18,$ff,$7f,$38,$77;0CF415|        |      ;
 ;      |        |      ;
-UNREACH_0CF425:
+Animation_DeadCode_TilePatterns:  ; Dead code - tile pattern data (orphaned byte sequence)
 	db $3c,$3c,$3c,$3c,$3c,$3c,$3c,$3c,$3d,$3e,$3f,$3d,$46,$47,$47,$46;0CF425|        |003C3C;
 	db $3c,$3c,$3c,$3c,$3c,$3c,$3c,$3c,$3d,$3e,$3f,$3d,$46,$47,$47,$46;0CF435|        |      ;
 	db $16,$16,$16,$16,$50,$51,$50,$51,$52,$53,$52,$53,$54,$55,$54,$55;0CF445|        |      ;
@@ -4065,13 +4065,13 @@ UNREACH_0CF425:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$18;0CF6F5|        |      ;
 	db $00,$38,$00,$78,$00,$f0,$00,$f0,$00,$00,$00,$00,$00,$00,$00,$00;0CF705|        |      ;
 ;      |        |      ;
-UNREACH_0CF715:
+Animation_DeadCode_ObjTableIndex1:  ; Dead code - object table index (orphaned byte)
 	db $00                               ;0CF715|        |      ;
 ;      |        |      ;
-UNREACH_0CF716:
+Animation_DeadCode_ObjTableIndex2:  ; Dead code - object table index (orphaned byte)
 	db $00                               ;0CF716|        |      ;
 ;      |        |      ;
-UNREACH_0CF717:
+Animation_DeadCode_ObjTableData:  ; Dead code - object table data (orphaned byte sequence)
 	db $01                               ;0CF717|        |000001;
 	db $01,$21,$10,$02,$32,$12,$03,$f1,$04,$04,$32,$11,$05,$32,$03,$06;0CF718|        |      ;
 	db $21,$03,$07,$24,$02               ;0CF728|        |      ;
