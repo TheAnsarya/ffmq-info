@@ -3461,8 +3461,8 @@ Cursor_UpdateSprite:
 	bra Cursor_UpdateSprite_SetAttr	; Branch to attribute setting code
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_008C81:
-	db $28,$60	; Unreachable code: php, rts (leftover from refactoring?)
+Cursor_DeadCode_PhpRts:
+	db $28,$60	; Dead code: php, rts (leftover from refactoring, unreachable due to BRA above)
 ;      |        |      ;
 Cursor_UpdateSprite_Field:
 	lda.L DATA8_049800,x	; A = Y offset from table (field mode lookup)
@@ -3533,8 +3533,8 @@ Cursor_UpdateSprite_DigitLoop:
 	bra Cursor_UpdateSprite_Done	; Finish cursor update → branch
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_008D06:
-	db $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f	; Unreachable: LDA #$45, STA $00,x, XBA, STA $01,x, BRA +$0F
+Cursor_DeadCode_ArrowSetup:
+	db $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f	; Dead code: LDA #$45, STA $00,x, XBA, STA $01,x, BRA +$0F (unreachable)
 ;      |        |      ;
 Cursor_UpdateSprite_Simple:
 	xba	; Swap A bytes: restore attribute from high byte
@@ -3875,8 +3875,8 @@ Cursor_CalcTileIndex:
 	rts	; Return with X = tilemap address for field cursor
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_008D93:
-	db $a2,$ff,$ff,$60	; Unreachable: LDX #$FFFF, RTS (disabled cursor path)
+Cursor_DeadCode_InvalidReturn:
+	db $a2,$ff,$ff,$60	; Dead code: LDX #$FFFF, RTS (disabled cursor path, error return?)
 	lda.w !ram_1031                          ;008D97|AD3110  |001031;
 	pha                                  ;008D9A|48      |      ;
 	lda.W #$0003                         ;008D9B|A90300  |      ;
@@ -4766,8 +4766,8 @@ Menu_CountBattleItems:
 	bra Menu_CountBattleItems_Store                      ;0090CF|8004    |0090D5;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0090D1:
-	db $22,$30,$97,$00                   ;0090D1|        |009730;
+Menu_DeadCode_CountSetBits:
+	db $22,$30,$97,$00                   ;0090D1|        |009730; Dead code: JSL Math_CountSetBits (unreachable)
 ;      |        |      ;
 Menu_CountBattleItems_Store:
 	eor.B #$ff                           ;0090D5|49FF    |      ;
@@ -4798,8 +4798,8 @@ Menu_CountRings:
 	bra Menu_CountRings_Store                      ;009102|8004    |009108;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_009104:
-	db $22,$30,$97,$00                   ;009104|        |009730;
+Menu_DeadCode_CountSetBits2:
+	db $22,$30,$97,$00                   ;009104|        |009730; Dead code: JSL Math_CountSetBits (unreachable)
 ;      |        |      ;
 Menu_CountRings_Store:
 	eor.B #$ff                           ;009108|49FF    |      ;
@@ -5411,8 +5411,8 @@ Timer_UpdateCounter:
 	bra Text_ProcessNibble                      ;009383|800A    |00938F;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_009385:
-	db $a9,$02,$00,$1c,$db,$00,$a7,$53,$e6,$53;009385|        |      ;
+Text_DeadCode_LoadBitmask:
+	db $a9,$02,$00,$1c,$db,$00,$a7,$53,$e6,$53;009385|        |      ; Dead code: LDA #$0002, TRB $00DB, etc. (unreachable)
 ;      |        |      ;
 Text_ProcessNibble:
 	and.W #$000f                         ;00938F|290F00  |      ;
@@ -5428,11 +5428,11 @@ Text_GetBitmask:
 	rts                                  ;0093C8|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0093C9:
-	db $4c,$4b,$95                       ;0093C9|        |00954B;
+Text_DeadCode_JmpDrawChar:
+	db $4c,$4b,$95                       ;0093C9|        |00954B; Dead code: JMP Text_DrawChar (unreachable)
 ;      |        |      ;
-UNREACH_0093CC:
-	db $a9,$06,$00,$85,$51,$a5,$8e,$f0,$d4,$a9,$01,$00,$2d,$db,$00,$d0;0093CC|        |      ;
+Text_DeadCode_CheckControl:
+	db $a9,$06,$00,$85,$51,$a5,$8e,$f0,$d4,$a9,$01,$00,$2d,$db,$00,$d0;0093CC|        |      ; Dead code: control flag check logic (unreachable)
 	db $21,$a5,$03,$c9,$03,$01,$f0,$40,$c9,$02,$02,$f0,$41,$c9,$04,$01;0093DC|        |0000A5;
 	db $f0,$55,$c9,$04,$03,$d0,$0d,$c9,$01,$02,$f0,$03,$4c,$d5,$94,$4c;0093EC|        |009443;
 	db $37,$96,$80,$66,$ad,$df,$04,$30,$1f,$ad,$52,$10,$29,$ff,$00,$c9;0093FC|        |000096;
@@ -6632,8 +6632,8 @@ Math_Divide32by16_Loop:
 	bra Math_Divide32by16_Next           ;00970E|8006    |009716; if carry clear (borrow): divisor too large, skip to next iteration
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_009710:
-	db $e5,$9c                           ;009710|        |00009C; unreachable: SBC $9C (redundant subtraction, always succeeds)
+Math_Divide32by16_DeadCode:
+	db $e5,$9c                           ;009710|        |00009C; dead code: SBC $9C (redundant subtraction, unreachable due to BRA above)
 ;      |        |      ;
 Math_Divide32by16_Store:
 	sta.B $a2                            ;009712|85A2    |0000A2; store subtraction result back to remainder (update accumulator)
