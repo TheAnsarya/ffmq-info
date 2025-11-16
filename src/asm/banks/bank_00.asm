@@ -183,19 +183,19 @@ SaveData_IncrementCharacter:
 	asl a;008198|0A      |      ;
 	asl a;008199|0A      |      ;
 	asl a;00819A|0A      |      ;
-	tax                                  ;00819B|AA      |      ;
+	tax                                  ;00819B|AA      |      ;	X = character_index × 8 (8-byte spawn entries)
 	sep #$20                             ;00819C|E220    |      ;
 	stz.B $19                            ;00819E|6419    |000019;
-	lda.W DATA8_0081d5,x                 ;0081A0|BDD581  |0081D5;
+	lda.W CharacterSpawn_MapID,x         ;0081A0|BDD581  |0081D5;	Load map ID from spawn table
 	sta.w !context_param                          ;0081A3|8D880E  |000E88;
-	ldy.W DATA8_0081d6,x                 ;0081A6|BCD681  |0081D6;
+	ldy.W CharacterSpawn_Coordinates,x   ;0081A6|BCD681  |0081D6;	Load X,Y coordinates from spawn table
 	sty.w !player_map_x                          ;0081A9|8C890E  |000E89;
-	lda.W DATA8_0081d8,x                 ;0081AC|BDD881  |0081D8;
+	lda.W CharacterSpawn_Direction,x     ;0081AC|BDD881  |0081D8;	Load direction/parameter from spawn table
 	sta.W $0e92                          ;0081AF|8D920E  |000E92;
-	ldy.W DATA8_0081db,x                 ;0081B2|BCDB81  |0081DB;
+	ldy.W CharacterSpawn_Pointer2,x      ;0081B2|BCDB81  |0081DB;	Load pointer 2 from spawn table
 	sty.B $53                            ;0081B5|8453    |000053;
-	ldy.W DATA8_0081d9,x                 ;0081B7|BCD981  |0081D9;
-	tyx                                  ;0081BA|BB      |      ;
+	ldy.W CharacterSpawn_Pointer1,x      ;0081B7|BCD981  |0081D9;	Load pointer 1 from spawn table (bank $0C data)
+	tyx                                  ;0081BA|BB      |      ;	X = pointer 1
 	rep #$30                             ;0081BB|C230    |      ;
 	ldy.W #$0ea8                         ;0081BD|A0A80E  |      ;
 	lda.W #$001f                         ;0081C0|A91F00  |      ;
@@ -208,19 +208,19 @@ SaveData_IncrementCharacter:
 	rts                                  ;0081D4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0081d5:
+CharacterSpawn_MapID:
 	db $2d                               ;0081D5|        |      ;
 ;      |        |      ;
-DATA8_0081d6:
+CharacterSpawn_Coordinates:
 	db $26,$1f                           ;0081D6|        |      ;
 ;      |        |      ;
-DATA8_0081d8:
+CharacterSpawn_Direction:
 	db $05                               ;0081D8|        |      ;
 ;      |        |      ;
-DATA8_0081d9:
+CharacterSpawn_Pointer1:
 	db $0c,$aa                           ;0081D9|        |      ;
 ;      |        |      ;
-DATA8_0081db:
+CharacterSpawn_Pointer2:
 	db $2e,$a8                           ;0081DB|        |      ;
 	db $19,$0e,$1a,$02,$0c,$aa,$c1,$a8,$14,$33,$28,$05,$2c,$aa,$6a,$a9;0081DD|        |001A0E;
 	db $ec,$a6,$03                       ;0081ED|        |      ;
@@ -8565,12 +8565,12 @@ Bitfield_GetBitmask:
 	phx                                  ;0097F2|DA      |      ;	[4 cycles] Save X register (will use as table index, must preserve for caller)
 	asl a                                ;0097F3|0A      |      ;	[2 cycles] Multiply A by 2 (bit_position × 2 = table offset, because entries are 16-bit = 2 bytes)
 	tax                                  ;0097F4|AA      |      ;	[2 cycles] Transfer A to X (use as index for table lookup)
-	lda.L DATA8_0097fb,x                 ;0097F5|BFFB9700|0097FB;	[6 cycles] Load 16-bit bitmask from table (table[$0097FB + X] → A, single bit set at position)
+	lda.L Bitfield_BitmaskTable,x        ;0097F5|BFFB9700|0097FB;	[6 cycles] Load 16-bit bitmask from table (table[$0097FB + X] → A, single bit set at position)
 	plx                                  ;0097F9|FA      |      ;	[5 cycles] Restore X register (return caller's X value)
 	rts                                  ;0097FA|60      |      ;	[6 cycles] Return to caller (A contains bitmask ready for TSB/TRB/AND operations)
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0097fb:
+Bitfield_BitmaskTable:
 	db $01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80,$00;0097FB|        |      ;
 	db $00,$01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80;00980B|        |      ;
 ;      |        |      ;
