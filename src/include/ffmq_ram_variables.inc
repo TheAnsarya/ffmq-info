@@ -320,11 +320,18 @@
 !animation_type         = $0601     ; Animation type parameter
 
 ; ----------------------------------------------------------------------------
-; Audio System Extended ($0600-$0601, $366x buffers)
+; Audio System Extended ($0600-$0601, $0628-$0688, $366x buffers)
 ; ----------------------------------------------------------------------------
 ; SPC700 audio command interface - direct page $0600 for audio driver
 !audio_command_reg      = $0600     ; Audio command register (interface to SPC700)
 !audio_param_reg        = $0601     ; Audio parameter register
+
+; Audio channel management arrays (8 channels × 32 bytes each = 256 bytes)
+!audio_channel_assign   = $0628     ; Audio channel assignments (8 channels)
+!audio_ram_addr_start   = $0648     ; SPC700 RAM start addresses (16-bit × 8)
+!audio_ram_addr_end     = $064a     ; SPC700 RAM end addresses (16-bit × 8)  
+!audio_pattern_size     = $0668     ; Pattern data sizes (16-bit × 8)
+!audio_pattern_buffer   = $0688     ; Pattern buffer slots (indexed by channel)
 
 ; Audio/graphics data buffers
 !audio_data_buffer_1    = $3669     ; Audio data buffer slot 1
