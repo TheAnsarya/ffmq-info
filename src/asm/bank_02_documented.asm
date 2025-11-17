@@ -6026,7 +6026,7 @@ Display_ColorManager:
 
 ; Color Effect Processing Loop 1
 Display_ColorLoop1:
-	lda.w DB_DATA8_02da7d,x ;02DA2F|BD7DDA  |02DA7D; Load color data
+	lda.w DB_Entity_ConfigTable1,x ;02DA2F|BD7DDA  |02DA7D; Load color data
 	beq Display_ColorPhase2 ;02DA32|F015    |02DA49; Exit if zero
 	inx ;02DA34|E8      |      ; Next color
 	sta.b !SNES_COLDATA-$2100 ;02DA35|8532    |002132; Set color data
@@ -6046,7 +6046,7 @@ Display_ColorPhase2:
 
 ; Color Effect Processing Loop 2
 Display_ColorLoop2:
-	lda.w DB_DATA8_02da7d,x ;02DA54|BD7DDA  |02DA7D; Load color data
+	lda.w DB_Entity_ConfigTable1,x ;02DA54|BD7DDA  |02DA7D; Load color data
 	beq Display_ProcessDone ;02DA57|F019    |02DA72; Exit if zero
 	inx ;02DA59|E8      |      ; Next color
 	sta.b !SNES_COLDATA-$2100 ;02DA5A|8532    |002132; Set color data
@@ -6078,7 +6078,7 @@ Display_ProcessDone:
 
 ; Color Effect Data Table and Display Processing Completion
 ; Complex color gradient data for sophisticated display effects
-DB_DATA8_02da7d:
+DB_Entity_ConfigTable1:
 	db $f8,$f4,$f0,$eb,$ea,$e7,$e6,$e5,$e4,$e3,$e2,$e1,$e0,$00 ;02DA7D; Color fade sequence 1
 	db $81,$61,$41,$31,$21,$21,$11,$11,$11,$01,$01,$ff,$01 ;02DA8B; Color fade sequence 2
 
@@ -6231,7 +6231,7 @@ Display_VBlankWait:
 
 ; DMA Control Data Table
 ; Configuration data for sprite DMA transfer
-DB_DATA8_02db83:
+DB_Entity_ConfigTable2:
 	db $02,$0e,$33,$0b,$00 ;02DB83; DMA configuration data
 
 ; Sprite Processing and Display Coordination Engine
@@ -6451,7 +6451,7 @@ Object_ManagementEngine:
 
 ; Configuration Data Tables
 ; State configuration data for different modes
-DB_DATA8_02dcc4:
+DB_Entity_ConfigTable3:
 	db $0c,$10,$02,$02,$12,$10,$02,$02,$0f,$10,$02,$02,$ff,$ff,$02,$02 ;02DCC4
 
 ;-------------------------------------------------------------------------------
@@ -6533,7 +6533,7 @@ Sprite_GridLoop:
 
 ; Unreachable Alternate Processing Path
 ; Complex processing chain for special handling modes
-DB_DATA8_02dd30:
+DB_Entity_ConfigTable4:
 	db $08,$0b,$8b,$e2,$20,$c2,$10,$f4,$00,$0a,$2b,$a9,$0c,$85,$8a,$a2 ;02DD30
 	db $85,$d7,$86,$8b,$64,$8d,$a2,$a0,$5d,$86,$8e,$a9,$06,$85,$90,$a2 ;02DD40
 	db $e0,$00,$22,$c3,$e1,$02,$ca,$d0,$f9,$f4,$00,$0b,$2b,$a9,$0c,$8d ;02DD50
@@ -6577,7 +6577,7 @@ Sprite_InitEngine:
 	tax ;02DF41|AA      |      ; Transfer parameter to X
 	lda.w Sprite_ParameterTable,x ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
 	sta.w $0aee	 ;02DF45|8DEE0A  |020AEE; Store sprite configuration
-	pea.w DB_DATA8_02df53 ;02DF48|F453DF  |02DF53; Push configuration table
+	pea.w DB_Entity_ConfigTable5 ;02DF48|F453DF  |02DF53; Push configuration table
 	jsl.l CallSpriteInitializer ;02DF4B|22BE9700|0097BE; Call sprite initializer
 	plp ;02DF4F|28      |      ; Restore processor status
 	ply ;02DF50|7A      |      ; Restore Y register
@@ -6585,7 +6585,7 @@ Sprite_InitEngine:
 	rts ;02DF52|60      |      ; Return to caller
 
 ; Sprite Configuration Data Table
-DB_DATA8_02df53:
+DB_Entity_ConfigTable5:
 	db $7f,$df,$80,$df,$81,$df ;02DF53; Sprite configuration entries
 	db $80,$df	 ;02DF59; Additional configuration
 
@@ -6651,7 +6651,7 @@ Graphics_BufferInit:
 	rts ;02DFBD|60      |      ; Return to caller
 
 ; DMA Configuration Data Table
-DB_DATA8_02dfbe:
+DB_Entity_ConfigTable6:
 	db $42,$0f,$40,$c6,$7e,$60,$c6,$7e,$f0,$60,$c6,$e7,$40,$c7,$00 ; DMA parameters
 
 ; Memory Clearing and System Reset Engine
