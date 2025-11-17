@@ -5176,24 +5176,24 @@ BattleAudio_SoundEffectCoordinator:
 	rep #$10		;01B6EA|C210    |      ;
 	lda.b #$0e	  ;01B6EC|A90E    |      ;
 	ora.w !hardware_flags	 ;01B6EE|0D541A  |011A54;
-	sta.w $0c57	 ;01B6F1|8D570C  |010C57;
+	sta.w !battle_state_c57	 ;01B6F1|8D570C  |010C57;
 	ora.b #$40	  ;01B6F4|0940    |      ;
-	sta.w $0c53	 ;01B6F6|8D530C  |010C53;
+	sta.w !battle_state_c53	 ;01B6F6|8D530C  |010C53;
 	lda.b #$68	  ;01B6F9|A968    |      ;
-	sta.w $0c52	 ;01B6FB|8D520C  |010C52;
-	sta.w $0c56	 ;01B6FE|8D560C  |010C56;
+	sta.w !battle_state_c52	 ;01B6FB|8D520C  |010C52;
+	sta.w !battle_state_c56	 ;01B6FE|8D560C  |010C56;
 	lda.w !battle_offset	 ;01B701|AD2D19  |01192D;
 	sec ;01B704|38      |      ;
 	sbc.b #$08	  ;01B705|E908    |      ;
-	sta.w $0c50	 ;01B707|8D500C  |010C50;
+	sta.w !battle_state_c50	 ;01B707|8D500C  |010C50;
 	clc ;01B70A|18      |      ;
 	adc.b #$18	  ;01B70B|6918    |      ;
-	sta.w $0c54	 ;01B70D|8D540C  |010C54;
+	sta.w !battle_state_c54	 ;01B70D|8D540C  |010C54;
 	lda.w !tilemap_y_offset	 ;01B710|AD2E19  |01192E;
 	clc ;01B713|18      |      ;
 	adc.b #$08	  ;01B714|6908    |      ;
 	sta.w !sprite_data_c51	 ;01B716|8D510C  |010C51;
-	sta.w $0c55	 ;01B719|8D550C  |010C55;
+	sta.w !battle_state_c55	 ;01B719|8D550C  |010C55;
 	lda.b #$50	  ;01B71C|A950    |      ;
 	sta.w !hw_register_2	 ;01B71E|8D050E  |010E05;
 	jsr.w ProcessMemoryWithStateUpdate ;01B721|20D082  |0182D0;
@@ -5202,7 +5202,7 @@ BattleAudio_SoundEffectCoordinator:
 	lda.w !sprite_data_c51	 ;01B729|AD510C  |010C51;
 	dec a;01B72C|3A      |      ;
 	sta.w !sprite_data_c51	 ;01B72D|8D510C  |010C51;
-	sta.w $0c55	 ;01B730|8D550C  |010C55;
+	sta.w !battle_state_c55	 ;01B730|8D550C  |010C55;
 	jsr.w ProcessMemoryWithStateUpdate ;01B733|20D082  |0182D0;
 	lda.b #$2c	  ;01B736|A92C    |      ;
 	jsr.w Sub_01D6A9 ;01B738|20A9D6  |01D6A9;
@@ -5625,20 +5625,20 @@ BattleScene_TransitionManager:
 ; ==============================================================================
 
 BattleGraphics_TileCoordProcessor1:
-	sta.w $0c58	 ;01D044|8D580C  |010C58;
+	sta.w !battle_state_c58	 ;01D044|8D580C  |010C58;
 	clc ;01D047|18      |      ;
 	adc.b #$08	  ;01D048|6908    |      ;
-	sta.w $0c54	 ;01D04A|8D540C  |010C54;
-	sta.w $0c5c	 ;01D04D|8D5C0C  |010C5C;
+	sta.w !battle_state_c54	 ;01D04A|8D540C  |010C54;
+	sta.w !battle_state_c5c	 ;01D04D|8D5C0C  |010C5C;
 	rts ;01D050|60      |      ;
 
 BattleGraphics_TileCoordProcessor2:
 	sta.w !sprite_data_c51	 ;01D051|8D510C  |010C51;
-	sta.w $0c55	 ;01D054|8D550C  |010C55;
+	sta.w !battle_state_c55	 ;01D054|8D550C  |010C55;
 	clc ;01D057|18      |      ;
 	adc.b #$08	  ;01D058|6908    |      ;
-	sta.w $0c59	 ;01D05A|8D590C  |010C59;
-	sta.w $0c5d	 ;01D05D|8D5D0C  |010C5D;
+	sta.w !battle_state_c59	 ;01D05A|8D590C  |010C59;
+	sta.w !battle_state_c5d	 ;01D05D|8D5D0C  |010C5D;
 	rts ;01D060|60      |      ;
 
 ; ==============================================================================
@@ -5658,23 +5658,23 @@ BattleGraphics_TileManagementSystem2:
 	lda.w #$0144	;01D06C|A94401  |      ;
 
 	.SetTilePatterns:
-	sta.w $0c52	 ;01D06F|8D520C  |010C52;
+	sta.w !battle_state_c52	 ;01D06F|8D520C  |010C52;
 	inc a;01D072|1A      |      ;
-	sta.w $0c56	 ;01D073|8D560C  |010C56;
+	sta.w !battle_state_c56	 ;01D073|8D560C  |010C56;
 	inc a;01D076|1A      |      ;
-	sta.w $0c5a	 ;01D077|8D5A0C  |010C5A;
+	sta.w !battle_state_c5a	 ;01D077|8D5A0C  |010C5A;
 	inc a;01D07A|1A      |      ;
-	sta.w $0c5e	 ;01D07B|8D5E0C  |010C5E;
+	sta.w !battle_state_c5e	 ;01D07B|8D5E0C  |010C5E;
 	sep #$20		;01D07E|E220    |      ;
 	rep #$10		;01D080|C210    |      ;
 	lda.b #$0c	  ;01D082|A90C    |      ;
 	ora.w !hardware_flags	 ;01D084|0D541A  |011A54;
 	tay ;01D087|A8      |      ;
-	ora.w $0c53	 ;01D088|0D530C  |010C53;
-	sta.w $0c53	 ;01D08B|8D530C  |010C53;
+	ora.w !battle_state_c53	 ;01D088|0D530C  |010C53;
+	sta.w !battle_state_c53	 ;01D08B|8D530C  |010C53;
 	tya ;01D08E|98      |      ;
-	ora.w $0c57	 ;01D08F|0D570C  |010C57;
-	sta.w $0c57	 ;01D092|8D570C  |010C57;
+	ora.w !battle_state_c57	 ;01D08F|0D570C  |010C57;
+	sta.w !battle_state_c57	 ;01D092|8D570C  |010C57;
 	tya ;01D095|98      |      ;
 	ora.w $0c5b	 ;01D096|0D5B0C  |010C5B;
 	sta.w $0c5b	 ;01D099|8D5B0C  |010C5B;
@@ -6812,17 +6812,17 @@ dma_coordinate_processing_system:
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
 	lda.w !battle_data_index_1	 ; Load X coordinate
-	sta.w $0cd0	 ; Set DMA destination X
+	sta.w !dma_dest_addr	 ; Set DMA destination X
 	clc ; Clear carry
 	adc.w #$0008	; Add sprite width offset
-	sta.w $0cd4	 ; Set DMA destination X+8
+	sta.w !dma_source_addr	 ; Set DMA destination X+8
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM page offset
-	sta.w $0cdc	 ; Set DMA destination high
+	sta.w !dma_source_addr_alt	 ; Set DMA destination high
 	lda.w !battle_data_index_1	 ; Reload X coordinate
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM offset
-	sta.w $0cd8	 ; Set DMA source high
+	sta.w !dma_dest_addr_alt	 ; Set DMA source high
 	plp ; Restore processor flags
 	rts ; Return from DMA processing
 
@@ -7222,17 +7222,17 @@ dynamic_coordinate_processing_engine:
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
 	lda.w !battle_data_index_1	 ; Load X coordinate
-	sta.w $0cd0	 ; Set DMA destination X
+	sta.w !dma_dest_addr	 ; Set DMA destination X
 	clc ; Clear carry
 	adc.w #$0008	; Add sprite width offset
-	sta.w $0cd4	 ; Set DMA destination X+8
+	sta.w !dma_source_addr	 ; Set DMA destination X+8
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM page offset
-	sta.w $0cdc	 ; Set DMA destination high
+	sta.w !dma_source_addr_alt	 ; Set DMA destination high
 	lda.w !battle_data_index_1	 ; Reload X coordinate
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM offset
-	sta.w $0cd8	 ; Set DMA source high
+	sta.w !dma_dest_addr_alt	 ; Set DMA source high
 	plp ; Restore processor flags
 	rts ; Return from coordinate processing
 ; Advanced Battle Processing and Memory Management Systems for FFMQ Bank $01
@@ -8876,11 +8876,11 @@ Sprite_Processing_Loop:
 	lda.w !battle_sprite_comp1	 ; Load sprite data component 1
 	sta.w !tilemap_wram_source_start,y   ; Store sprite data to buffer 1
 	lda.w !battle_sprite_comp2	 ; Load sprite data component 2
-	sta.w $0802,y   ; Store sprite data to buffer 2
+	sta.w !gfx_sprite_buffer_1,y   ; Store sprite data to buffer 2
 	lda.w !battle_sprite_comp3	 ; Load sprite data component 3
-	sta.w $0880,y   ; Store sprite data to buffer 3
+	sta.w !gfx_sprite_buffer_2,y   ; Store sprite data to buffer 3
 	lda.w !battle_sprite_comp4	 ; Load sprite data component 4
-	sta.w $0882,y   ; Store sprite data to buffer 4
+	sta.w !gfx_sprite_buffer_3,y   ; Store sprite data to buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment sprite buffer index
 	iny ; Continue increment for double-byte data
@@ -8957,11 +8957,11 @@ Alternative_Sprite_Loop:
 	lda.w !battle_sprite_comp1	 ; Load alternative sprite component 1
 	sta.w !tilemap_wram_source_start,y   ; Store to alternative buffer 1
 	lda.w !battle_sprite_comp2	 ; Load alternative sprite component 2
-	sta.w $0880,y   ; Store to alternative buffer 2
+	sta.w !gfx_sprite_buffer_2,y   ; Store to alternative buffer 2
 	lda.w !battle_sprite_comp3	 ; Load alternative sprite component 3
-	sta.w $0802,y   ; Store to alternative buffer 3
+	sta.w !gfx_sprite_buffer_1,y   ; Store to alternative buffer 3
 	lda.w !battle_sprite_comp4	 ; Load alternative sprite component 4
-	sta.w $0882,y   ; Store to alternative buffer 4
+	sta.w !gfx_sprite_buffer_3,y   ; Store to alternative buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment alternative sprite index
 	iny ; Continue increment for alignment
@@ -9040,11 +9040,11 @@ Memory_Graphics_Processing_Loop:
 	lda.w !battle_sprite_comp1	 ; Load memory graphics component 1
 	sta.w !tilemap_wram_source_start_2,y   ; Store to memory graphics buffer 1
 	lda.w !battle_sprite_comp2	 ; Load memory graphics component 2
-	sta.w $0902,y   ; Store to memory graphics buffer 2
+	sta.w !gfx_sprite_buffer_4,y   ; Store to memory graphics buffer 2
 	lda.w !battle_sprite_comp3	 ; Load memory graphics component 3
-	sta.w $0980,y   ; Store to memory graphics buffer 3
+	sta.w !gfx_sprite_buffer_5,y   ; Store to memory graphics buffer 3
 	lda.w !battle_sprite_comp4	 ; Load memory graphics component 4
-	sta.w $0982,y   ; Store to memory graphics buffer 4
+	sta.w !gfx_sprite_buffer_6,y   ; Store to memory graphics buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment memory graphics index
 	iny ; Continue increment for alignment
@@ -9122,11 +9122,11 @@ Alternative_Memory_Graphics_Loop:
 	lda.w !battle_sprite_comp1	 ; Load alternative memory component 1
 	sta.w !tilemap_wram_source_start_2,y   ; Store to alternative memory buffer 1
 	lda.w !battle_sprite_comp2	 ; Load alternative memory component 2
-	sta.w $0980,y   ; Store to alternative memory buffer 2
+	sta.w !gfx_sprite_buffer_5,y   ; Store to alternative memory buffer 2
 	lda.w !battle_sprite_comp3	 ; Load alternative memory component 3
-	sta.w $0902,y   ; Store to alternative memory buffer 3
+	sta.w !gfx_sprite_buffer_4,y   ; Store to alternative memory buffer 3
 	lda.w !battle_sprite_comp4	 ; Load alternative memory component 4
-	sta.w $0982,y   ; Store to alternative memory buffer 4
+	sta.w !gfx_sprite_buffer_6,y   ; Store to alternative memory buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment alternative memory index
 	iny ; Continue increment for alignment
@@ -9547,11 +9547,11 @@ Graphics_Completion_Loop:
 	lda.w !battle_sprite_comp1	 ; Load graphics completion component 1
 	sta.w !tilemap_wram_source_start_2,y   ; Store completion component 1
 	lda.w !battle_sprite_comp2	 ; Load graphics completion component 2
-	sta.w $0902,y   ; Store completion component 2
+	sta.w !gfx_sprite_buffer_4,y   ; Store completion component 2
 	lda.w !battle_sprite_comp3	 ; Load graphics completion component 3
-	sta.w $0980,y   ; Store completion component 3
+	sta.w !gfx_sprite_buffer_5,y   ; Store completion component 3
 	lda.w !battle_sprite_comp4	 ; Load graphics completion component 4
-	sta.w $0982,y   ; Store completion component 4
+	sta.w !gfx_sprite_buffer_6,y   ; Store completion component 4
 	iny ; Increment completion index
 	iny ; Continue increment for alignment
 	iny ; Continue increment for spacing
