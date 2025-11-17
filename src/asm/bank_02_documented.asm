@@ -4271,15 +4271,15 @@ DB_System_ConfigData2:
 	db $03,$03,$03,$03 ;02AAB9|        |      ; Uniform configuration
 
 ; Coordinate Offset Table
-DB_DATA8_02aabd:
+DB_System_DirectionOffsets:
 	db $00,$04,$0c,$08 ;02AABD|        |      ; Direction offsets
 
 ; Boundary Limit Data
-DB_DATA8_02aac1:
+DB_System_BoundaryMarkers1:
 	db $f0,$f0,$f0,$f0 ;02AAC1|        |      ; Boundary markers
 
 ; Extended Boundary Configuration
-DB_DATA8_02aac5:
+DB_System_BoundaryMarkers2:
 	db $f0,$f0,$f0,$f0 ;02AAC5|        |      ; Additional boundaries
 
 ;----------------------------------------------------------------------------
@@ -4520,7 +4520,7 @@ Graphics_SystemReset:
 ;----------------------------------------------------------------------------
 
 ; Progressive Graphics Pattern Table
-DB_DATA8_02ac53:
+DB_Graphics_ConfigTable1:
 	db $00,$03,$09,$0c,$12,$15,$1b,$1e ;02AC53|        |      ; Progressive sequence start
 	db $24,$27,$2a,$30,$36,$39,$3c,$3f ;02AC5B|        |      ; Continued progression
 	db $42,$45,$48,$4b,$4e,$51,$54,$57 ;02AC63|        |      ; Mid-range values
@@ -4532,19 +4532,19 @@ DB_DATA8_02ac53:
 	db $24		 ;02AC92|        |000003; End marker
 
 ; Graphics Configuration Data
-DB_DATA8_02ac93:
+DB_Graphics_ConfigTable2:
 	db $03,$03,$03,$03 ;02AC93|        |      ; Uniform configuration values
 
 ; Direction Vector Table
-DB_DATA8_02ac97:
+DB_Graphics_ConfigTable3:
 	db $00,$04,$0c,$08 ;02AC97|        |      ; Movement direction offsets
 
 ; Boundary Limit Configuration
-DB_DATA8_02ac9b:
+DB_Graphics_ConfigTable4:
 	db $f0,$f0,$f0,$f0 ;02AC9B|        |      ; Standard boundary limits
 
 ; Extended Graphics Boundary Data
-DB_DATA8_02ac9f:
+DB_Graphics_ConfigTable5:
 	db $f0,$f0,$f0,$f0 ;02AC9F|        |      ; Extended boundary limits
 
 ;----------------------------------------------------------------------------
@@ -4986,10 +4986,10 @@ GameState_Transition:
 
 ; Data Tables for State Processing
 ; Memory offset and flag data for state management
-DB_DATA8_02d3e7:
+DB_State_OffsetTable:
 	db $20,$38,$a0,$44,$20,$51 ;02D3E7; State offset table
 
-DB_DATA8_02d3ed:
+DB_State_BitMaskTable:
 	db $7f,$7f,$fb,$fb,$df,$df,$bf,$bf,$fd,$fd,$ef,$ef,$fe,$fe,$f7,$f7 ;02D3ED; bit mask table
 
 ; Advanced Graphics Processing Engine
@@ -5035,7 +5035,7 @@ Graphics_XLoop:
 	txa ;02D438|8A      |      ; Transfer X to A
 	asl a;02D439|0A      |      ; Multiply by 2
 	tax ;02D43A|AA      |      ; Transfer back to X
-	lda.w DB_DATA8_02d3e7,x ;02D43B|BDE7D3  |02D3E7; Load offset data
+	lda.w DB_State_OffsetTable,x ;02D43B|BDE7D3  |02D3E7; Load offset data
 	sta.b $85	   ;02D43E|8585    |000A85; Store offset
 	plx ;02D440|FA      |      ; Restore X
 	sep #$20		;02D441|E220    |      ; 8-bit accumulator
@@ -5115,14 +5115,14 @@ Graphics_PixelProcessor:
 
 ; Advanced bit Manipulation
 	lda.b [$85],y   ;02D49A|B785    |000A85; Load graphics data
-	and.w DB_DATA8_02d3ed,x ;02D49C|3DEDD3  |02D3ED; Apply bit mask
+	and.w DB_State_BitMaskTable,x ;02D49C|3DEDD3  |02D3ED; Apply bit mask
 	sta.b [$85],y   ;02D49F|9785    |000A85; Store modified data
 	tya ;02D4A1|98      |      ; Transfer Y to A
 	clc ;02D4A2|18      |      ; Clear carry
 	adc.w #$0010	;02D4A3|691000  |      ; Add offset (16)
 	tay ;02D4A6|A8      |      ; Transfer to Y
 	lda.b [$85],y   ;02D4A7|B785    |000A85; Load next data
-	and.w DB_DATA8_02d3ed,x ;02D4A9|3DEDD3  |02D3ED; Apply bit mask
+	and.w DB_State_BitMaskTable,x ;02D4A9|3DEDD3  |02D3ED; Apply bit mask
 	sta.b [$85],y   ;02D4AC|9785    |000A85; Store modified data
 	plp ;02D4AE|28      |      ; Restore processor status
 	pla ;02D4AF|68      |      ; Restore accumulator
@@ -5176,7 +5176,7 @@ State_ProcessPipeline:
 	asl a;02D528|0A      |      ; Multiply by 2
 	tax ;02D529|AA      |      ; Transfer to X
 	lda.w #$3800	;02D52A|A90038  |      ; Base offset
-	adc.w DB_DATA8_02d58f,x ;02D52D|7D8FD5  |02D58F; Add state offset
+	adc.w DB_Graphics_ProcessTable1,x ;02D52D|7D8FD5  |02D58F; Add state offset
 	sta.b $70	   ;02D530|8570    |000A70; Store final offset
 
 ; Graphics Data Retrieval and Setup
@@ -5247,7 +5247,7 @@ Graphics_ProcessDone:
 	rts ;02D58E|60      |      ; Return
 
 ; Graphics State Offset Data Table
-DB_DATA8_02d58f:
+DB_Graphics_ProcessTable1:
 	db $20,$00,$a0,$0c,$20,$19 ;02D58F; State offset table
 	db $a0,$25	 ;02D595; Additional offsets
 
@@ -5292,7 +5292,7 @@ Graphics_SetupEngine:
 	asl a;02D5CD|0A      |      ; Multiply by 2
 	tax ;02D5CE|AA      |      ; Transfer to X
 	rep #$30		;02D5CF|C230    |      ; 16-bit mode
-	lda.w DB_DATA8_02d627,x ;02D5D1|BD27D6  |02D627; Load tile data
+	lda.w DB_Graphics_ProcessTable2,x ;02D5D1|BD27D6  |02D627; Load tile data
 	sta.b $74	   ;02D5D4|8574    |000A74; Store tile data
 	jsr.w CallCalculationEngine ;02D5D6|20D0D6  |02D6D0; Calculate positions
 	ldy.b $72	   ;02D5D9|A472    |000A72; Load Y position
@@ -5347,7 +5347,7 @@ Graphics_SetupDone:
 	rts ;02D626|60      |      ; Return
 
 ; Graphics Tile Data Table
-DB_DATA8_02d627:
+DB_Graphics_ProcessTable2:
 	db $01,$00,$65,$00,$c9,$00 ;02D627; Tile index data
 
 ; Advanced Memory and Tile Processing Engine
@@ -5511,7 +5511,7 @@ Coord_StorePosition:
 	lda.b $18	   ;02D6F6|A518    |000A18; Load height parameter
 	lsr a;02D6F8|4A      |      ; Divide by 2
 	pha ;02D6F9|48      |      ; Save half height
-	lda.w DB_DATA8_02d72b,x ;02D6FA|BD2BD7  |02D72B; Load position data
+	lda.w DB_Graphics_ProcessTable3,x ;02D6FA|BD2BD7  |02D72B; Load position data
 	sec ;02D6FD|38      |      ; Set carry
 	sbc.b $01,s	 ;02D6FE|E301    |000001; Subtract half height
 	sta.b $16	   ;02D700|8516    |000A16; Store adjusted position
@@ -5546,7 +5546,7 @@ Coord_StorePosition:
 
 ; Position Data Table
 ; Position offset values for coordinate calculations
-DB_DATA8_02d72b:
+DB_Graphics_ProcessTable3:
 	db $10		 ;02D72B; Position offset 1
 	db $00,$00	 ;02D72C; Position offsets 2-3
 	db $0b,$15	 ;02D72E; Position offsets 4-5
@@ -5573,7 +5573,7 @@ Coord_PositionProcessor:
 
 ; Height Parameter Search Loop
 Coord_HeightSearch:
-	cmp.w DB_DATA8_02d77a,x ;02D751|DD7AD7  |02D77A; Compare with height table
+	cmp.w DB_Graphics_ProcessTable4,x ;02D751|DD7AD7  |02D77A; Compare with height table
 	beq Coord_HeightFound ;02D754|F004    |02D75A; Branch if match found
 	inx ;02D756|E8      |      ; Increment index
 	inx ;02D757|E8      |      ; Increment index (word values)
@@ -5599,7 +5599,7 @@ Coord_ProcessorExit:
 
 ; Height Data Table
 ; Height values for position calculations
-DB_DATA8_02d77a:
+DB_Graphics_ProcessTable4:
 	db $06,$06,$08,$08,$0a,$0a ;02D77A; Height values 1-6
 	db $0a,$08,$1c,$0a ;02D780; Height values 7-10
 
@@ -5617,7 +5617,7 @@ State_BankManager:
 
 ; State Data Search Loop
 State_SearchLoop:
-	lda.w DB_DATA8_02d7d3,x ;02D790|BDD3D7  |02D7D3; Load state threshold
+	lda.w DB_Graphics_ProcessTable5,x ;02D790|BDD3D7  |02D7D3; Load state threshold
 	cmp.b $20	   ;02D793|C520    |000A20; Compare with current state
 	bpl State_DataProcess ;02D795|100E    |02D7A5; Branch if threshold reached
 	rep #$30		;02D797|C230    |      ; 16-bit mode
@@ -5658,7 +5658,7 @@ State_DataProcess:
 
 ; State Data Table
 ; Complex state configuration data with thresholds and parameters
-DB_DATA8_02d7d3:
+DB_Graphics_ProcessTable5:
 	db $37,$09,$00,$00,$06,$06,$24,$00,$01,$3f,$0a,$00,$00,$08,$08,$40 ;02D7D3
 	db $00,$02,$41 ;02D7E3
 	db $0b,$00,$00,$0a,$0a,$64,$00,$03 ;02D7E6
@@ -5787,7 +5787,7 @@ Entity_ParameterProcessor:
 	php ;02D8B1|08      |      ; Save processor status
 	sep #$30		;02D8B2|E230    |      ; 8-bit mode
 	ldx.b $20	   ;02D8B4|A620    |000A20; Load entity parameter
-	lda.w DB_DATA8_02d8bf,x ;02D8B6|BDBFD8  |02D8BF; Load entity data from table
+	lda.w DB_Graphics_ProcessTable6,x ;02D8B6|BDBFD8  |02D8BF; Load entity data from table
 	sta.b $78	   ;02D8B9|8578    |000A78; Store entity data
 	plp ;02D8BB|28      |      ; Restore processor status
 	pla ;02D8BC|68      |      ; Restore accumulator
@@ -5796,7 +5796,7 @@ Entity_ParameterProcessor:
 
 ; Entity Parameter Table
 ; Complex entity parameter mapping table
-DB_DATA8_02d8bf:
+DB_Graphics_ProcessTable6:
 	db $00,$00,$00,$01,$01,$01,$02,$02 ;02D8BF; Entity parameters 0-7
 	db $02		 ;02D8C7; Entity parameter 8
 	db $03,$03	 ;02D8C8; Entity parameters 9-10
@@ -5845,7 +5845,7 @@ Graphics_DataProcessor_1:
 
 ; Graphics Parameter Search Loop
 Graphics_ParameterSearch:
-	cmp.w DB_DATA8_02d96e,x ;02D921|DD6ED9  |02D96E; Compare with threshold table
+	cmp.w DB_Graphics_ThresholdValues,x ;02D921|DD6ED9  |02D96E; Compare with threshold table
 	bmi Graphics_CalcProcess ;02D924|300A    |02D930; Branch if below threshold
 	pha ;02D926|48      |      ; Save parameter
 	txa ;02D927|8A      |      ; Transfer index to A
@@ -5858,12 +5858,12 @@ Graphics_ParameterSearch:
 ; Graphics Calculation Processing
 Graphics_CalcProcess:
 	sec ;02D930|38      |      ; Set carry
-	sbc.w DB_DATA8_02d96c,x ;02D931|FD6CD9  |02D96C; Subtract base value
+	sbc.w DB_Graphics_BaseValues,x ;02D931|FD6CD9  |02D96C; Subtract base value
 	sep #$20		;02D934|E220    |      ; 8-bit accumulator
 	rep #$10		;02D936|C210    |      ; 16-bit index
 	sta.w !WRMPYA	 ;02D938|8D0242  |024202; Set multiplicand
 	rep #$30		;02D93B|C230    |      ; 16-bit mode
-	lda.w DB_DATA8_02d972,x ;02D93D|BD72D9  |02D972; Load multiplier data
+	lda.w DB_Graphics_MultiplierValues1,x ;02D93D|BD72D9  |02D972; Load multiplier data
 	sta.w $0a79	 ;02D940|8D790A  |020A79; Store multiplier
 	sep #$20		;02D943|E220    |      ; 8-bit accumulator
 	rep #$10		;02D945|C210    |      ; 16-bit index
@@ -5876,14 +5876,14 @@ Graphics_CalcProcess:
 ; Second Stage Graphics Calculation
 	lda.w !RDMPYL	 ;02D94E|AD1642  |024216; Load multiplication result
 	sta.w !WRMPYA	 ;02D951|8D0242  |024202; Set new multiplicand
-	lda.w DB_DATA8_02d974,x ;02D954|BD74D9  |02D974; Load second multiplier
+	lda.w DB_Graphics_MultiplierValues2,x ;02D954|BD74D9  |02D974; Load second multiplier
 	sta.w !WRMPYB	 ;02D957|8D0342  |024203; Set second multiplier
 	nop ;02D95A|EA      |      ; Wait for multiplication
 	nop ;02D95B|EA      |      ; Wait for multiplication
 	nop ;02D95C|EA      |      ; Wait for multiplication
 	nop ;02D95D|EA      |      ; Wait for multiplication
 	rep #$30		;02D95E|C230    |      ; 16-bit mode
-	lda.w DB_DATA8_02d970,x ;02D960|BD70D9  |02D970; Load base offset
+	lda.w DB_Graphics_OffsetValues,x ;02D960|BD70D9  |02D970; Load base offset
 	clc ;02D963|18      |      ; Clear carry
 	adc.w !RDMPYL	 ;02D964|6D1642  |024216; Add calculation result
 	sta.b $6b	   ;02D967|856B    |000A6B; Store final result
@@ -5892,19 +5892,19 @@ Graphics_CalcProcess:
 	rts ;02D96B|60      |      ; Return
 
 ; Graphics Calculation Data Tables
-DB_DATA8_02d96c:
+DB_Graphics_BaseValues:
 	db $00,$00	 ;02D96C; Base calculation values
 
-DB_DATA8_02d96e:
+DB_Graphics_ThresholdValues:
 	db $18,$00	 ;02D96E; Threshold values
 
-DB_DATA8_02d970:
+DB_Graphics_OffsetValues:
 	db $00,$00	 ;02D970; Base offset values
 
-DB_DATA8_02d972:
+DB_Graphics_MultiplierValues1:
 	db $05,$00	 ;02D972; Multiplier values
 
-DB_DATA8_02d974:
+DB_Graphics_MultiplierValues2:
 	db $02		 ;02D974; Second multiplier
 	db $00		 ;02D975; Padding
 	db $18,$00,$20,$00,$f0,$00,$08,$00,$03 ;02D976; Graphics parameter table 1
