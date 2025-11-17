@@ -36,6 +36,10 @@
 !temp_index         = $0b       ; Temporary index/counter
 !temp_flags         = $0c       ; Temporary flag byte
 
+; Additional zero page temp variables
+!temp_byte_calc     = $0d       ; Temporary calculation byte
+!temp_byte_scratch  = $0f       ; Scratch byte for calculations
+
 ; Additional temporary variables (Medium Priority - Issue #29)
 !temp_byte_4        = $0e       ; Temporary byte storage 4 (text engine)
 !temp_byte_5        = $14       ; Temporary byte storage 5
@@ -186,6 +190,11 @@
 !player_state       = $46       ; Current player state (walk/run/etc)
 !player_animation   = $47       ; Animation frame counter
 
+; ----------------------------------------------------------------------------
+; Controller / Input System ($50-$6f)
+; ----------------------------------------------------------------------------
+!controller_data_base   = $50       ; Controller data base address (used with indexed access)
+
 !map_id             = $48       ; Current map ID
 !map_x_pos          = $49       ; Map X coordinate (tile)
 !map_y_pos          = $4a       ; Map Y coordinate (tile)
@@ -252,6 +261,15 @@
 !atb_gauge_enemy1   = $97       ; Enemy 1 ATB gauge (0-255)
 !atb_gauge_enemy2   = $98       ; Enemy 2 ATB gauge (0-255)
 
+; Calculation scratch block (8 bytes: $98-$9f)
+!calc_scratch_base  = $98       ; Calculation scratch block base address
+!calc_scratch_x     = $98       ; Calculation scratch X coordinate (2 bytes)
+!calc_scratch_y     = $9a       ; Calculation scratch Y coordinate (2 bytes)
+!calc_scratch_temp1 = $9c       ; Calculation scratch temporary value 1 (2 bytes)
+!calc_scratch_temp2 = $9e       ; Calculation scratch temporary value 2 (2 bytes)
+!calc_result_x      = $9e       ; Calculation result X (alias)
+!calc_result_y      = $a0       ; Calculation result Y (extended to $a0)
+
 !damage_value       = $99       ; Damage calculation (2 bytes: $99-$9a)
 !damage_value_lo    = $99       ; Damage calculation (low byte)
 !damage_value_hi    = $9a       ; Damage calculation (high byte)
@@ -263,6 +281,43 @@
 !exp_gained         = $9e       ; EXP gained in battle (2 bytes: $9e-$9f)
 !exp_gained_lo      = $9e       ; EXP gained (low byte)
 !exp_gained_hi      = $9f       ; EXP gained (high byte)
+
+; ----------------------------------------------------------------------------
+; Random Number Generator ($a8-$a9)
+; ----------------------------------------------------------------------------
+!rng_seed_alt       = $a8       ; Random number generator seed (alternate system)
+!rng_result         = $a9       ; Random number generator result
+
+; ----------------------------------------------------------------------------
+; Display and Animation System ($0051, $0055, $0600-$0601)
+; ----------------------------------------------------------------------------
+!display_timer          = $0051     ; Display timer counter
+!display_config         = $0055     ; Display configuration register
+!animation_command      = $0600     ; Animation command register (SPC700 interface)
+!animation_type         = $0601     ; Animation type parameter
+
+; ----------------------------------------------------------------------------
+; Audio System Extended ($0600-$0601, $366x buffers)
+; ----------------------------------------------------------------------------
+; SPC700 audio command interface - direct page $0600 for audio driver
+!audio_command_reg      = $0600     ; Audio command register (interface to SPC700)
+!audio_param_reg        = $0601     ; Audio parameter register
+
+; Audio/graphics data buffers
+!audio_data_buffer_1    = $3669     ; Audio data buffer slot 1
+!audio_data_buffer_2    = $366a     ; Audio data buffer slot 2
+!audio_data_buffer_3    = $366b     ; Audio data buffer slot 3
+!audio_data_buffer_4    = $366c     ; Audio data buffer slot 4
+!audio_data_buffer_5    = $366d     ; Audio data buffer slot 5
+!audio_data_buffer_6    = $366e     ; Audio data buffer slot 6
+!audio_data_buffer_7    = $366f     ; Audio data buffer slot 7
+!audio_data_buffer_8    = $3670     ; Audio data buffer slot 8
+
+; ----------------------------------------------------------------------------
+; System State Variables ($0e92, $31b5)
+; ----------------------------------------------------------------------------
+!sys_state_e92          = $0e92     ; System state register (multiple uses)
+!game_state_var         = $31b5     ; Game state variable ($0098 common value)
 
 ; ----------------------------------------------------------------------------
 ; Legacy / Historical Labels
@@ -372,17 +427,110 @@
 !ram_0900                       = $0900     ; Legacy label
 
 ; ============================================================================
-; System State & Temporary Variables ($04xx)
+; System State & Temporary Variables ($04xx-$05xx)
 ; ============================================================================
 ; Multi-purpose temp storage, parameters, and system state tracking
+
+; ----------------------------------------------------------------------------
+; Calculation and Result Storage ($0410-$0439)
+; ----------------------------------------------------------------------------
+!calc_base_value        = $0410     ; Base value for calculations (12 uses)
+!calc_result_storage    = $0415     ; Calculation result storage (11 uses)
+!temp_calc_area_1       = $0438     ; Temporary calculation area 1 (7 uses)
+!temp_calc_area_2       = $0439     ; Temporary calculation area 2 (6 uses)
+
+; ----------------------------------------------------------------------------
+; System Parameters and State ($043a-$04af)
+; ----------------------------------------------------------------------------
 !sys_temp_param     = $043a     ; System temporary parameter (item ID, spell ID, effect ID) (19 uses)
+
+; Movement and coordinate buffers
+!movement_offset_x      = $0477     ; Movement offset X coordinate / buffer (14 uses)
+!movement_offset_y      = $0479     ; Movement offset Y coordinate / buffer (9 uses)
+
 !sys_game_mode      = $048b     ; System game mode/state flag (12 uses)
 !sys_state_counter  = $048d     ; System state counter/flag (17 uses)
 !sys_temp_work_1    = $04a0     ; System temp working variable 1 (30 uses - highest in range)
 !sys_temp_work_2    = $04a2     ; System temp working variable 2 (11 uses)
 !sys_temp_buffer    = $04af     ; System temp buffer (10 uses)
+
+; ----------------------------------------------------------------------------
+; System State and Configuration ($04e0-$0520)
+; ----------------------------------------------------------------------------
 !sys_state_ptr      = $04e0     ; System state pointer/offset (16 uses)
 !sys_operation_type = $0513     ; System operation type (14 uses)
+
+; Configuration and validation storage
+!config_validated       = $0514     ; Validated configuration storage (8 uses)
+!config_validation_result = $0515   ; Configuration validation result (5 uses)
+
+; ============================================================================
+; DMA and Graphics System ($0800-$0a84)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; Tilemap / Graphics Base ($0800)
+; ----------------------------------------------------------------------------
+!tilemap_wram_source_start      = $0800     ; Tilemap source start (legacy label)
+
+; ----------------------------------------------------------------------------
+; DMA Parameter Block ($0900-$0921)
+; ----------------------------------------------------------------------------
+; Used for graphics decompression and DMA transfers
+!dma_param_block_base   = $0900     ; DMA parameter block base address
+!dma_src_addr_param     = $0900     ; DMA source address parameter (2 bytes: $0900-$0901)
+!dma_src_bank_param     = $0902     ; DMA source bank parameter
+!dma_dest_addr_param    = $0903     ; DMA destination address parameter (3 bytes: $0903-$0905)
+!dma_end_addr_param     = $0906     ; DMA end address parameter (for range checking)
+!dma_copy_count         = $0908     ; DMA copy count (for RLE/compression)
+!dma_skip_offset        = $090a     ; DMA skip offset (for compression)
+!dma_control_byte       = $090d     ; DMA control flags/byte
+!dma_decompress_routine = $0918     ; Decompression routine copied to this address (12 bytes)
+!dma_copy_routine       = $091e     ; Copy subroutine address
+!dma_bank_backup_1      = $0920     ; DMA bank backup storage 1
+!dma_bank_backup_2      = $0921     ; DMA bank backup storage 2
+
+; ----------------------------------------------------------------------------
+; Secondary Memory and Controller ($0a00-$0aff)
+; ----------------------------------------------------------------------------
+!secondary_mem_block    = $0a00     ; Secondary memory block base address
+!controller_input_array = $0a02     ; Controller input data array (indexed access)
+!validation_state       = $0a84     ; Validation state storage (8 uses)
+
+; Extended system state variables ($0a7e-$0aff)
+!display_flag           = $0a7e     ; Display processing flag
+!processing_flag_1      = $0a84     ; Processing flag 1 (also validation_state)
+!frame_counter_ext      = $0af0     ; Extended frame counter
+!processing_flag_2      = $0af4     ; Processing flag 2
+!processing_flag_3      = $0af5     ; Processing flag 3 (secondary)
+!processing_flag_4      = $0af8     ; Processing flag 4
+!sys_variable_aa3       = $0aa3     ; System variable (cleared in init)
+!sys_variable_aac       = $0aac     ; System variable (cleared in init)
+!sys_variable_aad       = $0aad     ; System variable (cleared in init)
+
+; ============================================================================
+; Battle and Sprite System ($0c51, $0c60-$0c6d, $0f2a-$0f2b)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; Sprite and Battle Data Registers ($0c51, $0f2a-$0f2b)
+; ----------------------------------------------------------------------------
+!sprite_data_c51        = $0c51     ; Sprite data register
+!battle_data_f2a        = $0f2a     ; Battle data array base
+!battle_data_f2b        = $0f2b     ; Battle data array (offset +1)
+
+; ----------------------------------------------------------------------------
+; Battle Coordinate Storage ($0c60-$0c6d)
+; ----------------------------------------------------------------------------
+; 4D coordinate system for battle graphics (X, Y, Z, W)
+!battle_coord_x_lo      = $0c60     ; Battle X coordinate (low byte)
+!battle_coord_x_hi      = $0c61     ; Battle X coordinate (high byte)
+!battle_coord_y_lo      = $0c64     ; Battle Y coordinate (low byte)
+!battle_coord_y_hi      = $0c65     ; Battle Y coordinate (high byte)
+!battle_coord_z_lo      = $0c68     ; Battle Z coordinate (low byte)
+!battle_coord_z_hi      = $0c69     ; Battle Z coordinate (high byte)
+!battle_coord_w_lo      = $0c6c     ; Battle W coordinate (low byte)
+!battle_coord_w_hi      = $0c6d     ; Battle W coordinate (high byte)
 
 ; ============================================================================
 ; OAM Sprite Buffer ($0c00-$0c1f+)
@@ -411,6 +559,21 @@
 !oam_sprite4_tile   = $0c12     ; Sprite 4 tile index (25 uses)
 !oam_sprite5_tile   = $0c16     ; Sprite 5 tile index (25 uses)
 !oam_sprite_window  = $0c40     ; OAM sprite window/control (18 uses)
+
+; ----------------------------------------------------------------------------
+; Save Slot Indicators and Data Buffers ($0fe7, $1010, $1050)
+; ----------------------------------------------------------------------------
+!save_slot_indicator    = $0fe7     ; Save slot indicator byte ($02 = slot 2, etc.)
+!data_copy_dest_1       = $1010     ; Data copy destination buffer 1 (64 bytes)
+!data_copy_dest_2       = $1050     ; Data copy destination buffer 2 (10+ bytes)
+
+; ----------------------------------------------------------------------------
+; System Pointers and Registers ($0b83, $1020, $1114-$1116)
+; ----------------------------------------------------------------------------
+!rom_function_ptr       = $0b83     ; ROM function pointer base
+!status_register        = $1020     ; System status register (6 uses)
+!position_coord_x       = $1114     ; Position X coordinate (low word)
+!position_coord_y       = $1116     ; Position Y coordinate (high word)
 
 !ram_1031                       = $1031     ; Legacy label
 !ram_1031_long                  = $001031   ; Legacy label (long address)
@@ -926,7 +1089,32 @@
 !menu_buffer        = $7e0e00   ; Menu text buffer (256 bytes)
 
 ; ============================================================================
+; Extended WRAM Graphics and Data Buffers ($c588-$f0f0)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; Graphics Tile Data Buffers ($cef4-$d174)
+; ----------------------------------------------------------------------------
+!wram_buffer_cef4       = $cef4     ; Graphics tile data buffer 1 (indexed access)
+!wram_buffer_cef6       = $cef6     ; Graphics tile data buffer 2 (offset +2)
+!wram_buffer_d0f4       = $d0f4     ; Graphics tile data buffer 3
+!wram_buffer_d174       = $d174     ; Graphics tile data buffer 4
+
+; ----------------------------------------------------------------------------
+; Extended Data Storage ($c588, $f0f0)
+; ----------------------------------------------------------------------------
+!wram_buffer_c588       = $c588     ; WRAM data buffer (indexed access)
+!wram_buffer_f0f0       = $f0f0     ; Extended data buffer (high WRAM)
+
+; ----------------------------------------------------------------------------
+; System Flags Register ($0094)
+; ----------------------------------------------------------------------------
+!sys_flags_94           = $0094     ; System flags register (battle/graphics state)
+
+; ============================================================================
 ; End of RAM Variables
 ; ============================================================================
+
+
 
 
