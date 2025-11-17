@@ -6731,7 +6731,7 @@ Graphics_DataLoop:
 
 ; Graphics Configuration Data Table
 ; Complex graphics setup parameters
-DB_DATA8_02e04f:
+DB_Display_ConfigTable1:
 	db $0c,$00,$00,$00,$a0,$5d,$06 ;02E04F; Graphics configuration parameters
 
 ; Advanced Graphics Processing and Calculation Engine
@@ -6994,14 +6994,14 @@ Pattern_Complete:
 ; Advanced Graphics Data Tables and Constants
 ; ------------------------------------------------------------------------------
 ; Complex graphics configuration data for multi-system coordination
-DB_DATA8_02e5a0:
+DB_Display_ConfigTable2:
 	db $18,$00	 ;02E5A0|        |      ;  Graphics timing constant
 	db $07,$00,$b4,$7e,$b8,$fa ;02E5A2|        |000000;  Graphics buffer addresses
 
-DB_DATA8_02e5a8:
+DB_Display_ConfigTable3:
 	db $00,$01	 ;02E5A8|        |      ;  Graphics increment value
 
-DB_DATA8_02e5aa:
+DB_Display_ConfigTable4:
 	db $00,$02	 ;02E5AA|        |      ;  Graphics step value
 
 ; ------------------------------------------------------------------------------
@@ -7017,9 +7017,9 @@ System_Coordinator:
 	rep #$30		;02E5B1|C230    |      ;  16-bit registers and indexes
 	phk ;02E5B3|4B      |      ;  Push current bank
 	plb ;02E5B4|AB      |      ;  Set data bank to current
-	lda.w DB_DATA8_02e5a8 ;02E5B5|ADA8E5  |02E5A8;  Load system increment
+	lda.w DB_Display_ConfigTable3 ;02E5B5|ADA8E5  |02E5A8;  Load system increment
 	sta.w $0aae	 ;02E5B8|8DAE0A  |020AAE;  Store to system variable
-	lda.w DB_DATA8_02e5aa ;02E5BB|ADAAE5  |02E5AA;  Load system step
+	lda.w DB_Display_ConfigTable4 ;02E5BB|ADAAE5  |02E5AA;  Load system step
 	sta.w $0ab0	 ;02E5BE|8DB00A  |020AB0;  Store to system variable
 	sep #$20		;02E5C1|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E5C3|C210    |      ;  16-bit index registers
@@ -7146,7 +7146,7 @@ DB_Label_02E6B4:
 	adc.w $0aae	 ;02E6B9|6DAE0A  |020AAE;  Add system increment
 	sta.w $0aae	 ;02E6BC|8DAE0A  |020AAE;  Store updated timer
 	lda.w $0ab0	 ;02E6BF|ADB00A  |020AB0;  Load system timer
-	adc.w DB_DATA8_02e5a0 ;02E6C2|6DA0E5  |02E5A0;  Add timing constant
+	adc.w DB_Display_ConfigTable2 ;02E6C2|6DA0E5  |02E5A0;  Add timing constant
 	sta.w $0ab0	 ;02E6C5|8DB00A  |020AB0;  Store updated timer
 	jsl.l CWaitTimingRoutine ;02E6C8|2200800C|0C8000;  Call external coordination
 	sep #$20		;02E6CC|E220    |      ;  8-bit accumulator mode
@@ -7472,14 +7472,14 @@ DB_Label_02E969:
 
 ; Priority Assignment and Return
 DB_Load_02E983:
-	lda.w DB_DATA8_02e98a,x ;02E983|BD8AE9  |02E98A;  Load priority value from table
+	lda.w DB_Display_ConfigTable5,x ;02E983|BD8AE9  |02E98A;  Load priority value from table
 	plp ;02E986|28      |      ;  Restore processor status
 	ply ;02E987|7A      |      ;  Restore Y register
 	plx ;02E988|FA      |      ;  Restore X register
 	rts ;02E989|60      |      ;  Return with priority value
 
 ; Priority Value Lookup Table
-DB_DATA8_02e98a:
+DB_Display_ConfigTable5:
 	db $07		 ;02E98A|        |      ;  Highest priority
 	db $06,$05,$04,$03,$00,$01,$02 ;02E98B|        |000005;  Priority values (descending)
 
@@ -7796,7 +7796,7 @@ DB_Label_02EACA:
 	tay ;02EAFD|A8      |      ;  Transfer to Y index
 	sep #$20		;02EAFE|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02EB00|C210    |      ;  16-bit index registers
-	lda.w DB_DATA8_02eb10,y ;02EB02|B910EB  |02EB10;  Load bit mask from table
+	lda.w DB_Display_ConfigTable6,y ;02EB02|B910EB  |02EB10;  Load bit mask from table
 	eor.w $0e00,x   ;02EB05|5D000E  |020E00;  XOR with current bit state
 	sta.w $0e00,x   ;02EB08|9D000E  |020E00;  Store updated bit state
 	plp ;02EB0B|28      |      ;  Restore processor status
@@ -7806,7 +7806,7 @@ DB_Label_02EACA:
 	rts ;02EB0F|60      |      ;  Return from bit processing
 
 ; bit Processing Lookup Table
-DB_DATA8_02eb10:
+DB_Display_ConfigTable6:
 	db $01,$04,$10,$40 ;02EB10|        |      ;  bit mask values for bit processing
 
 ; ------------------------------------------------------------------------------
@@ -7823,7 +7823,7 @@ DB_Label_02EB14:
 	lda.b $03,s	 ;02EB1A|A303    |000003;  Load validation data from stack
 	and.b #$03	  ;02EB1C|2903    |      ;  Mask to 2-bit validation index
 	tay ;02EB1E|A8      |      ;  Transfer to Y index
-	lda.w DB_DATA8_02eb2c,y ;02EB1F|B92CEB  |02EB2C;  Load validation mask from table
+	lda.w DB_Display_ConfigTable7,y ;02EB1F|B92CEB  |02EB2C;  Load validation mask from table
 	eor.w $0e00,x   ;02EB22|5D000E  |020E00;  XOR with current validation state
 	sta.w $0e00,x   ;02EB25|9D000E  |020E00;  Store updated validation state
 	ply ;02EB28|7A      |      ;  Restore Y register
@@ -7832,7 +7832,7 @@ DB_Label_02EB14:
 	rts ;02EB2B|60      |      ;  Return from bit validation
 
 ; Validation bit Lookup Table
-DB_DATA8_02eb2c:
+DB_Display_ConfigTable7:
 	db $02,$08,$20 ;02EB2C|        |      ;  Validation bit masks
 	db $80		 ;02EB2F|        |02EB39;  High validation bit
 
@@ -7857,14 +7857,14 @@ DB_Label_02EB30:
 
 ; Slot Allocation and Return
 DB_Load_02EB4A:
-	lda.w DB_DATA8_02eb51,x ;02EB4A|BD51EB  |02EB51;  Load slot configuration from table
+	lda.w DB_Display_ConfigTable8,x ;02EB4A|BD51EB  |02EB51;  Load slot configuration from table
 	ply ;02EB4D|7A      |      ;  Restore Y register
 	plx ;02EB4E|FA      |      ;  Restore X register
 	plp ;02EB4F|28      |      ;  Restore processor status
 	rts ;02EB50|60      |      ;  Return with slot configuration
 
 ; Memory Slot Configuration Table
-DB_DATA8_02eb51:
+DB_Display_ConfigTable8:
 	db $00		 ;02EB51|        |      ;  Base slot configuration
 	db $08,$80,$88 ;02EB52|        |      ;  Extended slot configurations
 
@@ -8071,7 +8071,7 @@ DB_Label_02EC27:
 	bpl DB_Label_02EC3B ;02EC31|1008    |02EC3B;  Branch if high priority
 	asl a;02EC33|0A      |      ;  Multiply by 2
 	tax ;02EC34|AA      |      ;  Transfer to X index
-	jmp.w (DB_DATA8_02ec60,x) ;02EC35|7C60EC  |02EC60;  Jump to thread handler table
+	jmp.w (DB_Display_ConfigTable9,x) ;02EC35|7C60EC  |02EC60;  Jump to thread handler table
 	db $80,$07	 ;02EC38|        |02EC41;  Skip high priority handler
 
 ; High Priority Thread Processing
@@ -8110,7 +8110,7 @@ DB_Load_02EC4A:
 	rts ;02EC5C|60      |      ;  Return with execution time
 
 ; Thread Handler Lookup Table
-DB_DATA8_02ec60:
+DB_Display_ConfigTable9:
 	dw DB_Label_02EC42 ;02EC60|        |      ;  Standard thread completion
 	dw DB_Load_02EC4A ;02EC62|        |      ;  Execution time management
 	dw DB_Load_02EC45 ;02EC64|        |      ;  Environment initialization
@@ -8184,7 +8184,7 @@ DB_Label_02ECA5:
 
 ; Standard Validation Processing
 	tax ;02ECB1|AA      |      ;  Transfer validation code to X
-	lda.w DB_DATA8_02ece0,x ;02ECB2|BDE0EC  |02ECE0;  Load validation mask from table
+	lda.w DB_Display_ConfigTable10,x ;02ECB2|BDE0EC  |02ECE0;  Load validation mask from table
 	sta.b $d1	   ;02ECB5|85D1    |000AD1;  Store validation mask
 	ldy.w #$0004	;02ECB7|A00400  |      ;  Load validation loop counter
 
@@ -8231,7 +8231,7 @@ DB_Store_02ECD9:
 	rts ;02ECDF|60      |      ;  Return from validation
 
 ; Validation Mask Lookup Table
-DB_DATA8_02ece0:
+DB_Display_ConfigTable10:
 	db $01,$02,$04,$08,$10,$20,$40,$80 ;02ECE0|        |      ;  Validation bit masks
 	db $03,$06,$0c,$18,$30,$60,$c0,$81 ;02ECE8|        |      ;  Complex validation patterns
 
@@ -8308,11 +8308,11 @@ DB_Label_02ED2C:
 	rep #$10		;02ED3B|C210    |      ;  16-bit index registers
 
 ; bit Manipulation Processing with Validation
-	lda.w DB_DATA8_02ed5c,x ;02ED3D|BD5CED  |02ED5C;  Load bit manipulation mask
+	lda.w DB_Display_ConfigByte1,x ;02ED3D|BD5CED  |02ED5C;  Load bit manipulation mask
 	sta.b $d2	   ;02ED40|85D2    |000AD2;  Store manipulation mask
-	lda.w DB_DATA8_02ed5d,x ;02ED42|BD5DED  |02ED5D;  Load validation mask
+	lda.w DB_Display_ConfigByte2,x ;02ED42|BD5DED  |02ED5D;  Load validation mask
 	sta.b $d3	   ;02ED45|85D3    |000AD3;  Store validation mask
-	lda.w DB_DATA8_02ed5e,x ;02ED47|BD5EED  |02ED5E;  Load operation flags
+	lda.w DB_Display_ConfigByte3,x ;02ED47|BD5EED  |02ED5E;  Load operation flags
 	sta.b $d4	   ;02ED4A|85D4    |000AD4;  Store operation flags
 
 ; Complex bit Operation Processing
@@ -8336,11 +8336,11 @@ DB_Store_02ED58:
 	rts ;02ED5E|60      |      ;  Return from bit manipulation
 
 ; bit Manipulation Configuration Table
-DB_DATA8_02ed5c:
+DB_Display_ConfigByte1:
 	db $01,$02,$81,$04,$08,$82,$10,$20 ;02ED5C|        |      ;  bit manipulation configurations
-DB_DATA8_02ed5d:
+DB_Display_ConfigByte2:
 	db $81,$40,$85,$80,$81,$86,$81,$87 ;02ED5D|        |      ;  Validation mask configurations
-DB_DATA8_02ed5e:
+DB_Display_ConfigByte3:
 	db $40,$00,$60,$00,$40,$20,$40,$40 ;02ED5E|        |      ;  Operation flag configurations
 
 ; **CYCLE 21 COMPLETION MARKER - 7,700+ lines documented (62%+ complete)**
@@ -8370,7 +8370,7 @@ DB_Label_02EE60:
 	phx ;02EE60|DA      |      ;  Preserve entity index
 	ldx.w $0ad7	 ;02EE61|AED70A  |020AD7;  Load entity processing counter
 	bne DB_Label_02EE6B ;02EE64|D005    |02EE6B;  Branch if counter active
-	cmp.w DB_DATA8_02ee87,y ;02EE66|D987EE  |02EE87;  Compare with priority threshold
+	cmp.w DB_Display_ConfigTable11,y ;02EE66|D987EE  |02EE87;  Compare with priority threshold
 	bmi DB_Label_02EE6E ;02EE69|3003    |02EE6E;  Branch if below threshold
 
 ; Entity Processing Counter Management
@@ -8383,11 +8383,11 @@ DB_Label_02EE6E:
 
 ; Entity State Value Processing Loop
 DB_Label_02EE6F:
-	cmp.w DB_DATA8_02ee87,y ;02EE6F|D987EE  |02EE87;  Compare with processing threshold
+	cmp.w DB_Display_ConfigTable11,y ;02EE6F|D987EE  |02EE87;  Compare with processing threshold
 	bmi DB_Label_02EE7D ;02EE72|3009    |02EE7D;  Branch if below threshold
 	inc.w $0ad1,x   ;02EE74|FED10A  |020AD1;  Increment entity state counter
 	sec ;02EE77|38      |      ;  Set carry for subtraction
-	sbc.w DB_DATA8_02ee87,y ;02EE78|F987EE  |02EE87;  Subtract processing threshold
+	sbc.w DB_Display_ConfigTable11,y ;02EE78|F987EE  |02EE87;  Subtract processing threshold
 	bra DB_Label_02EE6F ;02EE7B|80F2    |02EE6F;  Continue processing loop
 
 ; Entity Processing Completion
@@ -8405,7 +8405,7 @@ DB_Label_02EE84:
 	rts ;02EE86|60      |      ;  Return from entity processing
 
 ; Entity Processing Threshold Table
-DB_DATA8_02ee87:
+DB_Display_ConfigTable11:
 	db $10,$27,$e8,$03,$64,$00,$0a,$00,$01,$00 ;02EE87|        |      ;  Processing thresholds for entities
 
 ; ------------------------------------------------------------------------------
@@ -8483,7 +8483,7 @@ DB_Load_02EEFB:
 ; Active Graphics Element Processing
 DB_Label_02EF05:
 	txa ;02EF05|8A      |      ;  Transfer graphics index to accumulator
-	pea.w DB_DATA8_02ef0e ;02EF06|F40EEF  |02EF0E;  Push graphics handler table address
+	pea.w DB_Display_ConfigTable12 ;02EF06|F40EEF  |02EF0E;  Push graphics handler table address
 	jsl.l CallSpriteInitializer ;02EF09|22BE9700|0097BE;  Call external graphics processor
 
 ; Graphics Processing Completion
@@ -8491,7 +8491,7 @@ DB_Return_02EF0D:
 	rtl ;02EF0D|6B      |      ;  Return from graphics processing
 
 ; Graphics Handler Table
-DB_DATA8_02ef0e:
+DB_Display_ConfigTable12:
 	db $16,$ef,$8d,$ef,$3c,$f0,$8c,$f0 ;02EF0E|        |      ;  Graphics handler addresses
 
 ; ------------------------------------------------------------------------------
@@ -8524,11 +8524,11 @@ DB_Label_02EF31:
 
 ; DMA Transfer Configuration Setup
 	rep #$30		;02EF38|C230    |      ;  16-bit registers and indexes
-	lda.w DB_DATA8_02ef63,x ;02EF3A|BD63EF  |02EF63;  Load VRAM destination from table
+	lda.w DB_Display_ConfigTable13,x ;02EF3A|BD63EF  |02EF63;  Load VRAM destination from table
 	sta.w !VMADDL	 ;02EF3D|8D1621  |022116;  Set VRAM address register
-	lda.w DB_DATA8_02ef71,x ;02EF40|BD71EF  |02EF71;  Load DMA source address from table
+	lda.w DB_Display_ConfigTable14,x ;02EF40|BD71EF  |02EF71;  Load DMA source address from table
 	sta.w !DMA0_A1T0L	 ;02EF43|8D0243  |024302;  Set DMA source address register
-	lda.w DB_DATA8_02ef7f,x ;02EF46|BD7FEF  |02EF7F;  Load DMA transfer size from table
+	lda.w DB_Display_ConfigTable15,x ;02EF46|BD7FEF  |02EF7F;  Load DMA transfer size from table
 	sta.w !DMA0_DAS0L	 ;02EF49|8D0543  |024305;  Set DMA transfer size register
 	sep #$20		;02EF4C|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02EF4E|C210    |      ;  16-bit index registers
@@ -8545,15 +8545,15 @@ DB_Label_02EF31:
 	db $01,$18,$00,$00,$7e ;02EF5E|        |      ;  DMA configuration block
 
 ; DMA Transfer Address Tables
-DB_DATA8_02ef63:
+DB_Display_ConfigTable13:
 	db $00,$40,$00,$48,$00,$00,$50,$06,$90,$0c,$d0,$12 ;02EF63|        |      ;  VRAM destination addresses
 	db $d0,$12	 ;02EF6F|        |02EF83;  Additional destination
 
-DB_DATA8_02ef71:
+DB_Display_ConfigTable14:
 	db $00,$a8,$00,$b8,$00,$38,$a0,$44,$20,$51,$a0,$5d ;02EF71|        |      ;  DMA source addresses
 	db $a0,$5d	 ;02EF7D|        |      ;  Additional source
 
-DB_DATA8_02ef7f:
+DB_Display_ConfigTable15:
 	db $80,$06,$80,$06,$a0,$0c,$80,$0c,$80,$0c,$00,$13 ;02EF7F|        |      ;  DMA transfer sizes
 	db $00,$1c	 ;02EF8B|        |      ;  Additional sizes
 
@@ -8587,11 +8587,11 @@ DB_Label_02EFA8:
 
 ; Secondary DMA Transfer Configuration
 	rep #$30		;02EFAF|C230    |      ;  16-bit registers and indexes
-	lda.w DB_DATA8_02efe4,x ;02EFB1|BDE4EF  |02EFE4;  Load secondary VRAM destination
+	lda.w DB_Display_ConfigTable16,x ;02EFB1|BDE4EF  |02EFE4;  Load secondary VRAM destination
 	sta.w !VMADDL	 ;02EFB4|8D1621  |022116;  Set secondary VRAM address
-	lda.w DB_DATA8_02eff2,x ;02EFB7|BDF2EF  |02EFF2;  Load secondary DMA source
+	lda.w DB_Display_ConfigTable17,x ;02EFB7|BDF2EF  |02EFF2;  Load secondary DMA source
 	sta.w !DMA0_A1T0L	 ;02EFBA|8D0243  |024302;  Set secondary DMA source address
-	lda.w DB_DATA8_02f000,x ;02EFBD|BD00F0  |02F000;  Load secondary DMA transfer size
+	lda.w DB_Display_ConfigTable18,x ;02EFBD|BD00F0  |02F000;  Load secondary DMA transfer size
 	sta.w !DMA0_DAS0L	 ;02EFC0|8D0543  |024305;  Set secondary DMA size
 	sep #$20		;02EFC3|E220    |      ;  8-bit accumulator mode
 	lda.b #$80	  ;02EFC5|A980    |      ;  Load secondary VRAM increment mode
@@ -8618,15 +8618,15 @@ DB_Label_02EFDB:
 	db $01,$18,$00,$00,$7e ;02EFDF|        |      ;  Secondary DMA configuration
 
 ; Secondary DMA Transfer Address Tables
-DB_DATA8_02efe4:
+DB_Display_ConfigTable16:
 	db $00,$70,$00,$78,$00,$61,$00,$69 ;02EFE4|        |      ;  Secondary VRAM destinations
 	db $00,$00,$50,$06,$90,$0c ;02EFEC|        |      ;  Additional secondary destinations
 
-DB_DATA8_02eff2:
+DB_Display_ConfigTable17:
 	db $00,$78,$00,$88,$00,$78,$00,$78 ;02EFF2|        |      ;  Secondary DMA sources
 	db $00,$78,$a0,$84,$20,$91 ;02EFFA|        |      ;  Additional secondary sources
 
-DB_DATA8_02f000:
+DB_Display_ConfigTable18:
 	db $00,$10,$00,$10,$00,$10,$00,$0e ;02F000|        |      ;  Secondary DMA transfer sizes
 	db $a0,$0c,$80,$0c,$80,$0c,$da,$5a,$08,$e2,$20,$c2,$10,$a2,$35,$f0 ;02F008|        |      ;  Extended size configurations
 
@@ -8649,7 +8649,7 @@ DB_DATA8_02f000:
 ; Advanced Color Validation and Error Handling Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated color validation with comprehensive error handling and recovery
-DB_DATA8_02f5bf:
+DB_Memory_ConfigTable1:
 	db $fd,$f7,$df,$7f ;02F5BF|        |      ;  Color validation bit masks
 
 ; Color Processing Control and Validation
@@ -8661,7 +8661,7 @@ DB_Label_02F5C3:
 	lda.w $0aee	 ;02F5CB|ADEE0A  |020AEE;  Load color validation state
 	cmp.b #$03	  ;02F5CE|C903    |      ;  Check if validation level sufficient
 	bpl DB_Label_02F5D9 ;02F5D0|1007    |02F5D9;  Skip if validation insufficient
-	pea.w DB_DATA8_02f5db ;02F5D2|F4DBF5  |02F5DB;  Push color handler table address
+	pea.w DB_Memory_ConfigTable2 ;02F5D2|F4DBF5  |02F5DB;  Push color handler table address
 	jsl.l CallSpriteInitializer ;02F5D5|22BE9700|0097BE;  Call external color processor
 
 ; Color Processing Completion
@@ -8670,7 +8670,7 @@ DB_Label_02F5D9:
 	rts ;02F5DA|60      |      ;  Return from color processing
 
 ; Color Handler Table
-DB_DATA8_02f5db:
+DB_Memory_ConfigTable2:
 	db $e1,$f5,$e1,$f5,$e3,$f5 ;02F5DB|        |      ;  Color handler addresses
 	rts ;02F5E1|60      |      ;  Return from color handler
 
@@ -8678,7 +8678,7 @@ DB_DATA8_02f5db:
 ; Complex Color Processing and Palette Management Engine
 ; ------------------------------------------------------------------------------
 ; Advanced color processing with sophisticated palette management and validation
-DB_DATA8_02f5e2:
+DB_Memory_ConfigTable3:
 	db $08		 ;02F5E2|        |      ;  Color processing increment
 
 ; Color Processing with Mathematical Operations
@@ -8686,7 +8686,7 @@ DB_Label_02F5E3:
 	php ;02F5E3|08      |      ;  Preserve processor status
 	lda.w $0aef	 ;02F5E4|ADEF0A  |020AEF;  Load color processing state
 	clc ;02F5E7|18      |      ;  Clear carry for addition
-	adc.w DB_DATA8_02f5e2 ;02F5E8|6DE2F5  |02F5E2;  Add color processing increment
+	adc.w DB_Memory_ConfigTable3 ;02F5E8|6DE2F5  |02F5E2;  Add color processing increment
 	pha ;02F5EB|48      |      ;  Preserve color result
 	and.b #$0f	  ;02F5EC|290F    |      ;  Mask to low nibble
 	sta.w $0aef	 ;02F5EE|8DEF0A  |020AEF;  Store updated color state
@@ -8701,7 +8701,7 @@ DB_Label_02F5F9:
 	cpx.b #$52	  ;02F5F9|E052    |      ;  Check if reached color limit (82 colors)
 	bpl DB_Label_02F615 ;02F5FB|1018    |02F615;  Branch to extended processing
 	txa ;02F5FD|8A      |      ;  Transfer color index to accumulator
-	cmp.w DB_DATA8_02f626,y ;02F5FE|D926F6  |02F626;  Compare with color threshold
+	cmp.w DB_Memory_ConfigByte1,y ;02F5FE|D926F6  |02F626;  Compare with color threshold
 	bmi DB_Load_02F605 ;02F601|3002    |02F605;  Skip threshold update if below
 	iny ;02F603|C8      |      ;  Increment threshold index
 	iny ;02F604|C8      |      ;  Increment again (2 bytes per threshold)
@@ -8710,7 +8710,7 @@ DB_Label_02F5F9:
 DB_Load_02F605:
 	lda.l $7ec660,x ;02F605|BF60C67E|7EC660;  Load color value from WRAM
 	clc ;02F609|18      |      ;  Clear carry for addition
-	adc.w DB_DATA8_02f627,y ;02F60A|7927F6  |02F627;  Add color adjustment value
+	adc.w DB_Memory_ConfigByte2,y ;02F60A|7927F6  |02F627;  Add color adjustment value
 	sta.l $7ec660,x ;02F60D|9F60C67E|7EC660;  Store updated color value
 	inx ;02F611|E8      |      ;  Increment color index
 	inx ;02F612|E8      |      ;  Increment again (2 bytes per color)
@@ -8735,17 +8735,17 @@ DB_Label_02F624:
 	rts ;02F625|60      |      ;  Return from color processing
 
 ; Color Processing Configuration Tables
-DB_DATA8_02f626:
+DB_Memory_ConfigByte1:
 	db $30		 ;02F626|        |      ;  Color threshold boundary
 
-DB_DATA8_02f627:
+DB_Memory_ConfigByte2:
 	db $03,$40,$02,$50,$01 ;02F627|        |      ;  Color adjustment values
 
 ; ------------------------------------------------------------------------------
 ; Advanced Entity State Processing and Handler Management Engine
 ; ------------------------------------------------------------------------------
 ; Complex entity state processing with sophisticated handler management
-DB_DATA8_02f62c:
+DB_Memory_ConfigTable4:
 	db $c2,$f6,$c3,$f6,$d4,$f6,$e3,$f6,$f4,$f6,$08,$f7,$21,$f7 ;02F62C|        |      ;  Entity handler addresses
 	db $36,$f7	 ;02F63A|        |0000F7;  Additional handler addresses
 	db $4a,$f7	 ;02F63C|        |      ;  More handler addresses
@@ -8951,7 +8951,7 @@ Sprite_Processor:
 ; ============================================================================
 
 Sprite_DataCopyLoop:
-	lda.w DB_DATA8_02fb41,y ;02FB30|B941FB  |02FB41; Load sprite graphics data from table
+	lda.w DB_Memory_ConfigTable5,y ;02FB30|B941FB  |02FB41; Load sprite graphics data from table
 	iny ;02FB33|C8      |      ; Increment Y register for next graphics byte
 	sta.b $02,x	 ;02FB34|9502    |000C02; Store graphics data to sprite memory
 	inx ;02FB36|E8      |      ; Increment X register for next sprite position
@@ -8967,7 +8967,7 @@ Sprite_DataCopyLoop:
 ; SPRITE GRAPHICS DATA TABLE
 ; ============================================================================
 
-DB_DATA8_02fb41:
+DB_Memory_ConfigTable5:
 	db $9f,$a0,$a1,$a2 ;02FB41|        |      ; Sprite graphics tile indices for animation
 
 ; ============================================================================
@@ -9083,7 +9083,7 @@ Sprite_DefaultGraphics:
 	phx ;02FDAA|DA      |      ; Preserve X register for entity index
 	php ;02FDAB|08      |      ; Preserve processor status flags
 	lda.l $7ec380,x ;02FDAC|BF80C37E|7EC380; Load entity animation state from extended memory
-	pea.w DB_DATA8_02f62c ;02FDB0|F42CF6  |02F62C; Push animation data table address
+	pea.w DB_Memory_ConfigTable4 ;02FDB0|F42CF6  |02F62C; Push animation data table address
 	jsl.l CallSpriteInitializer ;02FDB3|22BE9700|0097BE; Call cross-bank animation processing routine
 	plp ;02FDB7|28      |      ; Restore processor status flags
 	plx ;02FDB8|FA      |      ; Restore X register (entity index)
@@ -9096,7 +9096,7 @@ Sprite_DefaultGraphics:
 
 	phx ;02FDBD|DA      |      ; Preserve X register for entity management
 	lda.l $7ec380,x ;02FDBE|BF80C37E|7EC380; Load entity animation state from memory
-	pea.w DB_DATA8_02f62c ;02FDC2|F42CF6  |02F62C; Push animation table reference
+	pea.w DB_Memory_ConfigTable4 ;02FDC2|F42CF6  |02F62C; Push animation table reference
 	jsl.l CallSpriteInitializer ;02FDC5|22BE9700|0097BE; Call cross-bank animation coordinator
 	plx ;02FDC9|FA      |      ; Restore X register (entity index)
 	rts ;02FDCA|60      |      ; Return from streamlined processing
@@ -9220,8 +9220,8 @@ Entity_Deactivator:
 	and.b #$03	  ;02FEB6|2903    |      ; Mask lower 2 bits for bit position
 	tay ;02FEB8|A8      |      ; Transfer to Y register for bit indexing
 	lda.w $0e00,x   ;02FEB9|BD000E  |020E00; Load entity activation flags from memory
-	and.w DB_DATA8_02feca,y ;02FEBC|39CAFE  |02FECA; Apply deactivation mask (clear specific bit)
-	ora.w DB_DATA8_02fece,y ;02FEBF|19CEFE  |02FECE; Apply activation pattern (set specific bits)
+	and.w DB_Memory_ConfigTable6,y ;02FEBC|39CAFE  |02FECA; Apply deactivation mask (clear specific bit)
+	ora.w DB_Memory_ConfigTable7,y ;02FEBF|19CEFE  |02FECE; Apply activation pattern (set specific bits)
 	sta.w $0e00,x   ;02FEC2|9D000E  |020E00; Store updated activation flags
 	plp ;02FEC5|28      |      ; Restore processor status flags
 	plx ;02FEC6|FA      |      ; Restore X register (entity index)
@@ -9233,10 +9233,10 @@ Entity_Deactivator:
 ; ENTITY ACTIVATION bit MANIPULATION TABLES
 ; ============================================================================
 
-DB_DATA8_02feca:
+DB_Memory_ConfigTable6:
 	db $fd,$f7,$df,$7f ;02FECA|        |      ; Deactivation masks (clear bits)
 
-DB_DATA8_02fece:
+DB_Memory_ConfigTable7:
 	db $01,$04,$10,$40 ;02FECE|        |      ; Activation patterns (set bits)
 
 ; ============================================================================
