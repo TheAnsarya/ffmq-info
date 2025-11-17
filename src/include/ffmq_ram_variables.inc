@@ -1248,6 +1248,78 @@
 !sys_flags_94           = $0094     ; System flags register (battle/graphics state)
 
 ; ============================================================================
+; Extended WRAM ($1000-$1fff)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; System Status and State ($1020-$10b0)
+; ----------------------------------------------------------------------------
+!sys_status_register    = $1020     ; System status register (read/write)
+!sys_timing_param       = $10a5     ; Timing parameter
+!sys_state_1            = $10b0     ; System state register
+
+; ----------------------------------------------------------------------------
+; Sprite Management ($1500-$1502)
+; ----------------------------------------------------------------------------
+!sprite_output_var      = $1500     ; Sprite output variable
+!sprite_target_id       = $1502     ; Target sprite ID for comparison
+
+; ----------------------------------------------------------------------------
+; Layer Scroll Positions ($190c-$190e)
+; ----------------------------------------------------------------------------
+!layer1_scroll_x        = $190c     ; Layer 1 scroll X position
+!layer2_scroll_x        = $190e     ; Layer 2 scroll X position
+
+; ----------------------------------------------------------------------------
+; Background and Map Variables ($19ab-$19d8)
+; ----------------------------------------------------------------------------
+!bg_variable_19ab       = $19ab     ; Background variable
+!bg_map_ptr_19b2        = $19b2     ; Background map pointer
+!bg_data_1953           = $1953     ; Background data
+!bg_variable_19d8       = $19d8     ; Background variable
+
+; ----------------------------------------------------------------------------
+; Tilemap Configuration ($1a4d-$1a50)
+; ----------------------------------------------------------------------------
+!bg2_tilemap_config     = $1a4d     ; BG2 tilemap configuration
+!color_math_control     = $1a50     ; Color math control / layer config 0
+
+; ----------------------------------------------------------------------------
+; Memory Graphics System ($1a18-$1a2c)
+; ----------------------------------------------------------------------------
+!mem_gfx_flags          = $1a18     ; Memory graphics flags
+!mem_gfx_final          = $1a1a     ; Memory graphics final
+!mem_gfx_buffer_sec     = $1a20     ; Memory graphics buffer secondary
+!mem_gfx_ext_sec        = $1a22     ; Memory graphics extended secondary
+!gfx_completion_mode    = $1a2c     ; Graphics completion mode counter
+
+; ----------------------------------------------------------------------------
+; Final Attribute Storage ($1a3e)
+; ----------------------------------------------------------------------------
+!sprite_final_attrs     = $1a3e     ; Final sprite attribute result (indexed)
+
+; ----------------------------------------------------------------------------
+; Sprite Property Arrays ($1a73-$1a79)
+; ----------------------------------------------------------------------------
+; Indexed sprite property arrays - accessed as $1a73,x $1a75,x etc.
+!sprite_x_array         = $1a73     ; Sprite X position array (indexed)
+!sprite_y_array         = $1a75     ; Sprite Y position array (indexed)
+!sprite_tile_array      = $1a77     ; Sprite tile index array (indexed)
+!sprite_attrs_array     = $1a79     ; Sprite attributes array (indexed)
+
+; ----------------------------------------------------------------------------
+; Graphics Buffer Array ($1144-$115c)
+; ----------------------------------------------------------------------------
+; Sequential graphics buffer - 8 word values (16 bytes)
+!gfx_buffer_1144        = $1144     ; Graphics buffer 0
+!gfx_buffer_1146        = $1146     ; Graphics buffer 1
+!gfx_buffer_1148        = $1148     ; Graphics buffer 2
+!gfx_buffer_114a        = $114a     ; Graphics buffer 3
+!gfx_buffer_1158        = $1158     ; Graphics buffer 4
+!gfx_buffer_115a        = $115a     ; Graphics buffer 5
+!gfx_buffer_115c        = $115c     ; Graphics buffer 6
+
+; ============================================================================
 ; End of RAM Variables
 ; ============================================================================
 
