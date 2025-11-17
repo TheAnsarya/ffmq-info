@@ -1320,6 +1320,75 @@
 !gfx_buffer_115c        = $115c     ; Graphics buffer 6
 
 ; ============================================================================
+; High WRAM ($3000-$6fff, $7e0000-$7effff)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; Delta Calculation Buffers ($3671-$36a9)
+; ----------------------------------------------------------------------------
+; Used for delta/movement calculations in bank_00
+!delta_buffer_base      = $3671     ; Delta buffer base (indexed +0, +1)
+!delta_buffer_1         = $3679     ; Delta buffer 1 (indexed)
+!delta_buffer_2         = $3689     ; Delta buffer 2 (indexed)
+!delta_buffer_3         = $3699     ; Delta buffer 3 (indexed)
+!delta_buffer_4         = $36a9     ; Delta buffer 4 (indexed)
+
+; ----------------------------------------------------------------------------
+; Color Palette Buffer ($5011-$5027)
+; ----------------------------------------------------------------------------
+; Color storage and adjustment system
+!color_buffer_5011      = $5011     ; Color buffer offset $11
+!color_buffer_5014      = $5014     ; Color buffer offset $14
+!color_adjusted_5017    = $5017     ; Adjusted color storage
+!color_buffer_501a      = $501a     ; Color buffer offset $1a
+!color_buffer_501e      = $501e     ; Color buffer offset $1e
+!color_buffer_5021      = $5021     ; Color buffer offset $21
+!color_adjusted_5024    = $5024     ; Adjusted color storage 2
+!color_buffer_5027      = $5027     ; Color buffer offset $27
+
+; ----------------------------------------------------------------------------
+; Save System State ($7e3665-$7e3668)
+; ----------------------------------------------------------------------------
+!save_state_flag        = $7e3665   ; Save state flag / screen ready flag
+!save_file_flag_1       = $7e3667   ; Save file state flag 1
+!save_file_flag_2       = $7e3668   ; Save file state flag 2 ($ff = set)
+
+; ----------------------------------------------------------------------------
+; Sprite System Arrays ($7ec260-$7ec480)
+; ----------------------------------------------------------------------------
+; Indexed sprite management arrays - accessed with ,x indexing
+!sprite_slot_array      = $7ec260   ; Sprite slot index array
+!sprite_base_array      = $7ec320   ; Sprite base index / X-position array
+!sprite_frame_array     = $7ec360   ; Animation frame counter array
+!sprite_state_array     = $7ec400   ; Sprite state / animation state array
+!sprite_tile_id_array   = $7ec480   ; Base tile index / channel array
+
+; ----------------------------------------------------------------------------
+; Graphics System State ($7ec240-$7ec380)
+; ----------------------------------------------------------------------------
+; Graphics processing and control arrays
+!gfx_state_control      = $7ec240   ; Graphics state/control register
+!gfx_result_data        = $7ec280   ; Graphics result/data storage
+!gfx_param_buffer       = $7ec2a0   ; Graphics parameter/buffer control
+!gfx_channel_state      = $7ec2e0   ; Channel state register
+!gfx_mode_register      = $7ec300   ; Graphics mode register
+!gfx_mode_buffer        = $7ec340   ; Graphics mode/buffer size
+!gfx_buffer_main        = $7ec380   ; Main graphics buffer
+
+; ----------------------------------------------------------------------------
+; Graphics Extended System ($7ec440-$7ec460)
+; ----------------------------------------------------------------------------
+!gfx_base_addr          = $7ec440   ; Graphics base address / coordinate data
+!gfx_pattern_index      = $7ec460   ; Graphics pattern index / extended memory
+
+; ----------------------------------------------------------------------------
+; Sound System ($7ec580-$7ec5c0)
+; ----------------------------------------------------------------------------
+!sound_param            = $7ec580   ; Sound parameter
+!sound_result           = $7ec5a0   ; Sound result
+!sound_processed        = $7ec5c0   ; Processed sound data
+
+; ============================================================================
 ; End of RAM Variables
 ; ============================================================================
 
