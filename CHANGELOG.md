@@ -1,6 +1,75 @@
 ﻿# Changelog - FFMQ Reverse Engineering Project
 
-## [Unreleased] - 2025-11-04 - Modding Toolkit & Graphics Extraction 🎮🎨
+## [Unreleased] - 2025-11-17 - System Documentation Expansion 📚
+
+### 🎯 Major Documentation
+
+**Comprehensive System Documentation** ✨ NEW!
+- **Menu System Documentation** (docs/MENU_SYSTEM.md - 900 lines)
+  * Complete window system architecture (8-byte structure, 16 color schemes)
+  * Cursor system (4 types, animation, position tracking)
+  * Menu rendering pipeline (VBlank sync, VRAM layout, text encoding)
+  * Input handling (60 Hz processing, 8-frame auto-repeat)
+  * Menu scripting (bytecode engine, 20+ opcodes, 8-level stack)
+  * Window effects (fades, scrolls, Mode 7 transformations)
+  * Performance analysis (~4% CPU overhead, VBlank timing)
+  * 5 code examples, multi-language support
+  * Commit: 4f4f68e
+
+- **Map System Documentation** (docs/MAP_SYSTEM.md - 900 lines)
+  * SNES Mode 1 background system (3 BG layers)
+  * Tilemap format (16-bit entries: tile ID + palette + flip + priority)
+  * Map loading process (300-frame load, decompression, rendering)
+  * Scrolling system (viewport calculation, dynamic tile updates)
+  * Collision detection (8+ tile types, collision check routine)
+  * Event system (trigger zones, script execution)
+  * Performance optimization (tile caching, VBlank management)
+  * Commit: bed3f07
+
+- **Controller System Documentation** (docs/CONTROLLER_SYSTEM.md - 650 lines)
+  * SNES hardware (auto-read, 16-button layout)
+  * Input state management (current, new press, previous, injected)
+  * Edge detection algorithm (XOR+AND for 0→1 transitions)
+  * Auto-repeat system (25-frame delay, 5-frame repeat rate)
+  * Context-aware processing (gameplay, menu, dialog modes)
+  * Performance: ~120 cycles/frame, 1-2 frame latency
+  * Commit: c2266c8
+
+- **Save System Documentation** (docs/SAVE_SYSTEM.md - 600 lines)
+  * SRAM architecture (9 slots, triple redundancy)
+  * Checksum algorithm (16-bit summation)
+  * Character data structure (80 bytes: stats, equipment, spells)
+  * World state data (map position, gold, play time)
+  * Save corruption recovery procedures
+  * Python editor tools integration
+  * Commit: 99bded2
+
+**Bank Documentation** ✨ NEW!
+- **Bank 03 Documentation** (docs/BANK_03_FUNCTIONS.md - 1,850 lines)
+  * Script engine architecture (80+ opcodes documented)
+  * Script bytecode execution model
+  * Command categories: variable/flag, control flow, entity, graphics, audio, map, dialog, timing
+  * Script data structures (entity spawn, map transitions, event triggers)
+  * Compression formats (RLE, dictionary, pattern-based)
+  * 5 practical script examples (boss fight, NPC dialog, map transition)
+  * Commit: eee19c2
+
+**GitHub Integration** ✨ NEW!
+- Created 3 GitHub issue templates
+  * graphics-verification.md (sprite extraction workflow)
+  * bank-documentation.md (standardized bank doc process)
+  * emulator-integration.md (Mesen Lua API integration)
+  * Commit: 8039fe5
+
+### 📊 Session Statistics
+
+**Total Output This Session:**
+- Commits: 6 total
+- Documentation files: 5 major (Bank 03 + 4 system docs)
+- Total lines created: ~5,150 lines
+- Token usage: 73,507 / 1,000,000 (7.35%)
+
+## [Previous] - 2025-11-04 - Modding Toolkit & Graphics Extraction 🎮🎨
 
 ### 🎯 Major Features
 
