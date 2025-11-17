@@ -2225,22 +2225,22 @@ Controller_DataSwap:
 	dec a; Adjust for zero-based indexing
 	dec a; Adjust for array indexing
 	tax ; Transfer to X register
-	lda.w $0a02,x   ; Load controller data 1
+	lda.w !controller_input_array,x   ; Load controller data 1
 	pha ; Push controller data 1
-	lda.w $0a0a,x   ; Load controller data 2
+	lda.w !controller_data_alt_2,x   ; Load controller data 2
 	pha ; Push controller data 2
-	lda.w $0a07,x   ; Load controller data 3
+	lda.w !controller_data_alt_1,x   ; Load controller data 3
 	pha ; Push controller data 3
 	lda.b $be	   ; Load target controller index
 	dec a; Adjust for zero-based indexing
 	dec a; Adjust for array indexing
 	tax ; Transfer to X register
 	pla ; Pull controller data 3
-	sta.w $0a07,x   ; Store controller data 3
+	sta.w !controller_data_alt_1,x   ; Store controller data 3
 	pla ; Pull controller data 2
-	sta.w $0a0a,x   ; Store controller data 2
+	sta.w !controller_data_alt_2,x   ; Store controller data 2
 	pla ; Pull controller data 1
-	sta.w $0a02,x   ; Store controller data 1
+	sta.w !controller_input_array,x   ; Store controller data 1
 	jsl.l SystemValidation ; Execute controller update
 	ldx.w #$d411	; Load system update address
 	jmp.w ProcessData ; Jump to system update
@@ -3016,7 +3016,7 @@ System_ComplexProcessing:
 	dec ;029DD7|3A      |
 	tax ;029DD8|AA      |
 	lda.b #$ff                           ;029DD9|A9FF    |
-	sta.w $0a02,X                        ;029DDB|9D020A  |000A02
+	sta.w !controller_input_array,X                        ;029DDB|9D020A  |000A02
 	lda.b #$00                           ;029DDE|A900    |
 	sta.w !audio_coord_register                          ;029DE0|8D0505  |000505
 	ldx.w #$0000                         ;029DE3|A20000  |
@@ -3765,7 +3765,7 @@ Sound_ProcessLoop:
 	pla ;02A6B4|68      |      ; Restore original
 	tax ;02A6B5|AA      |      ; Transfer to index
 	phd ;02A6B6|0B      |      ; Push direct page
-	pea.w $04a7	 ;02A6B7|F4A704  |0204A7; Push calculation address
+	pea.w !sys_work_register	 ;02A6B7|F4A704  |0204A7; Push calculation address
 	pld ;02A6BA|2B      |      ; Load new direct page
 	jsl.l CallCalculationSystem ;02A6BB|225A9700|00975A; Call calculation system
 	pld ;02A6BF|2B      |      ; Restore direct page
@@ -4316,7 +4316,7 @@ Graphics_CommandInterpreter:
 	sta.b $00	   ;02AAFA|8500    |000400; Store parameter
 	lda.b #$d7	  ;02AAFC|A9D7    |      ; Set graphics command ID
 	jsr.w CallGraphicsCommandProcessor ;02AAFE|200FFE  |02FE0F; Call graphics processor
-	lda.w $0417	 ;02AB01|AD1704  |020417; Read graphics status
+	lda.w !sys_command_status	 ;02AB01|AD1704  |020417; Read graphics status
 	and.b #$03	  ;02AB04|2903    |      ; Mask status bits
 	cmp.b #$03	  ;02AB06|C903    |      ; Compare to complete state
 	bne Graphics_AlternateCode ;02AB08|D004    |02AB0E; Branch if not complete
@@ -4412,9 +4412,9 @@ Graphics_ProcessShift:
 ;----------------------------------------------------------------------------
 Graphics_MemoryCoordinator:
 	lda.l $7ec380,x ;02AB91|BF80C37E|7EC380; Read graphics buffer
-	sta.w $04a7	 ;02AB95|8DA704  |0204A7; Store in working register
+	sta.w !sys_work_register	 ;02AB95|8DA704  |0204A7; Store in working register
 	lda.l $7ec320,x ;02AB98|BF20C37E|7EC320; Read graphics control
-	sta.w $04a5	 ;02AB9C|8DA504  |0204A5; Store control value
+	sta.w !sys_work_control	 ;02AB9C|8DA504  |0204A5; Store control value
 	lda.l $7ec240,x ;02AB9F|BF40C27E|7EC240; Read graphics state
 	and.b #$bf	  ;02ABA3|29BF    |      ; Mask state bits
 	sta.l $7ec240,x ;02ABA5|9F40C27E|7EC240; Store masked state
@@ -4423,9 +4423,9 @@ Graphics_MemoryCoordinator:
 	lda.b #$00	  ;02ABAF|A900    |      ; Clear accumulator
 	sta.l $7ec380,x ;02ABB1|9F80C37E|7EC380; Clear graphics buffer
 	lda.b #$08	  ;02ABB5|A908    |      ; Set buffer parameter
-	sta.w $04a4	 ;02ABB7|8DA404  |0204A4; Store buffer parameter
+	sta.w !sys_work_buffer_count	 ;02ABB7|8DA404  |0204A4; Store buffer parameter
 	jsr.w CallBufferProcessor ;02ABBA|2038FE  |02FE38; Call buffer processor
-	lda.w $04a7	 ;02ABBD|ADA704  |0204A7; Read working register
+	lda.w !sys_work_register	 ;02ABBD|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
 	lda.w !sys_state_counter	 ;02ABC4|AD8D04  |02048D; Read system state
 	beq Graphics_InactiveState ;02ABC7|F004    |02ABD2; Branch if state clear
@@ -4441,7 +4441,7 @@ Graphics_StoreStateValue:
 	sta.l $7ec2a0,x ;02ABDA|9FA0C27E|7EC2A0; Store buffer control
 	lda.b #$03	  ;02ABDE|A903    |      ; Set buffer mode
 	sta.l $7ec300,x ;02ABE0|9F00C37E|7EC300; Store buffer mode
-	lda.w $04a5	 ;02ABE4|ADA504  |0204A5; Read control value
+	lda.w !sys_work_control	 ;02ABE4|ADA504  |0204A5; Read control value
 	sta.l $7ec320,x ;02ABE7|9F20C37E|7EC320; Store in graphics control
 	lda.b #$04	  ;02ABEB|A904    |      ; Set processing mode
 	sta.l $7ec360,x ;02ABED|9F60C37E|7EC360; Store processing mode
@@ -4470,7 +4470,7 @@ Graphics_StoreStateValue:
 	lda.b #$03	  ;02AC20|A903    |      ; Set sound mode
 	sbc.w !rng_result	 ;02AC22|EDA900  |0200A9; Subtract sound result
 	sta.l $7ec5c0,x ;02AC25|9FC0C57E|7EC5C0; Store processed sound
-	dec.w $04a4	 ;02AC29|CEA404  |0204A4; Decrement buffer counter
+	dec.w !sys_work_buffer_count	 ;02AC29|CEA404  |0204A4; Decrement buffer counter
 	bne Graphics_ContinueLoop ;02AC2C|D001    |02AC2F; Continue if not zero
 	rts ;02AC2E|60      |      ; Return when complete
 
@@ -4586,7 +4586,7 @@ Graphics_CommandInit:
 	sta.b $00	   ;02ACD7|8500    |000400; Store parameter register
 	lda.b #$d7	  ;02ACD9|A9D7    |      ; Set graphics command ID
 	jsr.w CallGraphicsCommandProcessor ;02ACDB|200FFE  |02FE0F; Call graphics command processor
-	lda.w $0417	 ;02ACDE|AD1704  |020417; Read command status
+	lda.w !sys_command_status	 ;02ACDE|AD1704  |020417; Read command status
 	and.b #$03	  ;02ACE1|2903    |      ; Mask status bits
 	cmp.b #$03	  ;02ACE3|C903    |      ; Check for completion
 	bne Graphics_CommandAltCode ;02ACE5|D004    |02ACEB; Branch if not complete
@@ -4683,9 +4683,9 @@ Graphics_DataShift:
 ;----------------------------------------------------------------------------
 Buffer_MemoryCoordinator:
 	lda.l $7ec380,x ;02AD6D|BF80C37E|7EC380; Read buffer address
-	sta.w $04a7	 ;02AD71|8DA704  |0204A7; Store in working register
+	sta.w !sys_work_register	 ;02AD71|8DA704  |0204A7; Store in working register
 	lda.l $7ec320,x ;02AD74|BF20C37E|7EC320; Read buffer control
-	sta.w $04a5	 ;02AD78|8DA504  |0204A5; Store control value
+	sta.w !sys_work_control	 ;02AD78|8DA504  |0204A5; Store control value
 	lda.l $7ec240,x ;02AD7B|BF40C27E|7EC240; Read buffer state
 	and.b #$bf	  ;02AD7F|29BF    |      ; Mask state bits
 	sta.l $7ec240,x ;02AD81|9F40C27E|7EC240; Store masked state
@@ -4694,9 +4694,9 @@ Buffer_MemoryCoordinator:
 	lda.b #$00	  ;02AD8B|A900    |      ; Clear accumulator
 	sta.l $7ec380,x ;02AD8D|9F80C37E|7EC380; Clear buffer address
 	lda.b #$08	  ;02AD91|A908    |      ; Set buffer parameter
-	sta.w $04a4	 ;02AD93|8DA404  |0204A4; Store buffer parameter
+	sta.w !sys_work_buffer_count	 ;02AD93|8DA404  |0204A4; Store buffer parameter
 	jsr.w CallBufferProcessor ;02AD96|2038FE  |02FE38; Call buffer processor
-	lda.w $04a7	 ;02AD99|ADA704  |0204A7; Read working register
+	lda.w !sys_work_register	 ;02AD99|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02AD9C|9F80C37E|7EC380; Store in buffer address
 	lda.w !sys_state_counter	 ;02ADA0|AD8D04  |02048D; Read system state
 	beq Buffer_InactiveState ;02ADA3|F004    |02ADAE; Branch if state clear
@@ -4712,7 +4712,7 @@ Buffer_StoreState:
 	sta.l $7ec2a0,x ;02ADB6|9FA0C27E|7EC2A0; Store buffer control
 	lda.b #$03	  ;02ADBA|A903    |      ; Set buffer mode
 	sta.l $7ec300,x ;02ADBC|9F00C37E|7EC300; Store buffer mode
-	lda.w $04a5	 ;02ADC0|ADA504  |0204A5; Read control value
+	lda.w !sys_work_control	 ;02ADC0|ADA504  |0204A5; Read control value
 	sta.l $7ec320,x ;02ADC3|9F20C37E|7EC320; Store in buffer control
 	lda.b #$04	  ;02ADC7|A904    |      ; Set processing mode
 	sta.l $7ec360,x ;02ADC9|9F60C37E|7EC360; Store processing mode
@@ -4941,7 +4941,7 @@ GameState_ProcessLoop:
 	sta.b $20	   ;02D3AC|8520    |000A20; Store as current
 	sta.b $02,x	 ;02D3AE|9502    |000A02; Update current state
 	jsr.w ProcessStateChange ;02D3B0|2084D7  |02D784; Process state change
-	lda.w $0a1c	 ;02D3B3|AD1C0A  |020A1C; Load state data
+	lda.w !sys_state_data	 ;02D3B3|AD1C0A  |020A1C; Load state data
 	sta.b $07,x	 ;02D3B6|9507    |000A07; Store state data
 	inc.b $1d,x	 ;02D3B8|F61D    |000A1D; Increment state flag
 
@@ -4979,7 +4979,7 @@ GameState_Transition:
 	lda.b $83	   ;02D3DA|A583    |000A83; Load index
 	cmp.b $00	   ;02D3DC|C500    |000A00; Compare with limit
 	bne GameState_ProcessLoop ;02D3DE|D0BC    |02D39C; Continue loop if not done
-	lda.w $04b3	 ;02D3E0|ADB304  |0204B3; Load final state
+	lda.w !sys_work_result	 ;02D3E0|ADB304  |0204B3; Load final state
 	sta.b $13	   ;02D3E3|8513    |000A13; Store final state
 	plp ;02D3E5|28      |      ; Restore processor status
 	rts ;02D3E6|60      |      ; Return
@@ -5467,7 +5467,7 @@ Graphics_AltPixel:
 	pld ;02D6BC|2B      |      ; Load new direct page
 	lda.b #$00	  ;02D6BD|A900    |      ; Clear value
 	sta.b !SNES_WMADDH-$2100 ;02D6BF|8583    |002183; Set WRAM bank to 0
-	ldx.w $0a70	 ;02D6C1|AE700A  |020A70; Load memory address
+	ldx.w !sys_memory_addr	 ;02D6C1|AE700A  |020A70; Load memory address
 	stx.b !SNES_WMADDL-$2100 ;02D6C4|8681    |002181; Set WRAM address
 	lda.b #$20	  ;02D6C6|A920    |      ; Clear 32 bytes
 
@@ -5490,9 +5490,9 @@ Coord_CalculationEngine:
 	sec ;02D6D7|38      |      ; Set carry
 	sbc.b $19	   ;02D6D8|E519    |000A19; Subtract position parameter
 	inc a;02D6DA|1A      |      ; Increment result
-	ldy.w $0a0a,x   ;02D6DB|BC0A0A  |020A0A; Load position flags
+	ldy.w !controller_data_alt_2,x   ;02D6DB|BC0A0A  |020A0A; Load position flags
 	beq Coord_StorePosition ;02D6DE|F006    |02D6E6; Branch if zero
-	ldy.w $0a07,x   ;02D6E0|BC070A  |020A07; Load alternate flags
+	ldy.w !controller_data_alt_1,x   ;02D6E0|BC070A  |020A07; Load alternate flags
 	bne Coord_StorePosition ;02D6E3|D001    |02D6E6; Branch if not zero
 	dec a;02D6E5|3A      |      ; Decrement if special case
 
@@ -5864,7 +5864,7 @@ Graphics_CalcProcess:
 	sta.w !WRMPYA	 ;02D938|8D0242  |024202; Set multiplicand
 	rep #$30		;02D93B|C230    |      ; 16-bit mode
 	lda.w DB_Graphics_MultiplierValues1,x ;02D93D|BD72D9  |02D972; Load multiplier data
-	sta.w $0a79	 ;02D940|8D790A  |020A79; Store multiplier
+	sta.w !sys_multiplier	 ;02D940|8D790A  |020A79; Store multiplier
 	sep #$20		;02D943|E220    |      ; 8-bit accumulator
 	rep #$10		;02D945|C210    |      ; 16-bit index
 	sta.w !WRMPYB	 ;02D947|8D0342  |024203; Set multiplier
@@ -6015,7 +6015,7 @@ Display_ColorManager:
 	phd ;02DA18|0B      |      ; Save direct page
 	pea.w !INIDISP	 ;02DA19|F40021  |022100; Set direct page to $2100
 	pld ;02DA1C|2B      |      ; Load new direct page
-	stz.w $0a7e	 ;02DA1D|9C7E0A  |020A7E; Clear display flag
+	stz.w !display_flag	 ;02DA1D|9C7E0A  |020A7E; Clear display flag
 	lda.b #$1d	  ;02DA20|A91D    |      ; Main screen enable
 	sta.b !SNES_TM-$2100 ;02DA22|852C    |00212C; Set main screen
 	stz.b !SNES_TS-$2100 ;02DA24|642D    |00212D; Clear sub screen
@@ -6104,7 +6104,7 @@ Display_StateInit:
 	lda.b #$ff	  ;02DAAB|A9FF    |      ; Initialize display flag
 	sta.b $84	   ;02DAAD|8584    |000A84; Store display state
 	sta.b $7e	   ;02DAAF|857E    |000A7E; Store processing flag
-	stz.w $0af0	 ;02DAB1|9CF00A  |020AF0; Clear frame counter
+	stz.w !frame_counter_ext	 ;02DAB1|9CF00A  |020AF0; Clear frame counter
 	lda.b #$0f	  ;02DAB4|A90F    |      ; Set sprite limit
 	sta.w !battle_ready_flag	 ;02DAB6|8D1001  |020110; Store sprite count
 	lda.w !sys_temp_buffer	 ;02DAB9|ADAF04  |0204AF; Load world state
@@ -6118,9 +6118,9 @@ Display_StateInit:
 ; Configure special world state parameters
 	sta.w !audio_hw_register_2	 ;02DAC3|8D0B05  |02050B; Store world parameter 1
 	lda.b #$08	  ;02DAC6|A908    |      ; Set parameter 2
-	sta.w $050c	 ;02DAC8|8D0C05  |02050C; Store parameter 2
+	sta.w !sys_param_1	 ;02DAC8|8D0C05  |02050C; Store parameter 2
 	lda.b #$0f	  ;02DACB|A90F    |      ; Set parameter 3
-	sta.w $050d	 ;02DACD|8D0D05  |02050D; Store parameter 3
+	sta.w !sys_param_2	 ;02DACD|8D0D05  |02050D; Store parameter 3
 	lda.b #$03	  ;02DAD0|A903    |      ; Set parameter 4
 	sta.w !audio_hw_register_1	 ;02DAD2|8D0A05  |02050A; Store parameter 4
 
@@ -6128,7 +6128,7 @@ Display_StateInit:
 Display_SystemCoord:
 	stz.b $e3	   ;02DAD5|64E3    |000AE3; Clear system flag
 	inc.b $e2	   ;02DAD7|E6E2    |000AE2; Increment counter
-	stz.w $0af8	 ;02DAD9|9CF80A  |020AF8; Clear processing flag
+	stz.w !processing_flag_4	 ;02DAD9|9CF80A  |020AF8; Clear processing flag
 	inc.b $e6	   ;02DADC|E6E6    |000AE6; Increment synchronization flag
 
 ; VBlank Synchronization Loop
@@ -6194,7 +6194,7 @@ Display_VBlankWait:
 
 ; Advanced Sprite Management System
 ; Complex sprite initialization and state management
-	lda.w $0a9c	 ;02DB49|AD9C0A  |020A9C; Load sprite mode flag
+	lda.w !gfx_sprite_mode	 ;02DB49|AD9C0A  |020A9C; Load sprite mode flag
 	beq F03aBranchIfNoSprites ;02DB4C|F03A    |02DB88; Branch if no sprites
 
 ; DMA Configuration Engine
@@ -6284,8 +6284,8 @@ Sprite_RendererAlternate:
 Object_ManagementEngine:
 	sep #$30		;02DBC0|E230    |      ; 8-bit mode
 	jsr.w DB_Label_02EA60 ;02DBC2|2060EA  |02EA60; Call object allocator
-	stx.w $0ade	 ;02DBC5|8EDE0A  |020ADE; Store primary object index
-	stz.w $0af4	 ;02DBC8|9CF40A  |020AF4; Clear processing flag
+	stx.w !sprite_obj_index_1	 ;02DBC5|8EDE0A  |020ADE; Store primary object index
+	stz.w !processing_flag_2	 ;02DBC8|9CF40A  |020AF4; Clear processing flag
 
 ; Primary Object Configuration
 	lda.b #$00	  ;02DBCB|A900    |      ; Clear flags
@@ -6327,7 +6327,7 @@ Object_ManagementEngine:
 	sta.b $0f,x	 ;02DC09|950F    |000C0F; Set attribute 4
 
 ; Position Calculation Engine
-	lda.w $0a25	 ;02DC0B|AD250A  |020A25; Load X position base
+	lda.w !gfx_position_x	 ;02DC0B|AD250A  |020A25; Load X position base
 	asl a;02DC0E|0A      |      ; Multiply by 2
 	asl a;02DC0F|0A      |      ; Multiply by 4
 	asl a;02DC10|0A      |      ; Multiply by 8
@@ -6339,7 +6339,7 @@ Object_ManagementEngine:
 	sta.b $0c,x	 ;02DC1A|950C    |000C0C; Set X position 4
 
 ; Y Position Calculation
-	lda.w $0a26	 ;02DC1C|AD260A  |020A26; Load Y position base
+	lda.w !gfx_position_y	 ;02DC1C|AD260A  |020A26; Load Y position base
 	asl a;02DC1F|0A      |      ; Multiply by 2
 	asl a;02DC20|0A      |      ; Multiply by 4
 	asl a;02DC21|0A      |      ; Multiply by 8
@@ -6356,11 +6356,11 @@ Object_ManagementEngine:
 	sta.l $7ec480,x ;02DC31|9F80C47E|7EC480; Store tile configuration
 
 ; Secondary Object Management System
-	stz.w $0af5	 ;02DC35|9CF50A  |020AF5; Clear secondary flag
+	stz.w !processing_flag_3	 ;02DC35|9CF50A  |020AF5; Clear secondary flag
 	jsr.w DB_Label_02EA60 ;02DC38|2060EA  |02EA60; Call object allocator
 	lda.b #$02	  ;02DC3B|A902    |      ; Secondary object type
 	sta.l $7ec320,x ;02DC3D|9F20C37E|7EC320; Set object type
-	stx.w $0adf	 ;02DC41|8EDF0A  |020ADF; Store secondary object index
+	stx.w !sprite_obj_index_2	 ;02DC41|8EDF0A  |020ADF; Store secondary object index
 
 ; Secondary Object Configuration
 	lda.b #$00	  ;02DC44|A900    |      ; Clear flags
@@ -6376,7 +6376,7 @@ Object_ManagementEngine:
 	pha ;02DC5D|48      |      ; Save parameter
 	clc ;02DC5E|18      |      ; Clear carry
 	adc.b #$18	  ;02DC5F|6918    |      ; Add graphics offset
-	sta.w $0ae9	 ;02DC61|8DE90A  |020AE9; Store graphics index
+	sta.w !gfx_index	 ;02DC61|8DE90A  |020AE9; Store graphics index
 	pla ;02DC64|68      |      ; Restore parameter
 	asl a;02DC65|0A      |      ; Multiply by 2
 	asl a;02DC66|0A      |      ; Multiply by 4
@@ -6410,7 +6410,7 @@ Object_ManagementEngine:
 	sta.b $0f,x	 ;02DC8B|950F    |000C0F; Set attribute 4
 
 ; Secondary Position Calculation
-	lda.w $0a29	 ;02DC8D|AD290A  |020A29; Load secondary X base
+	lda.w !gfx_position_x_alt	 ;02DC8D|AD290A  |020A29; Load secondary X base
 	asl a;02DC90|0A      |      ; Multiply by 2
 	asl a;02DC91|0A      |      ; Multiply by 4
 	asl a;02DC92|0A      |      ; Multiply by 8
@@ -6422,7 +6422,7 @@ Object_ManagementEngine:
 	sta.b $0c,x	 ;02DC9C|950C    |000C0C; Set X position 4
 
 ; Secondary Y Position Calculation
-	lda.w $0a2a	 ;02DC9E|AD2A0A  |020A2A; Load secondary Y base
+	lda.w !gfx_position_y_alt	 ;02DC9E|AD2A0A  |020A2A; Load secondary Y base
 	asl a;02DCA1|0A      |      ; Multiply by 2
 	asl a;02DCA2|0A      |      ; Multiply by 4
 	asl a;02DCA3|0A      |      ; Multiply by 8
@@ -6480,7 +6480,7 @@ Sprite_RenderEngine:
 	stz.b $98	   ;02DCED|6498    |000A98; Clear sprite counter
 	lda.b #$06	  ;02DCEF|A906    |      ; Set sprite limit
 	sta.b $99	   ;02DCF1|8599    |000A99; Store sprite limit
-	lda.w $0a9d	 ;02DCF3|AD9D0A  |020A9D; Load sprite base
+	lda.w !gfx_sprite_base	 ;02DCF3|AD9D0A  |020A9D; Load sprite base
 	sta.b $9a	   ;02DCF6|859A    |000A9A; Store sprite base
 
 ; Sprite Processing Loop Coordination
@@ -6576,7 +6576,7 @@ Sprite_InitEngine:
 	php ;02DF40|08      |      ; Save processor status
 	tax ;02DF41|AA      |      ; Transfer parameter to X
 	lda.w Sprite_ParameterTable,x ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
-	sta.w $0aee	 ;02DF45|8DEE0A  |020AEE; Store sprite configuration
+	sta.w !sprite_config	 ;02DF45|8DEE0A  |020AEE; Store sprite configuration
 	pea.w DB_Entity_ConfigTable5 ;02DF48|F453DF  |02DF53; Push configuration table
 	jsl.l CallSpriteInitializer ;02DF4B|22BE9700|0097BE; Call sprite initializer
 	plp ;02DF4F|28      |      ; Restore processor status
@@ -6678,7 +6678,7 @@ Graphics_DataProcessor_2:
 	php ;02DFE8|08      |      ; Save processor status
 	sep #$20		;02DFE9|E220    |      ; 8-bit accumulator
 	rep #$10		;02DFEB|C210    |      ; 16-bit index
-	lda.w $0a9c	 ;02DFED|AD9C0A  |020A9C; Load graphics mode
+	lda.w !gfx_sprite_mode	 ;02DFED|AD9C0A  |020A9C; Load graphics mode
 	sta.w !WRMPYA	 ;02DFF0|8D0242  |024202; Set multiplicand
 	lda.b #$03	  ;02DFF3|A903    |      ; Set multiplier (3)
 	jsl.l CallMultiplicationRoutine ;02DFF5|221E9700|00971E; Call multiplication routine
@@ -6690,14 +6690,14 @@ Graphics_DataProcessor_2:
 	asl a;02E006|0A      |      ; Multiply by 4
 	asl a;02E007|0A      |      ; Multiply by 8
 	asl a;02E008|0A      |      ; Multiply by 16
-	sta.w $0a9d	 ;02E009|8D9D0A  |020A9D; Store graphics offset
+	sta.w !gfx_sprite_base	 ;02E009|8D9D0A  |020A9D; Store graphics offset
 	sep #$20		;02E00C|E220    |      ; 8-bit accumulator
 	rep #$10		;02E00E|C210    |      ; 16-bit index
 	lda.l Graphics_ParamTable2,x ;02E010|BF16F70C|0CF716; Load graphics parameter 2
-	sta.w $0a9f	 ;02E014|8D9F0A  |020A9F; Store graphics flag
+	sta.w !gfx_special_flag	 ;02E014|8D9F0A  |020A9F; Store graphics flag
 	dec a;02E017|3A      |      ; Decrement parameter
 	lda.l Graphics_ParamTable3,x ;02E018|BF17F70C|0CF717; Load graphics parameter 3
-	sta.w $0aa0	 ;02E01C|8DA00A  |020AA0; Store graphics mode
+	sta.w !gfx_param_mode	 ;02E01C|8DA00A  |020AA0; Store graphics mode
 	plp ;02E01F|28      |      ; Restore processor status
 	rts ;02E020|60      |      ; Return to caller
 
@@ -6713,7 +6713,7 @@ Graphics_DataProcessor_3:
 	sep #$20		;02E030|E220    |      ; 8-bit accumulator
 	rep #$10		;02E032|C210    |      ; 16-bit index
 	ldy.w #$0010	;02E034|A01000  |      ; Loop count (16 iterations)
-	ldx.w $0a9d	 ;02E037|AE9D0A  |020A9D; Load graphics base address
+	ldx.w !gfx_sprite_base	 ;02E037|AE9D0A  |020A9D; Load graphics base address
 
 ; Graphics Data Processing Loop
 ; High-speed graphics data extraction and transformation
@@ -6723,7 +6723,7 @@ Graphics_DataLoop:
 	jsr.w CallGraphicsProcessor ;02E03F|2056E0  |02E056; Call graphics processor
 	dey ;02E042|88      |      ; Decrement loop counter
 	bne Graphics_DataLoop ;02E043|D0F5    |02E03A; Continue processing loop
-	lda.w $0a9f	 ;02E045|AD9F0A  |020A9F; Load special graphics flag
+	lda.w !gfx_special_flag	 ;02E045|AD9F0A  |020A9F; Load special graphics flag
 	and.b #$0f	  ;02E048|290F    |      ; Mask lower 4 bits
 	jsr.w CallGraphicsProcessor ;02E04A|2056E0  |02E056; Process special graphics data
 	plp ;02E04D|28      |      ; Restore processor status
@@ -6761,7 +6761,7 @@ Graphics_SegmentLoop:
 	lda.w !RDMPYL	 ;02E080|AD1642  |024216; Load calculation result
 	clc ;02E083|18      |      ; Clear carry
 	adc.w #$d785	;02E084|6985D7  |      ; Add graphics base offset
-	sta.w $0a8b	 ;02E087|8D8B0A  |020A8B; Store graphics address
+	sta.w !gfx_system_addr	 ;02E087|8D8B0A  |020A8B; Store graphics address
 	jsl.l CallMemorySetup ;02E08A|22C3E102|02E1C3; Call graphics renderer
 	dey ;02E08E|88      |      ; Decrement segment counter
 	bne Graphics_SegmentLoop ;02E08F|D0DB    |02E06C; Continue segment processing
@@ -6783,7 +6783,7 @@ Graphics_BufferManager:
 	clc ;02E0A1|18      |      ; Clear carry
 	adc.w #$c040	;02E0A2|6940C0  |      ; Add graphics base address
 	tay ;02E0A5|A8      |      ; Set as destination
-	lda.w $0aa0	 ;02E0A6|ADA00A  |020AA0; Load graphics parameter
+	lda.w !gfx_param_mode	 ;02E0A6|ADA00A  |020AA0; Load graphics parameter
 	and.w #$00ff	;02E0A9|29FF00  |      ; Mask to 8-bit
 	asl a;02E0AC|0A      |      ; Multiply by 2
 	asl a;02E0AD|0A      |      ; Multiply by 4
@@ -6799,7 +6799,7 @@ Graphics_BufferManager:
 	clc ;02E0BD|18      |      ; Clear carry
 	adc.w #$c040	;02E0BE|6940C0  |      ; Add graphics base address
 	tay ;02E0C1|A8      |      ; Set as destination
-	lda.w $0a9f	 ;02E0C2|AD9F0A  |7E0A9F; Load secondary graphics parameter
+	lda.w !gfx_special_flag	 ;02E0C2|AD9F0A  |7E0A9F; Load secondary graphics parameter
 	and.w #$00f0	;02E0C5|29F000  |      ; Mask upper 4 bits
 	clc ;02E0C8|18      |      ; Clear carry
 	adc.w #$f285	;02E0C9|6985F2  |      ; Add graphics data base
@@ -6863,10 +6863,10 @@ Graphics_MultiProcessor:
 	phy ;02E4ED|5A      |      ;  Preserve Y register for addressing
 	php ;02E4EE|08      |      ;  Preserve processor status
 	rep #$30		;02E4EF|C230    |      ;  16-bit registers and indexing
-	lda.w $0a91	 ;02E4F1|AD910A  |020A91;  Load graphics X coordinate
+	lda.w !gfx_coord_x	 ;02E4F1|AD910A  |020A91;  Load graphics X coordinate
 	and.w #$00ff	;02E4F4|29FF00  |      ;  Mask to 8-bit coordinate
 	tax ;02E4F7|AA      |      ;  Transfer to X index
-	lda.w $0a92	 ;02E4F8|AD920A  |020A92;  Load graphics Y coordinate
+	lda.w !gfx_coord_y	 ;02E4F8|AD920A  |020A92;  Load graphics Y coordinate
 	and.w #$00ff	;02E4FB|29FF00  |      ;  Mask to 8-bit coordinate
 	tay ;02E4FE|A8      |      ;  Transfer to Y index
 	jsr.w CallGraphicsCalculationRoutine ;02E4FF|2023E5  |02E523;  Call graphics calculation routine
@@ -6916,8 +6916,8 @@ Coord_TransformEngine:
 ; Advanced graphics rendering with sophisticated bit manipulation and pattern processing
 Graphics_PatternEngine:
 	sep #$20		;02E536|E220    |      ;  8-bit accumulator mode
-	asl.w $0a94	 ;02E538|0E940A  |020A94;  Shift graphics flag (multiply by 2)
-	asl.w $0a94	 ;02E53B|0E940A  |020A94;  Shift graphics flag again (multiply by 4)
+	asl.w !gfx_pattern_counter	 ;02E538|0E940A  |020A94;  Shift graphics flag (multiply by 2)
+	asl.w !gfx_pattern_counter	 ;02E53B|0E940A  |020A94;  Shift graphics flag again (multiply by 4)
 	rep #$20		;02E53E|C220    |      ;  16-bit accumulator mode
 	pha ;02E540|48      |      ;  Preserve pattern data
 	pea.w $0000	 ;02E541|F40000  |020000;  Push pattern counter
@@ -6946,8 +6946,8 @@ Pattern_ProcessLoop:
 	and.w #$ff00	;02E55D|2900FF  |      ;  Mask high byte
 	adc.w #$012d	;02E560|692D01  |      ;  Add graphics base offset
 	sep #$20		;02E563|E220    |      ;  8-bit accumulator mode
-	adc.w $0a94	 ;02E565|6D940A  |020A94;  Add graphics counter
-	inc.w $0a94	 ;02E568|EE940A  |020A94;  Increment graphics counter
+	adc.w !gfx_pattern_counter	 ;02E565|6D940A  |020A94;  Add graphics counter
+	inc.w !gfx_pattern_counter	 ;02E568|EE940A  |020A94;  Increment graphics counter
 	xba ;02E56B|EB      |      ;  Exchange accumulator bytes
 	adc.b #$00	  ;02E56C|6900    |      ;  Add carry
 	phx ;02E56E|DA      |      ;  Preserve X register
@@ -7018,9 +7018,9 @@ System_Coordinator:
 	phk ;02E5B3|4B      |      ;  Push current bank
 	plb ;02E5B4|AB      |      ;  Set data bank to current
 	lda.w DB_Display_ConfigTable3 ;02E5B5|ADA8E5  |02E5A8;  Load system increment
-	sta.w $0aae	 ;02E5B8|8DAE0A  |020AAE;  Store to system variable
+	sta.w !sys_control_aae	 ;02E5B8|8DAE0A  |020AAE;  Store to system variable
 	lda.w DB_Display_ConfigTable4 ;02E5BB|ADAAE5  |02E5AA;  Load system step
-	sta.w $0ab0	 ;02E5BE|8DB00A  |020AB0;  Store to system variable
+	sta.w !sys_control_ab0	 ;02E5BE|8DB00A  |020AB0;  Store to system variable
 	sep #$20		;02E5C1|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E5C3|C210    |      ;  16-bit index registers
 	jsr.w CallSystemInitialization ;02E5C5|200FE6  |02E60F;  Call system initialization
@@ -7080,11 +7080,11 @@ PPU_InitEngine:
 
 ; System Variable Initialization
 	lda.b #$81	  ;02E64C|A981    |      ;  Load system control value
-	sta.w $0aaa	 ;02E64E|8DAA0A  |020AAA;  Store system control
+	sta.w !sys_control_aaa	 ;02E64E|8DAA0A  |020AAA;  Store system control
 	lda.b #$ff	  ;02E651|A9FF    |      ;  Load initialization value
-	sta.w $0aa2	 ;02E653|8DA20A  |020AA2;  Initialize system variable
+	sta.w !sys_control_aa2	 ;02E653|8DA20A  |020AA2;  Initialize system variable
 	stz.w $0aa3	 ;02E656|9CA30A  |020AA3;  Clear system variable
-	sta.w $0aab	 ;02E659|8DAB0A  |020AAB;  Initialize system variable
+	sta.w !sys_control_aab	 ;02E659|8DAB0A  |020AAB;  Initialize system variable
 	stz.w $0aac	 ;02E65C|9CAC0A  |020AAC;  Clear system variable
 	stz.w $0aad	 ;02E65F|9CAD0A  |020AAD;  Clear system variable
 	lda.b #$80	  ;02E662|A980    |      ;  Load system enable value
@@ -7142,12 +7142,12 @@ RealTime_StoreCalc:
 ; System Timing and Coordination Update
 DB_Label_02E6B4:
 	rep #$20		;02E6B4|C220    |      ;  16-bit accumulator mode
-	lda.w $0ab0	 ;02E6B6|ADB00A  |020AB0;  Load system timer
-	adc.w $0aae	 ;02E6B9|6DAE0A  |020AAE;  Add system increment
-	sta.w $0aae	 ;02E6BC|8DAE0A  |020AAE;  Store updated timer
-	lda.w $0ab0	 ;02E6BF|ADB00A  |020AB0;  Load system timer
+	lda.w !sys_control_ab0	 ;02E6B6|ADB00A  |020AB0;  Load system timer
+	adc.w !sys_control_aae	 ;02E6B9|6DAE0A  |020AAE;  Add system increment
+	sta.w !sys_control_aae	 ;02E6BC|8DAE0A  |020AAE;  Store updated timer
+	lda.w !sys_control_ab0	 ;02E6BF|ADB00A  |020AB0;  Load system timer
 	adc.w DB_Display_ConfigTable2 ;02E6C2|6DA0E5  |02E5A0;  Add timing constant
-	sta.w $0ab0	 ;02E6C5|8DB00A  |020AB0;  Store updated timer
+	sta.w !sys_control_ab0	 ;02E6C5|8DB00A  |020AB0;  Store updated timer
 	jsl.l CWaitTimingRoutine ;02E6C8|2200800C|0C8000;  Call external coordination
 	sep #$20		;02E6CC|E220    |      ;  8-bit accumulator mode
 	lda.b #$80	  ;02E6CE|A980    |      ;  Load system flag
@@ -7303,7 +7303,7 @@ State_SyncEngine:
 	cmp.b #$02	  ;02E895|C902    |      ;  Check if state advanced
 	bpl DB_Load_02E8B5 ;02E897|101C    |02E8B5;  Branch if advanced state
 	tay ;02E899|A8      |      ;  Transfer state to Y
-	ldx.w $0ade,y   ;02E89A|BEDE0A  |020ADE;  Load state-specific thread ID
+	ldx.w !sprite_obj_index_1,y   ;02E89A|BEDE0A  |020ADE;  Load state-specific thread ID
 	lda.b #$02	  ;02E89D|A902    |      ;  Load synchronization command
 	sta.l $7ec400,x ;02E89F|9F00C47E|7EC400;  Send sync command to thread
 
@@ -7314,7 +7314,7 @@ State_SyncWait:
 	beq State_SyncWait ;02E8A9|F0F8    |02E8A3;  Wait if still synchronizing
 	rep #$20		;02E8AB|C220    |      ;  16-bit accumulator mode
 	lda.w $0af6	 ;02E8AD|ADF60A  |020AF6;  Load synchronized state data
-	sta.w $0af4	 ;02E8B0|8DF40A  |020AF4;  Store to current state
+	sta.w !processing_flag_2	 ;02E8B0|8DF40A  |020AF4;  Store to current state
 	sep #$20		;02E8B3|E220    |      ;  Return to 8-bit mode
 
 ; System State Reset and Initialization
@@ -7583,7 +7583,7 @@ DB_Label_02E9F7:
 	sec ;02EA1B|38      |      ;  Set carry
 	sbc.b #$04	  ;02EA1C|E904    |      ;  Subtract border offset
 	clc ;02EA1E|18      |      ;  Clear carry
-	adc.w $0a25,y   ;02EA1F|79250A  |020A25;  Add base X coordinate
+	adc.w !gfx_position_x,y   ;02EA1F|79250A  |020A25;  Add base X coordinate
 	asl a;02EA22|0A      |      ;  Multiply by 2
 	asl a;02EA23|0A      |      ;  Multiply by 4
 	asl a;02EA24|0A      |      ;  Multiply by 8 (final X position)
@@ -7592,7 +7592,7 @@ DB_Label_02E9F7:
 	sec ;02EA2C|38      |      ;  Set carry
 	sbc.b #$08	  ;02EA2D|E908    |      ;  Subtract height offset
 	clc ;02EA2F|18      |      ;  Clear carry
-	adc.w $0a26,y   ;02EA30|79260A  |020A26;  Add base Y coordinate
+	adc.w !gfx_position_y,y   ;02EA30|79260A  |020A26;  Add base Y coordinate
 	pha ;02EA33|48      |      ;  Preserve Y position
 	lda.b $04,s	 ;02EA34|A304    |000004;  Load entity configuration from stack
 	cmp.b #$02	  ;02EA36|C902    |      ;  Check if special configuration
@@ -8658,7 +8658,7 @@ DB_Label_02F5C3:
 	sep #$30		;02F5C4|E230    |      ;  8-bit accumulator and indexes
 	lda.w $0ae2	 ;02F5C6|ADE20A  |020AE2;  Load color processing flag
 	beq DB_Label_02F5D9 ;02F5C9|F00E    |02F5D9;  Skip if color processing disabled
-	lda.w $0aee	 ;02F5CB|ADEE0A  |020AEE;  Load color validation state
+	lda.w !sprite_config	 ;02F5CB|ADEE0A  |020AEE;  Load color validation state
 	cmp.b #$03	  ;02F5CE|C903    |      ;  Check if validation level sufficient
 	bpl DB_Label_02F5D9 ;02F5D0|1007    |02F5D9;  Skip if validation insufficient
 	pea.w DB_Memory_ConfigTable2 ;02F5D2|F4DBF5  |02F5DB;  Push color handler table address
@@ -8938,10 +8938,10 @@ Sprite_Processor:
 	tax ;02FB1B|AA      |      ; Transfer to X register for sprite data indexing
 	sep #$20		;02FB1C|E220    |      ; Set 8-bit accumulator mode for byte operations
 	rep #$10		;02FB1E|C210    |      ; Set 16-bit index registers for address calculations
-	lda.w $0a02,y   ;02FB20|B9020A  |020A02; Load sprite type from sprite table
+	lda.w !controller_input_array,y   ;02FB20|B9020A  |020A02; Load sprite type from sprite table
 	cmp.b #$ff	  ;02FB23|C9FF    |      ; Compare against invalid sprite marker ($ff)
 	beq Sprite_DefaultGraphics ;02FB25|F01E    |02FB45; Branch if invalid sprite (use default graphics)
-	lda.w $0a0a,y   ;02FB27|B90A0A  |020A0A; Load sprite animation frame from table
+	lda.w !controller_data_alt_2,y   ;02FB27|B90A0A  |020A0A; Load sprite animation frame from table
 	beq Sprite_DefaultGraphics ;02FB2A|F019    |02FB45; Branch if no animation frame (use default)
 	phx ;02FB2C|DA      |      ; Push X register (preserve sprite index)
 	ldy.w #$0000	;02FB2D|A00000  |      ; Initialize Y register for graphics copying
