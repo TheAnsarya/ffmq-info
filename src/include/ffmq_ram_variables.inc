@@ -482,13 +482,20 @@
 !sys_state_counter  = $048d     ; System state counter/flag (17 uses)
 !sys_temp_work_1    = $04a0     ; System temp working variable 1 (30 uses - highest in range)
 !sys_temp_work_2    = $04a2     ; System temp working variable 2 (11 uses)
+!sys_work_buffer_count = $04a4  ; Working buffer counter (graphics processing)
+!sys_work_control   = $04a5     ; Working control value (graphics processing)
+!sys_work_register  = $04a7     ; Working register (temporary processing)
 !sys_temp_buffer    = $04af     ; System temp buffer (10 uses)
+!sys_work_result    = $04b3     ; Working result storage (final state)
 
 ; ----------------------------------------------------------------------------
 ; System State and Configuration ($04e0-$0520)
 ; ----------------------------------------------------------------------------
 !sys_state_ptr      = $04e0     ; System state pointer/offset (16 uses)
-!sys_operation_type = $0513     ; System operation type (14 uses)
+!sys_command_status = $0417     ; Command status register
+!sys_param_1        = $050c     ; System parameter 1 (graphics/command)
+!sys_param_2        = $050d     ; System parameter 2 (graphics/command)
+!sys_operation_type = $0513     ; System operation type (14 uses) / Special processing state
 
 ; Configuration and validation storage
 !config_validated       = $0514     ; Validated configuration storage (8 uses)
@@ -499,9 +506,15 @@
 ; ============================================================================
 
 ; ----------------------------------------------------------------------------
-; Tilemap / Graphics Base ($0800)
+; Tilemap / Graphics Base ($0800-$0982)
 ; ----------------------------------------------------------------------------
 !tilemap_wram_source_start      = $0800     ; Tilemap source start (legacy label)
+!gfx_sprite_buffer_1    = $0802     ; Graphics sprite buffer 1
+!gfx_sprite_buffer_2    = $0880     ; Graphics sprite buffer 2
+!gfx_sprite_buffer_3    = $0882     ; Graphics sprite buffer 3
+!gfx_sprite_buffer_4    = $0902     ; Graphics sprite buffer 4 (alternate/memory)
+!gfx_sprite_buffer_5    = $0980     ; Graphics sprite buffer 5 (alternate)
+!gfx_sprite_buffer_6    = $0982     ; Graphics sprite buffer 6 (alternate)
 
 ; ----------------------------------------------------------------------------
 ; DMA Parameter Block ($0900-$0921)
@@ -525,7 +538,33 @@
 ; ----------------------------------------------------------------------------
 !secondary_mem_block    = $0a00     ; Secondary memory block base address
 !controller_input_array = $0a02     ; Controller input data array (indexed access)
+!controller_data_alt_1  = $0a07     ; Controller data alternative 1 (indexed $0a07,x)
+!controller_data_alt_2  = $0a0a     ; Controller data alternative 2 (indexed $0a0a,x)
+!sys_state_data         = $0a1c     ; System state data register
+!gfx_position_x         = $0a25     ; Graphics X position base
+!gfx_position_y         = $0a26     ; Graphics Y position base
+!gfx_position_x_alt     = $0a29     ; Graphics secondary X position base
+!gfx_position_y_alt     = $0a2a     ; Graphics secondary Y position base
+!sys_memory_addr        = $0a70     ; System memory address pointer
+!sys_multiplier         = $0a79     ; System multiplier value
 !validation_state       = $0a84     ; Validation state storage (8 uses)
+!gfx_system_addr        = $0a8b     ; Graphics system address pointer
+!gfx_coord_x            = $0a91     ; Graphics X coordinate
+!gfx_coord_y            = $0a92     ; Graphics Y coordinate
+!gfx_pattern_counter    = $0a94     ; Graphics pattern counter (shifted 2x for *4)
+!gfx_sprite_mode        = $0a9c     ; Graphics/sprite mode flag
+!gfx_sprite_base        = $0a9d     ; Graphics sprite base address/offset
+!gfx_special_flag       = $0a9f     ; Graphics special processing flag
+!gfx_param_mode         = $0aa0     ; Graphics parameter mode
+!sys_control_aa2        = $0aa2     ; System control variable
+!sys_control_aaa        = $0aaa     ; System control variable
+!sys_control_aab        = $0aab     ; System control variable
+!sys_control_aae        = $0aae     ; System control variable
+!sys_control_ab0        = $0ab0     ; System control variable
+!sprite_obj_index_1     = $0ade     ; Primary sprite/object index
+!sprite_obj_index_2     = $0adf     ; Secondary sprite/object index
+!gfx_index              = $0ae9     ; Graphics index storage
+!sprite_config          = $0aee     ; Sprite configuration storage
 
 ; Extended system state variables ($0a7e-$0aff)
 !display_flag           = $0a7e     ; Display processing flag
@@ -543,9 +582,24 @@
 ; ============================================================================
 
 ; ----------------------------------------------------------------------------
-; Sprite and Battle Data Registers ($0c51, $0f2a-$0f2b)
+; Sprite and Battle Data Registers ($0c50-$0c5f, $0f2a-$0f2b)
 ; ----------------------------------------------------------------------------
+!battle_state_c50       = $0c50     ; Battle state register
 !sprite_data_c51        = $0c51     ; Sprite data register
+!battle_state_c52       = $0c52     ; Battle state register
+!battle_state_c53       = $0c53     ; Battle state register
+!battle_state_c54       = $0c54     ; Battle state register
+!battle_state_c55       = $0c55     ; Battle state register
+!battle_state_c56       = $0c56     ; Battle state register
+!battle_state_c57       = $0c57     ; Battle state register
+!battle_state_c58       = $0c58     ; Battle state register
+!battle_state_c59       = $0c59     ; Battle state register
+!battle_state_c5a       = $0c5a     ; Battle state register
+!battle_state_c5b       = $0c5b     ; Battle state register
+!battle_state_c5c       = $0c5c     ; Battle state register
+!battle_state_c5d       = $0c5d     ; Battle state register
+!battle_state_c5e       = $0c5e     ; Battle state register
+!battle_state_c5f       = $0c5f     ; Battle state register
 !battle_data_f2a        = $0f2a     ; Battle data array base
 !battle_data_f2b        = $0f2b     ; Battle data array (offset +1)
 
