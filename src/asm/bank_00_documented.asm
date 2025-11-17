@@ -562,7 +562,7 @@ Boot_FinalInit:
 ; ---------------------------------------------------------------------------
 ; Load Initial Data Table
 ; ---------------------------------------------------------------------------
-; $81ed points to initialization data (see DB_DATA8_0081ed below)
+; $81ed points to initialization data (see DB_Init_DataTable below)
 ; CodeLikelyLoadsProcessesThisData likely loads/processes this data table
 ; ---------------------------------------------------------------------------
 
@@ -793,7 +793,7 @@ Load_SaveSlotData:
 ; Slot number is incremented and used as index into data table.
 ;
 ; Data Table Structure (8 bytes per slot):
-;   See DB_DATA8_0081d5-0081ED below
+;   See DB_SaveSlot_Data1-0081ED below
 ; ===========================================================================
 
 	inc a; A = slot number + 1 (1, 2, or 3)
@@ -812,25 +812,25 @@ Load_SaveSlotData:
 ; ---------------------------------------------------------------------------
 ; Load Data from Slot Table
 ; ---------------------------------------------------------------------------
-; Uses X as offset into DB_DATA8_0081d5 table
+; Uses X as offset into DB_SaveSlot_Data1 table
 ; Loads 8 bytes of configuration data for this save slot
 ; ---------------------------------------------------------------------------
 
 	stz.b $19	   ; [$19] = $00 (clear direct page variable)
 
-	lda.w DB_DATA8_0081d5,x ; A = table[X+0] (byte 0)
+	lda.w DB_SaveSlot_Data1,x ; A = table[X+0] (byte 0)
 	sta.w !env_context_value	 ; Store to !env_context_value
 
-	ldy.w DB_DATA8_0081d6,x ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
+	ldy.w DB_SaveSlot_Data2,x ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
 	sty.w !env_coord_x	 ; Store to !env_coord_x-!env_coord_y
 
-	lda.w DB_DATA8_0081d8,x ; A = table[X+3] (byte 3)
+	lda.w DB_SaveSlot_Data3,x ; A = table[X+3] (byte 3)
 	sta.w $0e92	 ; Store to $0e92
 
-	ldy.w DB_DATA8_0081db,x ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
+	ldy.w DB_SaveSlot_Data5,x ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
 	sty.b $53	   ; Store to $53-$54
 
-	ldy.w DB_DATA8_0081d9,x ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
+	ldy.w DB_SaveSlot_Data4,x ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
 	tyx ; X = Y (transfer loaded value to X)
 
 	rep #$30		; 16-bit A, X, Y
@@ -868,19 +868,19 @@ Load_SaveSlotData:
 ; Structure unclear without further analysis
 ;-------------------------------------------------------------------------------
 
-DB_DATA8_0081d5:
+DB_SaveSlot_Data1:
 	db $2d		 ; Slot 0, byte 0
 
-DB_DATA8_0081d6:
+DB_SaveSlot_Data2:
 	dw $1f26	   ; Slot 0, bytes 1-2 (little-endian)
 
-DB_DATA8_0081d8:
+DB_SaveSlot_Data3:
 	db $05		 ; Slot 0, byte 3
 
-DB_DATA8_0081d9:
+DB_SaveSlot_Data4:
 	dw $aa0c	   ; Slot 0, bytes 4-5
 
-DB_DATA8_0081db:
+DB_SaveSlot_Data5:
 	dw $a82e	   ; Slot 0, bytes 6-7
 
 ; Slot 1 data (8 bytes)
@@ -889,7 +889,7 @@ DB_DATA8_0081db:
 ; Slot 2 data (8 bytes)
 	db $14, $33, $28, $05, $2c, $aa, $6a, $a9
 
-DB_DATA8_0081ed:
+DB_Init_DataTable:
 ; Referenced by OriginalCode (at $008113)
 ; Initialization data table
 	db $ec, $a6, $03
@@ -981,11 +981,11 @@ Load_InitDataTable:
 ; INITIALIZATION DATA TABLES
 ;-------------------------------------------------------------------------------
 
-DB_DATA8_00822a:
+DB_Init_ConfigTable:
 ; No save file table
 	db $2d, $a6, $03
 
-DB_DATA8_00822d:
+DB_Init_ParamTable:
 ; Has save file table
 	db $2b, $a6, $03
 
@@ -1062,7 +1062,7 @@ Init_Hardware:
 ;   - Byte 2 ($fd): DMA source bank or transfer parameters
 ;-------------------------------------------------------------------------------
 
-DB_DATA8_008252:
+DB_Hardware_ConfigTable:
 	db $00
 	db $db, $80, $fd, $db, $80, $fd, $db, $80, $fd
 
@@ -1262,7 +1262,7 @@ Init_VBlankDMA:
 ; INITIALIZATION DATA TABLE
 ;-------------------------------------------------------------------------------
 
-DB_DATA8_008334:
+DB_DMA_ConfigTable:
 ; Referenced at $0082a2
 	db $fc, $a6, $03
 
@@ -3031,13 +3031,13 @@ DMA_PaletteToCGRAM:
 ;===============================================================================
 
 ; Data table referenced by DataTableReferencedCode
-DB_DATA8_008960:
+DB_GameLoop_DataTable:
 	db $3c		 ; Tile $3c
 
-DB_DATA8_008961:
+DB_GameLoop_TileData2:
 	db $3d		 ; Tile $3d
 
-DB_DATA8_008962:
+DB_GameLoop_TileData3:
 	db $3e,$45,$3a,$3b ; Tiles: $3e, $45, $3a, $3b
 
 ;===============================================================================
@@ -6120,11 +6120,11 @@ Bit_PositionToMask:
 	phx ; Save X
 	asl a; Multiply by 2 for word table
 	tax ; X = index
-	lda.l DB_DATA8_0097fb,x ; Load bit mask from table
+	lda.l DB_BitMask_WordTable,x ; Load bit mask from table
 	plx ; Restore X
 	rts ; Return
 
-DB_DATA8_0097fb:
+DB_BitMask_WordTable:
 	dw $0001, $0002, $0004, $0008, $0010, $0020, $0040, $0080
 	dw $0100, $0200, $0400, $0800, $1000, $2000, $4000, $8000
 
@@ -6322,7 +6322,7 @@ Memory_FillLong:
 ; Technical Details:
 ;   - Handles blocks of 64 bytes ($40) at a time
 ;   - Uses Memory_Fill64 for 64-byte blocks
-;   - Uses jump table (DB_DATA8_009a1e) for partial blocks
+;   - Uses jump table (DB_MemoryFill_JumpTable) for partial blocks
 ;   - Remainder handled by indexed jump
 ; ===========================================================================
 
@@ -6354,7 +6354,7 @@ Fill_Block_Loop:
 Handle_Remainder:
 	tax ; X = remainder count (doubled for jump table)
 	pla ; Restore X from stack
-	jmp.w (DB_DATA8_009a1e,x) ; Jump to handler for exact count
+	jmp.w (DB_MemoryFill_JumpTable,x) ; Jump to handler for exact count
 
 ; ---------------------------------------------------------------------------
 ; Fill 64 Bytes With Value
@@ -6422,7 +6422,7 @@ Memory_Fill2Words:
 ;   - Allows exact fill counts without conditional logic
 ; ===========================================================================
 
-DB_DATA8_009a1e:
+DB_MemoryFill_JumpTable:
 	dw $9a1d	   ; 0 bytes (just return)
 	dw $9a1a, $9a17, $9a14, $9a11 ; 2, 4, 6, 8 bytes
 	dw $9a0e, $9a0b, $9a08, $9a05, $9a02 ; 10-18 bytes
@@ -6651,10 +6651,10 @@ DB_UNREACH_00A2D4:
 	pla ;00A2DB|FA      |      ; Pull accumulator
 	rts ;00A2DC|60      |      ; Return
 
-DB_DATA8_00a2dd:
+DB_Graphics_ConfigByte1:
 	db $10
 
-DB_DATA8_00a2de:
+DB_Graphics_ConfigTable1:
 	db $19,$00,$12,$32,$00,$dd,$0a,$00
 	db $ff
 
@@ -6772,7 +6772,7 @@ Graphics_DispatchTable:
 	and.w #$00ff
 	asl a
 TAX_Label:
-	jmp.w (DB_DATA8_009e6e,x)
+	jmp.w (DB_Graphics_CommandStream3,x)
 
 Graphics_CallSystem:
 	lda.w #$0080
@@ -7097,7 +7097,7 @@ Color_BlueOK:
 ; Color Palette Data
 ; ---------------------------------------------------------------------------
 
-DB_DATA8_009c87:
+DB_Graphics_CommandStream1:
 ; Color Palette Data Table
 DATA8_009c87_colors:
 	dw $0d00, $0d01, $0d01, $0d01 ; Color entries
@@ -7341,7 +7341,7 @@ Graphics_DispatchCommand:
 ; Jump table dispatch ($00-$2f)
 	asl a; Multiply by 2 (word index)
 	tax ; X = table offset
-	jsr.w (DB_DATA8_009e0e,x) ; Call handler via table
+	jsr.w (DB_Graphics_CommandStream2,x) ; Call handler via table
 	rep #$30		; 16-bit A/X/Y
 	rts ; Return
 
@@ -7384,7 +7384,7 @@ Graphics_IndexedDataFound:
 ; Commands $00-$2f dispatch here
 ; ===========================================================================
 
-DB_DATA8_009e0e:
+DB_Graphics_CommandStream2:
 ; Jump table entries
 DATA8_009e0e_handlers:
 	dw CommandHandler ; $00: Command handler
@@ -7440,7 +7440,7 @@ DATA8_009e0e_handlers:
 ; Secondary Jump Table (for specific graphics operations)
 ; ---------------------------------------------------------------------------
 
-DB_DATA8_009e6e:
+DB_Graphics_CommandStream3:
 	dw ImportedSegmentCodeCode ; $00
 	dw Sub_00A3AB ; $01
 	dw Sub_00A51E ; $02
@@ -7942,7 +7942,7 @@ Palette_SearchTable_Entry:
 
 Cmd_PaletteLookup_Search:
 ; Search palette table for matching index
-	lda.w DB_DATA8_00a2dd,x ; Load table entry
+	lda.w DB_Graphics_ConfigByte1,x ; Load table entry
 	cmp.b #$ff	  ; Check for end marker
 	bne +		   ; Not end, continue
 	jmp DB_UNREACH_00A2D4 ; End of table (not found)
@@ -7955,7 +7955,7 @@ Cmd_PaletteLookup_Search:
 
 Cmd_PaletteLookup_Found:
 	rep #$30		; 16-bit A/X/Y
-	lda.w DB_DATA8_00a2de,x ; Load palette pointer
+	lda.w DB_Graphics_ConfigTable1,x ; Load palette pointer
 	sta.b $9e	   ; Store to $9e
 	plx ; Clean stack
 	rts ; Return
@@ -9552,7 +9552,7 @@ Window_DrawTiles:
 	sta.b $64	   ; Save tile
 
 Window_DrawTileLoop:
-	jsr.w (DB_DATA8_009a1e,x) ; Call indexed routine
+	jsr.w (DB_MemoryFill_JumpTable,x) ; Call indexed routine
 	tya ; Get pointer
 	adc.w #$0040	; Next row
 TAY_Label_4:
@@ -9613,7 +9613,7 @@ PLB_Label_1:
 	lda.b $64
 	and.w #$fff8	; Mask to 8-byte boundary
 	adc.w #$0008	; Adjust
-	jsr.w (DB_DATA8_009a1e,x) ; Call indexed routine
+	jsr.w (DB_MemoryFill_JumpTable,x) ; Call indexed routine
 	sbc.w #$0007	; Adjust back
 TAX_Label_9:
 	lda.b $64
@@ -9651,7 +9651,7 @@ TXA_Label_1:
 	asl a; × 2
 TAX_Label_11:
 	lda.b $64
-	jsr.w (DB_DATA8_009a1e,x) ; Final draw
+	jsr.w (DB_MemoryFill_JumpTable,x) ; Final draw
 	plb ; Restore bank
 
 
@@ -13732,11 +13732,11 @@ Menu_BattleSettings_Speed_Store:
 Menu_BattleSettings_UpdateDisplay:
 	sty.b $03	   ; Store menu mode
 	sta.b $01	   ; Store current value
-	lda.w DB_DATA8_00c339,x ; Load color byte 1
+	lda.w DB_Graphics_ConfigByte2,x ; Load color byte 1
 	sta.l $7f56d7   ; Store to WRAM
-	lda.w DB_DATA8_00c33a,x ; Load color byte 2
+	lda.w DB_Graphics_ConfigByte3,x ; Load color byte 2
 	sta.l $7f56d9   ; Store to WRAM
-	lda.w DB_DATA8_00c33b,x ; Load color byte 3
+	lda.w DB_Graphics_ConfigByte4,x ; Load color byte 3
 	sta.l $7f56db   ; Store to WRAM
 
 Menu_BattleSettings_Refresh:
@@ -13822,11 +13822,11 @@ Menu_BattleSettings_SetBlue_Store:
 
 SystemData_Config14:
 	db $1f		 ; Blue data
-DB_DATA8_00c339:
+DB_Graphics_ConfigByte2:
 	db $1f		 ; Blue data
-DB_DATA8_00c33a:
+DB_Graphics_ConfigByte3:
 	db $20		 ; Green data
-DB_DATA8_00c33b:
+DB_Graphics_ConfigByte4:
 	db $78,$3f,$20,$58,$5f,$20,$38,$7f,$38,$00
 
 SystemData_Config15:

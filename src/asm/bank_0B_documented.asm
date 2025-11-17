@@ -478,7 +478,7 @@ BattleSprite_SearchNext:	; Continue search
 ;   !audio_coord_register/!audio_control_register/!audio_effect_control = Final graphics pointer
 ;
 ; Uses two lookup tables:
-;   DB_DATA8_0b8140: Battle type → graphics address low byte
+;   DB_Battle_GfxTypeLowBytes: Battle type → graphics address low byte
 ;   Battle_GfxAddressHigh: Battle phase → graphics address high byte
 ;
 ; Combines both lookups to create complete 24-bit pointer:
@@ -490,7 +490,7 @@ BattleGfx_LoadByTypeAndPhase:
 	xba ; Swap A/B (prepare for 16-bit index)
 	lda.w !battle_type	 ; Load battle type
 	tax ; Transfer to X for table lookup
-	lda.l DB_DATA8_0b8140,x ; Load graphics address low byte from table
+	lda.l DB_Battle_GfxTypeLowBytes,x ; Load graphics address low byte from table
 	sta.w !audio_effect_control	 ; Store to pointer low byte
 	lda.w !ram_193f	 ; Load battle phase index
 	tax ; Transfer to X for second lookup
@@ -501,7 +501,7 @@ BattleGfx_LoadByTypeAndPhase:
 	rtl ; Return to caller
 
 ; Data Tables for Graphics Pointers
-DB_DATA8_0b8140:
+DB_Battle_GfxTypeLowBytes:
 	db $88,$8b	 ; Type 0: $XX88, Type 1: $XX8B
 	db $88		 ; Type 2: $XX88
 	db $85		 ; Type 3: $XX85
@@ -672,11 +672,11 @@ BattleInit_SetupEnemyPalette:
 ;   - Background graphics parameters from lookup tables
 ;
 ; Tables Used:
-;   DB_DATA8_0b8296: Default layer values (11 bytes)
-;   DB_DATA8_0b8450: Background graphics primary table
-;   DB_DATA8_0b844f: Background graphics attribute table
-;   DB_DATA8_0b84df: Background layer configuration table
-;   DB_DATA8_0b829e: Layer scroll/position table
+;   DB_Battle_LayerDefaults: Default layer values (11 bytes)
+;   DB_Battle_ConfigByte5: Background graphics primary table
+;   DB_Battle_ConfigByte4: Background graphics attribute table
+;   DB_Battle_ConfigByte9: Background layer configuration table
+;   DB_Battle_ScrollTable0: Layer scroll/position table
 ;
 ; Process:
 ;   1. Clear layer scroll positions
@@ -696,7 +696,7 @@ BattleGfx_InitLayerData:
 	stx.w $190e	 ; Clear layer 2 scroll X
 
 BattleGfx_CopyDefaults:	; Copy default values loop
-	lda.w DB_DATA8_0b8296,x ; Load default byte
+	lda.w DB_Battle_LayerDefaults,x ; Load default byte
 	sta.w !coord_context,x   ; Store to layer data buffer
 	inx ; Increment index
 	cpx.w #$000b	; Copied 11 bytes?
@@ -712,15 +712,15 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	tax ; Transfer to X for lookup
 
 ; Load 3 bytes from primary table
-	lda.w DB_DATA8_0b8450,x ; Load byte 0
+	lda.w DB_Battle_ConfigByte5,x ; Load byte 0
 	sta.w !layer_flags	 ; Store background param 0
-	lda.w DB_DATA8_0b8451,x ; Load byte 1
+	lda.w DB_Battle_ConfigByte6,x ; Load byte 1
 	sta.w !coord_adjust_x	 ; Store background param 1
-	lda.w DB_DATA8_0b8452,x ; Load byte 2
+	lda.w DB_Battle_ConfigByte7,x ; Load byte 2
 	sta.w !coord_adjust_y	 ; Store background param 2
 
 ; Process attribute byte (bits 0-2 and bits 4-6)
-	lda.w DB_DATA8_0b844f,x ; Load attribute byte
+	lda.w DB_Battle_ConfigByte4,x ; Load attribute byte
 	pha ; Save it
 	and.b #$07	  ; Mask bits 0-2
 	sta.w !gfx_mode_control	 ; Store layer type (0-7)
@@ -731,21 +731,21 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	tax ; Transfer to X for second lookup
 
 ; Load layer configuration (3 bytes from second table)
-	lda.w DB_DATA8_0b84df,x ; Load config byte 0
+	lda.w DB_Battle_ConfigByte9,x ; Load config byte 0
 	sta.w $1a50	 ; Store layer config 0
-	lda.w DB_DATA8_0b84e0,x ; Load config byte 1
+	lda.w DB_Battle_ConfigByte10,x ; Load config byte 1
 	sta.w !buffer_state	 ; Store layer config 1
-	lda.w DB_DATA8_0b84e2,x ; Load config byte 2
+	lda.w DB_Battle_ConfigByte12,x ; Load config byte 2
 	sta.w !gfx_completion_flags	 ; Store layer priority
 
 ; Load scroll/position data (3 bytes from third table)
-	lda.w DB_DATA8_0b84e1,x ; Load scroll index
+	lda.w DB_Battle_ConfigByte11,x ; Load scroll index
 	tax ; Transfer to X for third lookup
-	lda.w DB_DATA8_0b829e,x ; Load scroll value 0
+	lda.w DB_Battle_ScrollTable0,x ; Load scroll value 0
 	sta.w !coord_modify_data	 ; Store layer scroll X
-	lda.w DB_DATA8_0b829f,x ; Load scroll value 1
+	lda.w DB_Battle_ScrollTable1,x ; Load scroll value 1
 	sta.w !coord_finalize_data	 ; Store layer scroll Y
-	lda.w DB_DATA8_0b82a0,x ; Load scroll value 2
+	lda.w DB_Battle_ScrollTable2,x ; Load scroll value 2
 	sta.w !ram_1a54	 ; Store layer scroll speed
 
 	lda.b #$17	  ; Layer count/flags = $17
@@ -756,16 +756,16 @@ BattleGfx_LayerExit:
 	rtl ; Return to caller
 
 ; Data Tables
-DB_DATA8_0b8296:
+DB_Battle_LayerDefaults:
 	db $00,$00,$00,$49,$15,$00,$00,$00 ; Default layer values (11 bytes total)
 
-DB_DATA8_0b829e:
+DB_Battle_ScrollTable0:
 	db $20		 ; Scroll table entry 0
 
-DB_DATA8_0b829f:
+DB_Battle_ScrollTable1:
 	db $00		 ; Scroll table entry 1
 
-DB_DATA8_0b82a0:
+DB_Battle_ScrollTable2:
 	db $30		 ; Scroll table entry 2
 	db $00,$00,$20,$20,$00,$00,$20,$30,$00 ; Additional scroll entries
 
@@ -833,7 +833,7 @@ DB_DATA8_0b82a0:
 ;   4. Extract bits 0-2 from $19cb, combine with $19d3 sign bit
 ;   5. Merge into $19b4 lower nibble
 ;   6. Choose configuration table offset: $0000 or $000a based on flags
-;   7. Copy 10 bytes from DB_DATA8_0b8324 table to $1993
+;   7. Copy 10 bytes from DB_Battle_ConfigTable1 table to $1993
 ;   8. Set PPU BG map pointer based on $1910 sign bit:
 ;      - Negative: $0e0e (alternate map)
 ;      - Positive: $0e06 (default map)
@@ -886,7 +886,7 @@ BattleState_CopyConfig:
 	ldy.w #$0000	; Y = destination index
 
 BattleState_CopyLoop:	; Copy loop
-	lda.l DB_DATA8_0b8324,x ; Load config byte from table
+	lda.l DB_Battle_ConfigTable1,x ; Load config byte from table
 	sta.w !graphics_state_param,y   ; Store to battle config RAM
 	inx ; Increment source
 	iny ; Increment destination
@@ -904,7 +904,7 @@ BattleState_SetMapPtr:
 	rtl ; Return
 
 ; Configuration Data Tables
-DB_DATA8_0b8324:
+DB_Battle_ConfigTable1:
 ; Table 0 (offset $00): Default battle configuration
 	db $10,$40,$04,$02,$0c,$02,$00,$00,$00,$00
 
@@ -971,9 +971,9 @@ BattleMap_GetTileData:
 ;   Decrements A, increments X/Y until A wraps to $ffff
 ;
 ; Decompression Tables:
-;   DB_DATA8_0b83ac: Block sizes (2 bytes each) - 3 entries
-;   DB_DATA8_0b83ad: Block size high bytes
-;   DB_DATA8_0b83b2: Source addresses in Bank $06
+;   DB_Battle_ConfigByte1: Block sizes (2 bytes each) - 3 entries
+;   DB_Battle_ConfigByte2: Block size high bytes
+;   DB_Battle_ConfigByte3: Source addresses in Bank $06
 
 EnemyGfx_Decompress:
 	phb ; Save data bank
@@ -990,20 +990,20 @@ EnemyGfx_DecompressLoop:	; Decompression loop (3 blocks)
 	xba ; Swap A (preserve flags in B)
 
 ; Calculate block size from table
-	lda.w DB_DATA8_0b83ac,x ; Load size low byte
+	lda.w DB_Battle_ConfigByte1,x ; Load size low byte
 	sta.w !M7A	 ; Store to hardware multiply low
-	lda.w DB_DATA8_0b83ad,x ; Load size high byte
+	lda.w DB_Battle_ConfigByte2,x ; Load size high byte
 	sta.w !M7A	 ; Store to hardware multiply high
 	xba ; Swap back (flags to A)
 	sta.w !M7B	 ; Store flags as multiplier
 
 ; Calculate source address
 	rep #$20		; Set A to 16-bit
-	lda.w DB_DATA8_0b83b2,x ; Load base address from table
+	lda.w DB_Battle_ConfigByte3,x ; Load base address from table
 	clc ; Clear carry
 	adc.w !MPYL	 ; Add multiply result (offset)
 	pha ; Save calculated source address
-	lda.w DB_DATA8_0b83ac,x ; Load block size again
+	lda.w DB_Battle_ConfigByte1,x ; Load block size again
 	dec a; Decrement for mvn (size-1)
 	plx ; Pop source address to X
 	sep #$20		; Set A to 8-bit
@@ -1025,15 +1025,15 @@ EnemyGfx_DecompressLoop:	; Decompression loop (3 blocks)
 	rtl ; Return
 
 ; Decompression Configuration Tables
-DB_DATA8_0b83ac:
+DB_Battle_ConfigByte1:
 	db $00		 ; Block 0 size low byte
 
-DB_DATA8_0b83ad:
+DB_Battle_ConfigByte2:
 	db $02		 ; Block 0 size high byte = $0200 (512 bytes)
 	db $80,$00	 ; Block 1 size = $0080 (128 bytes)
 	db $00,$01	 ; Block 2 size = $0100 (256 bytes)
 
-DB_DATA8_0b83b2:
+DB_Battle_ConfigByte3:
 	db $00,$80	 ; Block 0 source = $8000
 	db $00,$a0	 ; Block 1 source = $a000
 	db $00,$a8	 ; Block 2 source = $a800
@@ -1173,16 +1173,16 @@ BattlePPU_WriteColorMath:
 ; Complex multi-table system for configuring battle backgrounds
 ; Referenced by CodeBackgroundLayerInitializationMultiTable (documented in Cycle 1)
 
-DB_DATA8_0b844f:
+DB_Battle_ConfigByte4:
 	db $14		 ; Attribute byte for background type 0
 
-DB_DATA8_0b8450:
+DB_Battle_ConfigByte5:
 	db $1a		 ; Graphics address low byte 0
 
-DB_DATA8_0b8451:
+DB_Battle_ConfigByte6:
 	db $08		 ; Graphics address high byte 0
 
-DB_DATA8_0b8452:
+DB_Battle_ConfigByte7:
 	db $01		 ; Bank/flags byte 0
 
 ; Additional background configurations (16 entries × 4 bytes each)
@@ -1206,7 +1206,7 @@ DB_DATA8_0b8452:
 	db $04,$0a,$08,$01 ; Background type 17
 
 ; Layer scroll/animation configuration table (18 entries × 4 bytes each)
-DB_DATA8_0b8497:
+DB_Battle_ConfigByte8:
 	db $03,$15,$00,$00 ; Scroll config 0
 	db $33,$39,$00,$00 ; Scroll config 1
 	db $03,$15,$00,$00 ; Scroll config 2
@@ -1227,16 +1227,16 @@ DB_DATA8_0b8497:
 	db $41,$06,$21,$00 ; Scroll config 17
 
 ; Layer blending/priority configuration table
-DB_DATA8_0b84df:
+DB_Battle_ConfigByte9:
 	db $00		 ; Blend config 0
 
-DB_DATA8_0b84e0:
+DB_Battle_ConfigByte10:
 	db $00		 ; Blend config 0 (continued)
 
-DB_DATA8_0b84e1:
+DB_Battle_ConfigByte11:
 	db $00		 ; Scroll index 0
 
-DB_DATA8_0b84e2:
+DB_Battle_ConfigByte12:
 	db $02,$02,$40,$00,$02,$00,$00,$04 ; Configs 0-1
 	db $02,$00,$c2,$00,$02,$00,$00,$08 ; Configs 2-3
 	db $02,$02,$51,$00,$02,$00,$c1,$04 ; Configs 4-5
@@ -1402,11 +1402,11 @@ BattleLayer_TypeHandlerReturn:
 ; - Music/sound loading with fallback system (4 attempts)
 ;
 ; Data Tables:
-; - DB_DATA8_0b8324: Battle configuration (2 tables × 10 bytes)
-; - DB_DATA8_0b83ac/AD/B2: Decompression parameters (3 blocks)
-; - DB_DATA8_0b844f-8452: Background graphics config (18 types × 4 bytes)
-; - DB_DATA8_0b8497: Layer scroll/animation (18 configs × 4 bytes)
-; - DB_DATA8_0b84df-E2: Layer blending/priority configs
+; - DB_Battle_ConfigTable1: Battle configuration (2 tables × 10 bytes)
+; - DB_Battle_ConfigByte1/AD/B2: Decompression parameters (3 blocks)
+; - DB_Battle_ConfigByte4-8452: Background graphics config (18 types × 4 bytes)
+; - DB_Battle_ConfigByte8: Layer scroll/animation (18 configs × 4 bytes)
+; - DB_Battle_ConfigByte9-E2: Layer blending/priority configs
 ; - Battle_TileStride: Tile stride lookup (16 modes × 2 bytes)
 ; - DB_DATA8_0b856c: Background handler jump table (8 entries)
 ;

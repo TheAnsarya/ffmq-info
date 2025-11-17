@@ -16,7 +16,7 @@
 ; Key Routines:
 ; - SPC_InitMain: Main SPC700 initialization
 ; - Secondary_APU_Command_Entry_Point: Sound data transfer routine
-; - DB_DATA8_0d8008: Sound driver data pointers
+; - DB_Audio_DriverSizeLow: Sound driver data pointers
 ;
 ; APU I/O Ports (used for communication):
 ; - $2140 (APUIO0): Command/status port
@@ -49,16 +49,16 @@ SPC_TransferData:
 ; Pointers to sound driver code and data for upload to SPC700.
 ; ==============================================================================
 
-DB_DATA8_0d8008:
+DB_Audio_DriverSizeLow:
 	db $87		 ;0D8008	; Driver size low byte
 
-DB_DATA8_0d8009:
+DB_Audio_DriverPointers:
 	db $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1 ;0D8009	; Pointers
 
-DB_DATA8_0d8014:
+DB_Audio_LoadAddrLow:
 	db $00		 ;0D8014	; Load address low
 
-DB_DATA8_0d8015:
+DB_Audio_LoadPointers:
 	db $02,$00,$2c,$00,$48,$00,$1b,$80,$1a,$00,$1a ;0D8015	; Pointers
 	db $ae,$bd,$ff,$bd,$35,$be,$7d,$be,$59,$be,$a1,$be ;0D8020
 
@@ -117,9 +117,9 @@ SPC_WaitReady:
 
 ; Begin sound driver upload
 	ldx.w #$0000	;0D807C	; Start at offset 0
-	lda.l DB_DATA8_0d8014 ;0D807F	; Load target address low
+	lda.l DB_Audio_LoadAddrLow ;0D807F	; Load target address low
 	sta.w !SNES_APUIO2 ;0D8083	; Send to APU port 2
-	lda.l DB_DATA8_0d8015 ;0D8086	; Load target address high
+	lda.l DB_Audio_LoadPointers ;0D8086	; Load target address high
 	sta.w !SNES_APUIO3 ;0D808A	; Send to APU port 3
 	lda.b #$01	  ;0D808D	; Upload start command
 	sta.w !SNES_APUIO1 ;0D808F	; Send to APU port 1
@@ -141,9 +141,9 @@ SPC_WaitAck:
 SPC_TransferBlock:
 	lda.b #$00	  ;0D809C	; Clear high byte
 	xba ;0D809E	; Swap A/B
-	lda.l DB_DATA8_0d8008,x ;0D809F	; Load driver data byte
+	lda.l DB_Audio_DriverSizeLow,x ;0D809F	; Load driver data byte
 	sta.b $14	   ;0D80A3	; Store to transfer buffer
-	lda.l DB_DATA8_0d8009,x ;0D80A5	; Load pointer low
+	lda.l DB_Audio_DriverPointers,x ;0D80A5	; Load pointer low
 	sta.b $15	   ;0D80A9	; Store to buffer
 	lda.b #$0d	  ;0D80AB	; Bank $0d
 	sta.b $16	   ;0D80AD	; Store bank to buffer
@@ -182,9 +182,9 @@ SPC_WaitTransfer:
 ; Sound driver upload complete
 	lda.b #$00	  ;0D80DD	; Zero value
 	sta.w !SNES_APUIO1 ;0D80DF	; Clear port 1
-	lda.l DB_DATA8_0d8014 ;0D80E2	; Load start address low
+	lda.l DB_Audio_LoadAddrLow ;0D80E2	; Load start address low
 	sta.w !SNES_APUIO2 ;0D80E6	; Send to port 2
-	lda.l DB_DATA8_0d8015 ;0D80E9	; Load start address high
+	lda.l DB_Audio_LoadPointers ;0D80E9	; Load start address high
 	sta.w !SNES_APUIO3 ;0D80ED	; Send to port 3
 	lda.b #$00	  ;0D80F0	; Start execution command
 	xba ;0D80F2	; Swap
@@ -282,13 +282,13 @@ Secondary_APU_Command_Entry_Point:
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
-; DB_DATA8_0d8008: Module Count/Header
+; DB_Audio_DriverSizeLow: Module Count/Header
 ; ------------------------------------------------------------------------------
 DATA8_0d8008_1:
 	db $87		 ;0D8008|        |      ; Module count/header byte
 
 ; ------------------------------------------------------------------------------
-; DB_DATA8_0d8009: Module Pointer Table (Low Bytes)
+; DB_Audio_DriverPointers: Module Pointer Table (Low Bytes)
 ; ------------------------------------------------------------------------------
 ; Points to start of each SPC700 driver module in this bank
 ; These are 16-bit addresses offset from bank start ($0d8000)
@@ -297,7 +297,7 @@ DATA8_0d8009_1:
 	db $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1 ;0D8009|        |      ; Module pointers
 
 ; ------------------------------------------------------------------------------
-; DB_DATA8_0d8014-0D8015: Module Size/Address Table
+; DB_Audio_LoadAddrLow-0D8015: Module Size/Address Table
 ; ------------------------------------------------------------------------------
 ; Each pair defines: [size_low, size_high] for corresponding module
 ; Used to calculate transfer length during upload
@@ -397,9 +397,9 @@ SPC_WaitReady_1:
 ; Initialize upload parameters
 ; ------------------------------------------------------------------------------
 	ldx.w #$0000	;0D807C|A20000  |      ; Module index = 0
-	lda.l DB_DATA8_0d8014 ;0D807F|AF14800D|0D8014; Load module address low
+	lda.l DB_Audio_LoadAddrLow ;0D807F|AF14800D|0D8014; Load module address low
 	sta.w !SNES_APUIO2 ;0D8083|8D4221  |002142; Send to APUIO2 (SPC700 RAM addr low)
-	lda.l DB_DATA8_0d8015 ;0D8086|AF15800D|0D8015; Load module address high
+	lda.l DB_Audio_LoadPointers ;0D8086|AF15800D|0D8015; Load module address high
 	sta.w !SNES_APUIO3 ;0D808A|8D4321  |002143; Send to APUIO3 (SPC700 RAM addr high)
 	lda.b #$01	  ;0D808D|A901    |      ; Command $01 = upload data
 	sta.w !SNES_APUIO1 ;0D808F|8D4121  |002141; Send command to APUIO1
@@ -429,9 +429,9 @@ SPC_TransferBlock_1:
 ; Load module pointer from table
 ; $14-$16 = 24-bit pointer to module data in ROM
 ; ------------------------------------------------------------------------------
-	lda.l DB_DATA8_0d8008,x ;0D809F|BF08800D|0D8008; Get module pointer (low)
+	lda.l DB_Audio_DriverSizeLow,x ;0D809F|BF08800D|0D8008; Get module pointer (low)
 	sta.b $14	   ;0D80A3|8514    |000614; Store to DP $14
-	lda.l DB_DATA8_0d8009,x ;0D80A5|BF09800D|0D8009; Get module pointer (mid)
+	lda.l DB_Audio_DriverPointers,x ;0D80A5|BF09800D|0D8009; Get module pointer (mid)
 	sta.b $15	   ;0D80A9|8515    |000615; Store to DP $15
 	lda.b #$0d	  ;0D80AB|A90D    |      ; Bank $0d
 	sta.b $16	   ;0D80AD|8516    |000616; Store to DP $16 (complete 24-bit pointer)
@@ -499,9 +499,9 @@ DB_Label_0D80DD:
 ; Send next module parameters to SPC700
 ; ------------------------------------------------------------------------------
 	xba ;0D80E4|EB      |      ; Get handshake
-	lda.l DB_DATA8_0d8014,x ;0D80E5|BF14800D|0D8014; Next module address low
+	lda.l DB_Audio_LoadAddrLow,x ;0D80E5|BF14800D|0D8014; Next module address low
 	sta.w !SNES_APUIO2 ;0D80E9|8D4221  |002142; Send to APUIO2
-	lda.l DB_DATA8_0d8015,x ;0D80EC|BF15800D|0D8015; Next module address high
+	lda.l DB_Audio_LoadPointers,x ;0D80EC|BF15800D|0D8015; Next module address high
 	sta.w !SNES_APUIO3 ;0D80F0|8D4321  |002143; Send to APUIO3
 	xba ;0D80F3|EB      |      ; Restore handshake
 	sta.w !SNES_APUIO1 ;0D80F4|8D4121  |002141; Send to APUIO1
@@ -559,7 +559,7 @@ DB_Store_0D811D:
 ; Calculate and store checksum for warm start detection
 ; Checksum = driver_size + $4800 (base address in SPC700 RAM)
 ; ------------------------------------------------------------------------------
-	lda.l DB_DATA8_0d9d78 ;0D8129|AF789D0D|0D9D78; Load driver size
+	lda.l DB_Music_TrackData ;0D8129|AF789D0D|0D9D78; Load driver size
 	clc ;0D812D|18      |      ;
 	adc.w #$4800	;0D812E|690048  |      ; Add base address
 	sta.b $f8	   ;0D8131|85F8    |0006F8; Store checksum value 1
@@ -1035,11 +1035,11 @@ DB_Load_0D82FD:
 ; Look up sound effect data pointer using multiply result
 ; ------------------------------------------------------------------------------
 	ldx.w !SNES_RDMPYL ;0D8308|AE1642  |004216; Get multiply result (index × 3)
-	lda.l DB_DATA8_0dbdff,x ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
+	lda.l DB_Music_BankByte0,x ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
 	sta.b $14	   ;0D830F|8514    |000614; Store to DP
-	lda.l DB_DATA8_0dbe00,x ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
+	lda.l DB_Music_AddrLow0,x ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
 	sta.b $15	   ;0D8315|8515    |000615; Store to DP
-	lda.l DB_DATA8_0dbe01,x ;0D8317|BF01BE0D|0DBE01; Load data pointer bank
+	lda.l DB_Music_TrackPointersTable,x ;0D8317|BF01BE0D|0DBE01; Load data pointer bank
 	sta.b $16	   ;0D831B|8516    |000616; Store to DP
 
 ; ------------------------------------------------------------------------------
@@ -1331,11 +1331,11 @@ DB_Load_0D8448:
 ; Look up SFX data pointer in table
 ; ------------------------------------------------------------------------------
 	ldx.w !SNES_RDMPYL ;0D8454|AE1642  |004216; Get table index
-	lda.l DB_DATA8_0dbdff,x ;0D8457|BFFFBD0D|0DBDFF; Load pointer low
+	lda.l DB_Music_BankByte0,x ;0D8457|BFFFBD0D|0DBDFF; Load pointer low
 	sta.b $14	   ;0D845B|8514    |000614; Store to DP
-	lda.l DB_DATA8_0dbe00,x ;0D845D|BF00BE0D|0DBE00; Load pointer mid
+	lda.l DB_Music_AddrLow0,x ;0D845D|BF00BE0D|0DBE00; Load pointer mid
 	sta.b $15	   ;0D8461|8515    |000615; Store to DP
-	lda.l DB_DATA8_0dbe01,x ;0D8463|BF01BE0D|0DBE01; Load pointer bank
+	lda.l DB_Music_TrackPointersTable,x ;0D8463|BF01BE0D|0DBE01; Load pointer bank
 	sta.b $16	   ;0D8467|8516    |000616; Store to DP
 
 ; ------------------------------------------------------------------------------
@@ -1658,7 +1658,7 @@ SPC_CommandProcessorData:	db				   $dc,$8f,$00,$05,$43,$c0,$05,$8f,$09,$c1,$2f,$
 ; Lookup tables for music track and SFX pattern data.
 ; Format: 24-bit pointers [bank, addr_low, addr_high] for each track.
 
-DB_DATA8_0d9c3c:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$85,$06,$91 ;0D9C3C| Track pointers 0-7 |
+DB_Music_TrackPointers:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$85,$06,$91 ;0D9C3C| Track pointers 0-7 |
 	db $06,$13,$07,$1f,$07,$5b,$07,$9a,$07,$ac,$07,$b0,$07,$c2,$07,$c6 ;0D9C4C| Track pointers 8-15 |
 	db $07,$17,$08,$9b,$08,$5a,$08,$87,$08,$ab,$08,$c4,$08,$31,$08,$4a ;0D9C5C| Track pointers 16-23 |
 	db $08,$2d,$08,$23,$08,$29,$08,$6a,$07,$66,$07,$16,$0a,$d4,$08,$fe ;0D9C6C| Track pointers 24-31 |
@@ -1683,7 +1683,7 @@ DB_DATA8_0d9c3c:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$
 ; ===========================================================================
 ; Driver initialization parameters, timing values, buffer sizes, etc.
 
-DB_DATA8_0d9cfc:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$e5,$01,$fc ;0D9CFC| Config: Timing/buffers |
+DB_Audio_DriverConfig:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$e5,$01,$fc ;0D9CFC| Config: Timing/buffers |
 	db $eb,$c0,$90,$60,$40,$48,$30,$20,$24,$18,$10,$0c,$08,$06,$04,$03 ;0D9D0C| Config: Rate table |
 	db $bd,$18,$cc,$18,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0D9D1C| Config: Reserved |
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0D9D2C| Padding/alignment |
@@ -1693,13 +1693,13 @@ DB_DATA8_0d9cfc:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$
 	db $b6,$ca	 ;0D9D6C|        |
 
 ; ===========================================================================
-; DB_DATA8_0d9d78 - SPC700 MUSIC TRACK DATA
+; DB_Music_TrackData - SPC700 MUSIC TRACK DATA
 ; ===========================================================================
 ; Embedded music sequence data for multiple tracks.
 ; Format: Proprietary music notation (notes, durations, commands, loops, etc.)
 ; Processed by SPC700 sequencer uploaded during initialization.
 
-DB_DATA8_0d9d78:	db					   $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,$31,$ee ;0D9D78| Track data block 0 |
+DB_Music_TrackData:	db					   $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,$31,$ee ;0D9D78| Track data block 0 |
 	db $1e,$ce,$41,$f0,$86,$e5,$0d,$23,$00,$10,$23,$fd,$47,$96,$fd,$35 ;0D9D88|        |
 	db $fd,$35,$fd,$35,$0f,$34,$9a,$e0,$21,$11,$00,$33,$f1,$42,$bd,$aa ;0D9D98|        |
 	db $1f,$be,$42,$e0,$32,$ef,$00,$f0,$96,$0f,$02,$0f,$23,$fe,$34,$ed ;0D9DA8|        |
@@ -1868,47 +1868,47 @@ Sound_DataPtrBank:	db						 $0e		 ;0DBDB0| Pointer bank bytes |
 	db $d3,$fb,$0e ;0DBDFC| Ends at 0DBDFE |
 
 ; ===========================================================================
-; DB_DATA8_0dbdff - Music/SFX Data Pointer Tables
+; DB_Music_BankByte0 - Music/SFX Data Pointer Tables
 ; ===========================================================================
 ; 24-bit pointers (bank:address) to music and SFX pattern data.
 ; Format: [bank_byte, addr_low, addr_high] for each entry.
 ; Used by music loader to locate track data in ROM.
 
-DB_DATA8_0dbdff:	db					   $01	   ;0DBDFF| Bank byte for entry 0 |
-DB_DATA8_0dbe00:	db					   $c2	   ;0DBE00| Address low byte |
-DB_DATA8_0dbe01:	db					   $0d,$21,$c8,$0d,$2e,$cc,$0d,$08,$e8,$0d,$ff,$f5,$0d,$5d,$fa,$0d ;0DBE01| Music track pointers 0-5 |
+DB_Music_BankByte0:	db					   $01	   ;0DBDFF| Bank byte for entry 0 |
+DB_Music_AddrLow0:	db					   $c2	   ;0DBE00| Address low byte |
+DB_Music_TrackPointersTable:	db					   $0d,$21,$c8,$0d,$2e,$cc,$0d,$08,$e8,$0d,$ff,$f5,$0d,$5d,$fa,$0d ;0DBE01| Music track pointers 0-5 |
 	db $fb,$00,$0e,$30,$0d,$0e,$16,$14,$0e,$4e,$14,$0e,$06,$22,$0e,$65 ;0DBE11| Music track pointers 6-11 |
 	db $31,$0e,$a2,$4d,$0e,$84,$55,$0e,$c4,$5c,$0e,$6e,$69,$0e,$4a,$77 ;0DBE21| Music track pointers 12-17 |
 	db $0e,$f3,$81,$0e ;0DBE31| Music track pointers 18-19 |
 
 ; ===========================================================================
-; DB_DATA8_0dbe35 - Track Length/Size Table
+; DB_Music_TrackSizes - Track Length/Size Table
 ; ===========================================================================
 ; 16-bit size values for each music/SFX track (bytes to upload to SPC700).
 ; Used to calculate memory requirements and transfer sizes.
 
-DB_DATA8_0dbe35:	db					   $df,$05,$0b,$04,$26,$0d,$36,$09,$d5,$03,$81,$06,$fe,$04,$c9,$06 ;0DBE35| Track sizes 0-7 |
+DB_Music_TrackSizes:	db					   $df,$05,$0b,$04,$26,$0d,$36,$09,$d5,$03,$81,$06,$fe,$04,$c9,$06 ;0DBE35| Track sizes 0-7 |
 	db $1b,$00,$a8,$0c,$7d,$07,$1b,$00,$59,$07,$ff,$06,$21,$0c,$a9,$05 ;0DBE45| Track sizes 8-15 |
 	db $c1,$08,$18,$03 ;0DBE55| Track sizes 16-17 |
 
 ; ===========================================================================
-; DB_DATA8_0dbe59 - Track Type/Flags Table
+; DB_Music_TrackFlags - Track Type/Flags Table
 ; ===========================================================================
 ; Configuration flags for each track (looping, priority, channel assignment).
 ; $00 = no loop, $80 = loop enabled, $cd = special behavior, $ef = extended.
 
-DB_DATA8_0dbe59:	db					   $ef,$00,$00,$00,$80,$00,$80,$00,$80,$00,$cd,$00,$00,$00,$cd,$00 ;0DBE59| Track flags 0-7 |
+DB_Music_TrackFlags:	db					   $ef,$00,$00,$00,$80,$00,$80,$00,$80,$00,$cd,$00,$00,$00,$cd,$00 ;0DBE59| Track flags 0-7 |
 	db $cd,$00,$00,$00,$00,$00,$e4,$00,$80,$00,$ef,$00,$00,$00,$00,$00 ;0DBE69| Track flags 8-15 |
 	db $80,$00,$00,$00 ;0DBE79| Track flags 16-17 |
 
 ; ===========================================================================
-; DB_DATA8_0dbe7d - DSP ADSR Configuration Values
+; DB_Music_ADSRValues - DSP ADSR Configuration Values
 ; ===========================================================================
 ; ADSR envelope bytes for different instrument types.
 ; Format: 2 bytes per instrument [ADSR1, ADSR2].
 ; Controls attack rate, decay rate, sustain level, release rate.
 
-DB_DATA8_0dbe7d:	db					   $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,$8f,$a4 ;0DBE7D| ADSR values 0-7 |
+DB_Music_ADSRValues:	db					   $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,$8f,$a4 ;0DBE7D| ADSR values 0-7 |
 	db $ff,$84,$cf,$68,$8f,$b8,$a7,$c0,$ff,$d4,$9f,$a4,$bf,$ac,$af,$11 ;0DBE8D| ADSR values 8-15 |
 	db $ff,$b2,$ff,$e0 ;0DBE9D| ADSR values 16-17 |
 
@@ -2041,7 +2041,7 @@ Sound_PatternAssignment:	db						 $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$0
 ; Contains note sequences, duration values, envelope commands, loop markers,
 ; tempo changes, and pattern control opcodes for various game music tracks.
 ; Each byte sequence encodes musical events using custom SPC700 driver format.
-DB_DATA8_0dc451:
+DB_Music_TrackData2:
 	db $6d,$b0,$75,$fb,$8a,$df,$10,$f1,$0e,$f3,$30,$dd,$02,$8a,$0f,$fd ;0DC451 - Note patterns with $8a (possible voice/channel marker)
 	db $04,$20,$dc,$c1,$41,$bb,$8a,$df,$ff,$10,$bd,$11,$e9,$bf,$12,$8a ;0DC461 - $8a appears frequently (likely channel/command separator)
 	db $1c,$c0,$30,$ff,$ed,$e0,$21,$ff,$8a,$24,$3d,$e4,$52,$0d,$03,$32 ;0DC471 - $ff (max value), $ed (likely envelope end)
@@ -2108,7 +2108,7 @@ DB_DATA8_0dc451:
 ; Extensive pattern data with repeated byte sequences suggesting voice patterns.
 ; Pattern: Many sequences contain repeating nibbles (AA, BB, AB, etc) indicating
 ; possible voice channel routing or sample selection data for SPC700 hardware.
-DB_DATA8_0dc821:
+DB_Music_TrackData3:
 	db $0b,$04,$00,$00,$00,$00,$00,$00,$00,$00,$00,$88,$61,$ff,$00,$11 ;0DC821 - $88 marker, zeros (padding/init?)
 	db $12,$20,$05,$2c,$88,$c3,$53,$23,$1f,$ee,$55,$d1,$7d,$b8,$f2,$1e ;0DC831 - $88, $b8 markers
 	db $f3,$2d,$d2,$50,$be,$56,$c4,$1d,$d1,$42,$fd,$df,$34,$1e,$ef,$b8 ;0DC841 - $be, $c4, $b8 values
@@ -2179,7 +2179,7 @@ DB_DATA8_0dc821:
 ; Contains extensive sequences with $c2, $b2, $a6, $ba, $aa markers.
 ; Pattern suggests voice/channel assignment data or DSP register configurations.
 ; Frequent $96, $9a markers (lower values) may indicate specific voice mappings.
-DB_DATA8_0dcc31:
+DB_Music_TrackData4:
 	db $00,$00,$00,$03,$4f,$de,$ef,$00,$a6,$e0,$20,$00,$00,$15,$3a,$a0 ;0DCC31 - $4f, $de, $ef, $a6, $3a, $a0
 	db $01,$c2,$00,$00,$13,$1d,$df,$00,$00,$11,$86,$bb,$9e,$22,$00,$1f ;0DCC41 - $c2 marker, $86, $bb, $9e
 	db $df,$36,$21,$b6,$01,$41,$ab,$31,$f1,$ff,$11,$10,$b2,$00,$00,$14 ;0DCC51 - $b6, $ab, $b2 markers
@@ -2316,7 +2316,7 @@ DB_DATA8_0dcc31:
 
 ; Pattern Block A ($0ddd51-$ddfb1, 608 bytes):
 ; Extended music sequences with $a6, $ba, $aa markers
-DB_DATA8_0ddd51:
+DB_Music_TrackData5:
 	db $f5,$3b,$bf,$f1,$41,$de,$02,$aa,$1c,$c2,$51,$fe,$e2,$11,$fc,$10 ;0DDD51 - $aa marker, $1c, $c2 values
 	db $a2,$c0,$31,$ec,$cd,$16,$2a,$ac,$ef,$a6,$ff,$22,$22,$ff,$13,$2e ;0DDD61 - $a2, $c0, $cd, $ac, $a6 markers
 	db $dd,$f5,$a6,$3b,$bf,$01,$41,$ce,$13,$2f,$bc,$96,$26,$76,$dd,$25 ;0DDD71 - $dd, $a6, $3b, $bf, $ce, $bc, $96 (lower value)
@@ -2359,7 +2359,7 @@ DB_DATA8_0ddd51:
 
 ; Pattern Block B ($0ddfc1-$de421, 1,121 bytes):
 ; Continued sequences with heavy use of $a6, $96, $ba markers
-DB_DATA8_0ddfc1:
+DB_Music_TrackData6:
 	db $53,$1a,$ad,$f1,$a6,$44,$cb,$ff,$02,$31,$f1,$2f,$e1,$a6,$22,$1e ;0DDFC1 - $1a, $ad, $a6, $cb, $a6
 	db $e2,$31,$ec,$ef,$df,$11,$92,$d5,$5e,$ce,$12,$03,$66,$0b,$cf,$a6 ;0DDFD1 - $e2, $ec, $ef, $df, $92, $d5, $5e, $ce, $66, $0b, $cf, $a6
 	db $2f,$e1,$21,$1f,$dd,$f0,$44,$dc,$96,$ed,$04,$62,$f2,$40,$bf,$34 ;0DDFE1 - $e1, $dd, $dc, $96, $ed, $62, $bf
@@ -2435,7 +2435,7 @@ DB_DATA8_0ddfc1:
 ; Final Music Pattern Block ($de431-$df601, 4,561 bytes):
 ; Last major music/SFX data block before termination.
 ; Continued use of $ba, $b6, $96, $9a, $92, $86, $aa voice/channel markers.
-DB_DATA8_0de431:
+DB_Music_TrackData7:
 	db $d9,$06,$aa,$ff,$10,$0d,$f4,$ec,$55,$db,$21,$9a,$e2,$e0,$79,$a6 ;0DE431 - $d9, $aa, $0d, $ec, $db, $9a, $e2, $e0, $79, $a6
 	db $31,$cc,$62,$c0,$a6,$11,$20,$d0,$fd,$14,$31,$0f,$ef,$96,$fa,$e2 ;0DE441 - $cc, $62, $c0, $a6, $d0, $ef, $96, $fa, $e2
 	db $57,$eb,$cb,$16,$42,$42,$a6,$10,$d0,$0c,$05,$3d,$ef,$e1,$20,$9a ;0DE451 - $57, $eb, $cb, $a6, $d0, $0c, $3d, $ef, $e1, $9a
