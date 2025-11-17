@@ -742,18 +742,18 @@ Load_GameFromSRAM:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$a9c2	; X = $a9c2 (source address low/mid)
-	ldy.w #$1010	; Y = $1010 (destination address)
+	ldy.w #!data_copy_dest_1	; Y = !data_copy_dest_1 (destination address)
 	lda.w #$003f	; A = $003f (transfer 64 bytes: $3f+1)
 	mvn $00,$0c	 ; Copy from bank $0c to bank $00
 ; Source: $0ca9c2, Dest: $001010, Size: $40
 
 ; Note: mvn auto-increments X, Y and decrements A until A = $ffff
-; After execution: X = $a9c2+$40, Y = $1010+$40, A = $ffff
+; After execution: X = $a9c2+$40, Y = !data_copy_dest_1+$40, A = $ffff
 
 ; ---------------------------------------------------------------------------
 ; Copy Save Data Block 2
 ; ---------------------------------------------------------------------------
-; Y already = $1010+$40 = !control_region_1 from previous mvn
+; Y already = !data_copy_dest_1+$40 = !control_region_1 from previous mvn
 ; Copies $000a bytes from $0c0e9e to $001050
 ; ---------------------------------------------------------------------------
 
@@ -770,7 +770,7 @@ Load_GameFromSRAM:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$02	  ; A = $02
-	sta.w $0fe7	 ; [$0fe7] = $02 (save slot indicator?)
+	sta.w !save_slot_indicator	 ; [!save_slot_indicator] = $02 (save slot indicator?)
 
 ; ---------------------------------------------------------------------------
 ; Determine Active Save Slot
@@ -825,7 +825,7 @@ Load_SaveSlotData:
 	sty.w !env_coord_x	 ; Store to !env_coord_x-!env_coord_y
 
 	lda.w DB_SaveSlot_Data3,x ; A = table[X+3] (byte 3)
-	sta.w $0e92	 ; Store to $0e92
+	sta.w !sys_state_e92	 ; Store to !sys_state_e92
 
 	ldy.w DB_SaveSlot_Data5,x ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
 	sty.b $53	   ; Store to $53-$54
@@ -850,8 +850,8 @@ Load_SaveSlotData:
 ; Final Save Load Setup
 ; ---------------------------------------------------------------------------
 
-	ldx.w #$0e92	; X = $0e92
-	stx.b $17	   ; [$17] = $0e92 (store pointer)
+	ldx.w #!sys_state_e92	; X = !sys_state_e92
+	stx.b $17	   ; [$17] = !sys_state_e92 (store pointer)
 
 	jsr.w ProcessLoadedSaveData ; Process loaded save data
 
@@ -903,14 +903,14 @@ Clear_WorkRAM:
 ; Clear All Work RAM
 ; ===========================================================================
 ; Zeros out RAM ranges $0000-$05ff and $0800-$1fff.
-; Leaves $0600-$07ff untouched (likely reserved for specific purpose).
+; Leaves !audio_command_reg-$07ff untouched (likely reserved for specific purpose).
 ;
 ; Uses mvn (Block Move Negative) instruction for fast memory fill.
 ; Clever technique: Write zero to first byte, then copy that byte forward.
 ;
 ; RAM Layout After Clear:
 ;   $0000-$05ff: Cleared (1,536 bytes)
-;   $0600-$07ff: Preserved (512 bytes) - hardware mirrors or special use
+;   !audio_command_reg-$07ff: Preserved (512 bytes) - hardware mirrors or special use
 ;   $0800-$1fff: Cleared (6,144 bytes)
 ; ===========================================================================
 
@@ -940,7 +940,7 @@ Clear_WorkRAM:
 ; Clear $0800-$1fff (6,144 bytes)
 ; ---------------------------------------------------------------------------
 ; Same technique for second RAM region
-; Skips $0600-$07ff (512 bytes preserved)
+; Skips !audio_command_reg-$07ff (512 bytes preserved)
 ; ---------------------------------------------------------------------------
 
 	stz.w !tilemap_wram_source_start	 ; [$0800] = $00 (write zero to start of region)
@@ -1012,7 +1012,7 @@ Boot_PostInit:
 	jsr.w InitializeTheseParameters ; Initialize with these parameters
 
 	lda.w #$0098	; A = $0098
-	sta.w $31b5	 ; [$7e31b5] = $0098 (game state variable)
+	sta.w !game_state_var	 ; [$7e31b5] = $0098 (game state variable)
 
 	plb ; Restore B (Data Bank back to $00)
 	rts ; Return
@@ -2356,7 +2356,7 @@ Init_SaveGameDefaults:
 
 ; Copy 64 bytes of initialization data to work RAM at $0c:1010
 	ldx.w #$a9c2	; Source address: ROM bank $00, offset $a9c2
-	ldy.w #$1010	; Destination: Work RAM $0c:1010
+	ldy.w #!data_copy_dest_1	; Destination: Work RAM $0c:1010
 	lda.w #$003f	; Transfer size: 64 bytes ($3f+1)
 	mvn $00,$0c	 ; Block copy from bank $00 to bank $0c
 
@@ -2369,7 +2369,7 @@ Init_SaveGameDefaults:
 
 ; Set save system ready flag
 	lda.b #$02
-	sta.w $0fe7	 ; Save system state = $02 (initialized/ready)
+	sta.w !save_slot_indicator	 ; Save system state = $02 (initialized/ready)
 
 	lda.l $7e3668   ; Load save state
 	cmp.b #$02
@@ -2398,7 +2398,7 @@ Init_SaveGameDefaults:
 	sty.w !env_coord_x
 
 	lda.w DB_Save_State_Table+3,x
-	sta.w $0e92
+	sta.w !sys_state_e92
 
 	ldy.w DB_Save_State_Table+6,x
 	sty.b $53
@@ -2411,7 +2411,7 @@ TYX_Label:
 	lda.w #$001f
 	mvn $00,$0c	 ; Block copy
 
-	ldx.w #$0e92
+	ldx.w #!sys_state_e92
 	stx.b $17
 
 	jsr.w Some_Function_A236
@@ -2538,7 +2538,7 @@ PLB_Label:
 	jsr.w Some_Function_9A08	; Call initialization routine
 
 	lda.w #$0098
-	sta.w $31b5	 ; Store to WRAM variable
+	sta.w !game_state_var	 ; Store to WRAM variable
 
 	plb ; Restore data bank
 
@@ -5298,20 +5298,20 @@ Got_Layer_Offset:
 
 ; Copy calculated values to buffer
 	lda.b $db	   ; Get calculated value 1
-	sta.w $3670,x   ; Store to buffer
+	sta.w !audio_data_buffer_8,x   ; Store to buffer
 	lda.b $dc	   ; Get calculated value 2
 	sta.w $3671,x   ; Store to buffer
 	lda.b $e5	   ; Get calculated value 3
 	sta.w $3672,x   ; Store to buffer
 	lda.b $e6	   ; Get calculated value 4
-	adc.w $366a,x   ; Add to existing value
-	sta.w $366a,x   ; Store accumulated value
+	adc.w !audio_data_buffer_2,x   ; Add to existing value
+	sta.w !audio_data_buffer_2,x   ; Store accumulated value
 	lda.b $e7	   ; Get calculated value 5
-	sta.w $366e,x   ; Store to buffer
+	sta.w !audio_data_buffer_6,x   ; Store to buffer
 	lda.b $e8	   ; Get calculated value 6
-	sta.w $366d,x   ; Store to buffer
+	sta.w !audio_data_buffer_5,x   ; Store to buffer
 	lda.b $e9	   ; Get calculated value 7
-	sta.w $366f,x   ; Store to buffer
+	sta.w !audio_data_buffer_7,x   ; Store to buffer
 	bra Render_Done ; Done
 
 Simple_Icon:
@@ -5373,10 +5373,10 @@ Status_SetIconFlags:
 ;   $e4 (at Direct Page $0400) = Packed status flags
 ;
 ; Flag Mapping:
-;   bit 3 → $3669,X
-;   bit 2 → $366a,X
-;   bit 1 → $366b,X
-;   bit 0 → $366c,X
+;   bit 3 → !audio_data_buffer_1,x
+;   bit 2 → !audio_data_buffer_2,x
+;   bit 1 → !audio_data_buffer_3,x
+;   bit 0 → !audio_data_buffer_4,x
 ; ===========================================================================
 
 	lda.b $e4	   ; Get packed status flags
@@ -5386,7 +5386,7 @@ Status_SetIconFlags:
 	lda.b #$05	  ; A = $05 (active marker)
 
 Skip_Flag1:
-	sta.w $3669,x   ; Store to buffer slot 1
+	sta.w !audio_data_buffer_1,x   ; Store to buffer slot 1
 
 	tya ; A = flags
 	and.b #$04	  ; Check bit 2
@@ -5394,7 +5394,7 @@ Skip_Flag1:
 	db $a9,$05	 ; lda #$05
 
 Skip_Flag2:
-	sta.w $366a,x   ; Store to buffer slot 2
+	sta.w !audio_data_buffer_2,x   ; Store to buffer slot 2
 
 	tya ; A = flags
 	and.b #$02	  ; Check bit 1
@@ -5402,7 +5402,7 @@ Skip_Flag2:
 	lda.b #$05	  ; A = $05
 
 Skip_Flag3:
-	sta.w $366b,x   ; Store to buffer slot 3
+	sta.w !audio_data_buffer_3,x   ; Store to buffer slot 3
 
 	tya ; A = flags
 	and.b #$01	  ; Check bit 0
@@ -5410,7 +5410,7 @@ Skip_Flag3:
 	lda.b #$05	  ; A = $05
 
 Skip_Flag4:
-	sta.w $366c,x   ; Store to buffer slot 4
+	sta.w !audio_data_buffer_4,x   ; Store to buffer slot 4
 	rts ; Return
 
 ; ===========================================================================
@@ -5535,7 +5535,7 @@ Stat_CalcOR:
 ; ===========================================================================
 
 Stat_CalcSum:
-	lda.w $3669,x   ; A = base buffer value
+	lda.w !audio_data_buffer_1,x   ; A = base buffer value
 	adc.w $3679,x   ; Add delta buffer 1 (with carry)
 	adc.w $3689,x   ; Add delta buffer 2
 	adc.w $3699,x   ; Add delta buffer 3
@@ -5583,8 +5583,8 @@ Skip_Animation:
 ;   - $0c-$0e: Animation parameters (slot 3)
 ; Animation Types:
 ;   - $ff = empty slot
-;   - $01 = Type 1 animation (uses $0601 parameter)
-;   - $02 = Type 2 animation (uses $0601 parameter)
+;   - $01 = Type 1 animation (uses !audio_param_reg parameter)
+;   - $02 = Type 2 animation (uses !audio_param_reg parameter)
 ;   - $10-$1f = Range-based type (gated by $00e2 bit 2)
 ;   - Other values processed based on range checks
 ; ===========================================================================
@@ -5603,11 +5603,11 @@ Animation_UpdateSystem:
 	bne Check_Slot2 ; If set, skip slot 1
 	lda.b $00	   ; A = animation type (slot 1)
 	bmi Check_Slot2 ; If $ff (empty), skip
-	sta.w $0601	 ; Store animation type to $0601
+	sta.w !audio_param_reg	 ; Store animation type to !audio_param_reg
 	ldx.b $01	   ; X = animation parameter (16-bit)
 	stx.w $0602	 ; Store parameter to $0602
 	lda.b #$01	  ; Animation command = $01
-	sta.w $0600	 ; Store to animation command register
+	sta.w !audio_command_reg	 ; Store to animation command register
 	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
 	lda.b #$ff	  ; Mark slot as empty
 	sta.b $00	   ; Store to slot 1 type
@@ -5619,11 +5619,11 @@ Check_Slot2:
 	lda.b $05	   ; A = animation type (slot 2)
 	bmi Check_Slot3 ; If $ff (empty), skip
 	lda.b $05	   ; A = animation type (reload)
-	sta.w $0601	 ; Store animation type to $0601
+	sta.w !audio_param_reg	 ; Store animation type to !audio_param_reg
 	ldx.b $06	   ; X = animation parameter (16-bit)
 	stx.w $0602	 ; Store parameter to $0602
 	lda.b #$02	  ; Animation command = $02
-	sta.w $0600	 ; Store to animation command register
+	sta.w !audio_command_reg	 ; Store to animation command register
 	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
 	lda.b #$ff	  ; Mark slot as empty
 	sta.b $05	   ; Store to slot 2 type
@@ -5648,7 +5648,7 @@ Check_Gate:
 
 Execute_Slot3:
 	ldx.b $0a	   ; X = animation type (16-bit load)
-	stx.w $0600	 ; Store to animation command
+	stx.w !audio_command_reg	 ; Store to animation command
 	ldx.b $0c	   ; X = animation parameter (16-bit)
 	stx.w $0602	 ; Store parameter to $0602
 	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
@@ -5724,8 +5724,8 @@ Graphics_PrepareTransition:
 ; Purpose: Configure display parameters and enable certain display features
 ; Technical Details:
 ;   - Called to enable/configure display effects
-;   - Sets $0051 = $0008 (display timer/counter)
-;   - Sets $0055 = $0c (display mode/config)
+;   - Sets !display_timer = $0008 (display timer/counter)
+;   - Sets !display_config = $0c (display mode/config)
 ;   - Clears bit 1 ($02) of $00db (display update gate)
 ;   - Clears bit 7 ($80) of $00e2 (graphics effect flag)
 ;   - Sets bit 2 ($04) of $00db (animation gate)
@@ -5740,10 +5740,10 @@ Display_EnableEffects:
 	rep #$30		; 16-bit A/X/Y
 	pha ; Save A
 	lda.w #$0008	; Value $0008
-	sta.w $0051	 ; Store to display timer
+	sta.w !display_timer	 ; Store to display timer
 	sep #$20		; 8-bit A
 	lda.b #$0c	  ; Value $0c
-	sta.w $0055	 ; Store to display config
+	sta.w !display_config	 ; Store to display config
 	lda.b #$02	  ; bit 1 mask
 	trb.w !system_flags_6	 ; Clear display update gate
 	lda.b #$80	  ; bit 7 mask
@@ -7855,7 +7855,7 @@ Cmd_CharacterDMATransfer:
 	inc.b $17	   ; Advance stream
 	and.w #$00ff	; Mask to byte
 	sep #$30		; 8-bit A/X/Y
-	sta.w $0e92	 ; Store character slot
+	sta.w !sys_state_e92	 ; Store character slot
 
 ; Calculate offset: slot * $50
 	sta.w !SNES_WRMPYA ; Multiplicand = slot
@@ -9600,7 +9600,7 @@ Sprite_DrawCompressed:
 	and.w #$00ff
 	sta.b $64	   ; Save
 	asl a; × 2
-	adc.w #$31b5	; Add buffer base
+	adc.w #!game_state_var	; Add buffer base
 	tay ; Y = destination
 	lda.w #$01f9	; Calculate offset
 	sbc.b $64
@@ -14176,7 +14176,7 @@ WRAM_FillData:
 	lda.w #$01ad	; 430 bytes
 	mvn $7e,$7e	 ; Fill $7e3007-$7e31b5 with 0
 	lda.w #$0120	; Value $0120
-	sta.w $31b5	 ; Store at $7e31b5
+	sta.w !game_state_var	 ; Store at $7e31b5
 
 
 WRAM_SetupBattleSprites2:
@@ -14509,7 +14509,7 @@ Menu_Init_Status_Continue:
 	plb ;00C83D|AB      |      ;
 	ldx.w #$c8e3	;00C83E|A2E3C8  |      ;
 	jsr.w CodeLikelyLoadsProcessesThisData ;00C841|20C49B  |009BC4;
-	lda.w #$0600	;00C844|A90006  |      ;
+	lda.w #!audio_command_reg	;00C844|A90006  |      ;
 	sta.b $01	   ;00C847|8501    |000001;
 	sta.b $05	   ;00C849|8505    |000005;
 	rts ;00C84B|60      |      ;

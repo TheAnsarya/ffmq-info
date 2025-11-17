@@ -29,8 +29,8 @@ Advanced_Memory_Block_Initialization:
 ; Secondary Memory Block Processing
 ; Advanced secondary memory management with extended block operations
 Secondary_Memory_Block_Processing:
-	stz.w $0a00	 ; Clear secondary memory block base
-	ldx.w #$0a00	; Set secondary block source address
+	stz.w !secondary_mem_block	 ; Clear secondary memory block base
+	ldx.w #!secondary_mem_block	; Set secondary block source address
 	ldy.w #$0a02	; Set secondary block destination address
 	lda.w #$000a	; Set secondary block size
 	mvn $00,$00	 ; Execute secondary block transfer
@@ -75,7 +75,7 @@ Advanced_Configuration_Validation:
 	lda.w !sys_operation_type	 ; Load system configuration register
 	cmp.b #$ff	  ; Compare with configuration validation marker
 	beq Configuration_Validation_Complete ; Branch if configuration valid
-	sta.w $0514	 ; Store validated configuration
+	sta.w !config_validated	 ; Store validated configuration
 
 Configuration_Validation_Complete:
 	jsr.w ExecuteAdvancedSystemCoordination ; Execute advanced system coordination
@@ -223,7 +223,7 @@ Bank_02_Initialization_Complete:
 
 validate_entity_system:
 	lda.b #$ff	  ;02806B|A9FF    |      ; Initialize validation marker
-	sta.w $0a84	 ;02806D|8D840A  |020A84; Store validation state
+	sta.w !validation_state	 ;02806D|8D840A  |020A84; Store validation state
 	jsl.l SystemValidation ;028070|2249D102|02D149; Call external validation routine
 	sep #$20		;028074|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028076|C210    |      ; Set 16-bit index registers
@@ -558,9 +558,9 @@ data_transfer_loop:
 ; Modifies: A, X, Y, math registers, temporary variables
 
 advanced_math_processing:
-	sta.w $0415	 ;02841A|8D1504  |020415; Store calculation result
+	sta.w !calc_result_storage	 ;02841A|8D1504  |020415; Store calculation result
 	lda.b $20	   ;02841D|A520    |001020; Load calculation base
-	sta.w $0410	 ;02841F|8D1004  |020410; Store base value
+	sta.w !calc_base_value	 ;02841F|8D1004  |020410; Store base value
 	pld ;028422|2B      |      ; Restore direct page
 	lda.b $11	   ;028423|A511    |000411; Load calculation flags
 	and.b #$08	  ;028425|2908    |      ; Mask calculation bit
@@ -612,9 +612,9 @@ standard_math_operations:
 	lda.b $52	   ;028450|A552    |001052; Load calculation param 4
 	sta.w !sys_temp_param	 ;028452|8D3A04  |02043A; Store in temp area
 	pla ;028455|68      |      ; Restore param 3
-	sta.w $0439	 ;028456|8D3904  |020439; Store in temp area
+	sta.w !temp_calc_area_2	 ;028456|8D3904  |020439; Store in temp area
 	pla ;028459|68      |      ; Restore param 2
-	sta.w $0438	 ;02845A|8D3804  |020438; Store in temp area
+	sta.w !temp_calc_area_1	 ;02845A|8D3804  |020438; Store in temp area
 	bne param_validation ;02845D|D005    |028464; Validate if non-zero
 	pla ;02845F|68      |      ; Restore param 1
 	sta.w !sys_temp_param	 ;028460|8D3A04  |02043A; Overwrite temp
@@ -966,9 +966,9 @@ graphics_coordinate_processing:
 	clc ;028779|18      |      ; Clear carry
 	adc.w #$0028	;02877A|692800  |      ; Add coordinate offset
 	sta.b $16	   ;02877D|8516    |001016; Store new coordinate
-	sta.w $0098	 ;02877F|8D9800  |020098; Store for calculation
+	sta.w !calc_scratch_x	 ;02877F|8D9800  |020098; Store for calculation
 	lda.b $14	   ;028782|A514    |001014; Load Y coordinate
-	sta.w $009c	 ;028784|8D9C00  |02009C; Store for calculation
+	sta.w !calc_scratch_temp1	 ;028784|8D9C00  |02009C; Store for calculation
 	jsl.l ExecuteCalculation ;028787|22B39600|0096B3; Execute calculation
 
 ;--------------------------------------------------------------------
@@ -981,14 +981,14 @@ graphics_coordinate_processing:
 ; Coordinate with entity processing
 
 graphics_calc_results:
-	lda.w $009e	 ;02878B|AD9E00  |02009E; Load calc result X
-	sta.w $0098	 ;02878E|8D9800  |020098; Store processed X
-	lda.w $00a0	 ;028791|ADA000  |0200A0; Load calc result Y
-	sta.w $009a	 ;028794|8D9A00  |02009A; Store processed Y
+	lda.w !calc_result_x	 ;02878B|AD9E00  |02009E; Load calc result X
+	sta.w !calc_scratch_x	 ;02878E|8D9800  |020098; Store processed X
+	lda.w !calc_result_y	 ;028791|ADA000  |0200A0; Load calc result Y
+	sta.w !calc_scratch_y	 ;028794|8D9A00  |02009A; Store processed Y
 	pla ;028797|68      |      ; Restore original coord
-	sta.w $009c	 ;028798|8D9C00  |02009C; Store for calculation
+	sta.w !calc_scratch_temp1	 ;028798|8D9C00  |02009C; Store for calculation
 	jsl.l ExecuteFinalCalc ;02879B|22E49600|0096E4; Execute final calc
-	lda.w $009e	 ;02879F|AD9E00  |02009E; Load final result
+	lda.w !calc_result_x	 ;02879F|AD9E00  |02009E; Load final result
 	sta.b $14	   ;0287A2|8514    |001014; Store final coordinate
 
 ;--------------------------------------------------------------------
@@ -1588,7 +1588,7 @@ advanced_audio_processing:
 	sep #$20		;028C0A|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028C0C|C210    |      ; Set 16-bit index
 	lda.b #$65	  ;028C0E|A965    |      ; Load audio command
-	sta.w $00a8	 ;028C10|8DA800  |0200A8; Store audio parameter
+	sta.w !rng_seed_alt	 ;028C10|8DA800  |0200A8; Store audio parameter
 	jsl.l ExecuteAudioCall ;028C13|22839700|009783; Execute audio call
 
 ;--------------------------------------------------------------------
@@ -1642,7 +1642,7 @@ validation_range_processing:
 	bcs extended_validation ;028C33|B018    |028C4D; Branch to extended
 	lda.b #$00	  ;028C35|A900    |      ; Clear high byte
 	xba ;028C37|EB      |      ; Exchange accumulator
-	lda.w $00a9	 ;028C38|ADA900  |0200A9; Load validation result
+	lda.w !rng_result	 ;028C38|ADA900  |0200A9; Load validation result
 	cmp.b #$22	  ;028C3B|C922    |      ; Check threshold 1
 	bcc validation_store ;028C3D|9024    |028C63; Store if below
 	sec ;028C3F|38      |      ; Set carry
@@ -1667,7 +1667,7 @@ validation_range_processing:
 extended_validation:
 	lda.b #$00	  ;028C4D|A900    |      ; Clear high byte
 	xba ;028C4F|EB      |      ; Exchange accumulator
-	lda.w $00a9	 ;028C50|ADA900  |0200A9; Load validation result
+	lda.w !rng_result	 ;028C50|ADA900  |0200A9; Load validation result
 	cmp.b #$22	  ;028C53|C922    |      ; Check first threshold
 	bcc validation_store ;028C55|900C    |028C63; Store if below
 	sec ;028C57|38      |      ; Set carry
@@ -1690,7 +1690,7 @@ extended_validation:
 
 validation_store:
 	lda.w DATA8_02ce12,x ;028C63|BD12CE  |02CE12; Load from data table
-	sta.w $0515	 ;028C66|8D1505  |020515; Store validation result
+	sta.w !config_validation_result	 ;028C66|8D1505  |020515; Store validation result
 	lda.b #$ff	  ;028C69|A9FF    |      ; Set completion marker
 	sta.w !sys_operation_type	 ;028C6B|8D1305  |020513; Store completion flag
 
@@ -1818,9 +1818,9 @@ Entity_ProcessFinalize:
 ;Implements complex mathematical operations for entity positioning
 Entity_ProcessMathAdvanced:
 	rep #$30		; Set 16-bit accumulator and index registers
-	lda.w $1116	 ; Load position coordinate high
+	lda.w !position_coord_y	 ; Load position coordinate high
 	sec ; Set carry for subtraction
-	sbc.w $1114	 ; Subtract position coordinate low
+	sbc.w !position_coord_x	 ; Subtract position coordinate low
 	cmp.w DATA8_02d081 ; Compare with maximum distance
 	bcc Entity_CalcDistance ; Branch if within limits
 	lda.w DATA8_02d081 ; Load maximum distance limit
@@ -1871,12 +1871,12 @@ Entity_HealthCheck:
 	jsr.w SynchronizeEntityData ; Update entity data
 	lsr.b $b7	   ; Reduce health value for calculation
 	lda.b #$65	  ; Set random number seed
-	sta.w $00a8	 ; Store seed in random number generator
+	sta.w !rng_seed_alt	 ; Store seed in random number generator
 	jsl.l ExecuteAudioCall ; Generate random number
-	lda.w $00a9	 ; Load generated random value
+	lda.w !rng_result	 ; Load generated random value
 	sta.b $b9	   ; Store random modifier
 	jsl.l ExecuteAudioCall ; Generate second random number
-	lda.w $00a9	 ; Load second random value
+	lda.w !rng_result	 ; Load second random value
 	sta.b $b8	   ; Store second random modifier
 	lda.b $b7	   ; Reload health value
 	cmp.b $b8	   ; Compare with random modifier
@@ -1921,12 +1921,12 @@ Battle_RandomCalc:
 	beq Battle_Complete ; Branch to mode $15 completion
 	lsr.b $b7	   ; Prepare health for calculation
 	lda.b #$65	  ; Set calculation seed
-	sta.w $00a8	 ; Store in random number generator
+	sta.w !rng_seed_alt	 ; Store in random number generator
 	jsl.l ExecuteAudioCall ; Generate random number for calculation
-	lda.w $00a9	 ; Load generated value
+	lda.w !rng_result	 ; Load generated value
 	sta.b $b9	   ; Store calculation modifier
 	jsl.l ExecuteAudioCall ; Generate second random number
-	lda.w $00a9	 ; Load second generated value
+	lda.w !rng_result	 ; Load second generated value
 	sta.b $b8	   ; Store second modifier
 	lda.b $b7	   ; Reload health value
 	cmp.b $b8	   ; Compare with calculation modifier
@@ -2067,24 +2067,24 @@ Memory_ValidationSequence:
 	stx.b $77                            ;029589|8677    |000077
 	rts ;02958B|60      |
 	php ;02958C|08      |
-	stz.w $0098                          ;02958D|9C9800  |000098
+	stz.w !calc_scratch_x                          ;02958D|9C9800  |000098
 	lda.b #$65                           ;029590|A965    |
-	sta.w $00a8                          ;029592|8DA800  |0000A8
+	sta.w !rng_seed_alt                          ;029592|8DA800  |0000A8
 	jsl.l ExecuteAudioCall                    ;029595|22839700|009783
-	lda.w $00a9                          ;029599|ADA900  |0000A9
-	sta.w $009c                          ;02959C|8D9C00  |00009C
-	stz.w $009d                          ;02959F|9C9D00  |00009D
+	lda.w !rng_result                          ;029599|ADA900  |0000A9
+	sta.w !calc_scratch_temp1                          ;02959C|8D9C00  |00009C
+	stz.w !calc_scratch_temp1+1                          ;02959F|9C9D00  |00009D
 	jsl.l ExecuteCalculation                    ;0295A2|22B39600|0096B3
-	ldx.w $009e                          ;0295A6|AE9E00  |00009E
-	stx.w $0098                          ;0295A9|8E9800  |000098
-	ldx.w $00a0                          ;0295AC|AEA000  |0000A0
-	stx.w $009a                          ;0295AF|8E9A00  |00009A
+	ldx.w !calc_result_x                          ;0295A6|AE9E00  |00009E
+	stx.w !calc_scratch_x                          ;0295A9|8E9800  |000098
+	ldx.w !calc_result_y                          ;0295AC|AEA000  |0000A0
+	stx.w !calc_scratch_y                          ;0295AF|8E9A00  |00009A
 	lda.b #$64                           ;0295B2|A964    |
-	sta.w $009c                          ;0295B4|8D9C00  |00009C
-	stz.w $009d                          ;0295B7|9C9D00  |00009D
+	sta.w !calc_scratch_temp1                          ;0295B4|8D9C00  |00009C
+	stz.w !calc_scratch_temp1+1                          ;0295B7|9C9D00  |00009D
 	jsl.l ExecuteFinalCalc                    ;0295BA|22E49600|0096E4
 	rep #$30                             ;0295BE|C230    |
-	lda.w $009e                          ;0295C0|AD9E00  |00009E
+	lda.w !calc_result_x                          ;0295C0|AD9E00  |00009E
 	sta.b $77                            ;0295C3|8577    |000077
 	plp ;0295C5|28      |
 	rts ;0295C6|60      |
@@ -2096,13 +2096,13 @@ Coord_BoundsCheck:
 	rep #$30		; Set 16-bit accumulator and index registers
 	lda.b $14	   ; Load position coordinate
 	clc ; Clear carry for addition
-	adc.w $0477	 ; Add movement offset
+	adc.w !movement_offset_x	 ; Add movement offset
 	cmp.b $16	   ; Compare with boundary limit
 	bcc Coord_BoundsOK ; Branch if within bounds
 	lda.b $16	   ; Load boundary limit
 	sec ; Set carry for subtraction
 	sbc.b $14	   ; Calculate maximum movement
-	sta.w $0477	 ; Store corrected movement
+	sta.w !movement_offset_x	 ; Store corrected movement
 
 ;Bounds checking completion
 Coord_BoundsOK:
@@ -2136,7 +2136,7 @@ Coord_Transform:
 	jsr.w ProcessEntity ; Switch to coordinate processing context
 	rep #$30		; Set 16-bit accumulator and index registers
 	lda.b $14	   ; Load X coordinate
-	sta.w $0479	 ; Store in coordinate buffer
+	sta.w !movement_offset_y	 ; Store in coordinate buffer
 	lda.b $16	   ; Load Y coordinate
 	pld ; Restore direct page
 	sta.b $77	   ; Store Y coordinate
@@ -2525,12 +2525,12 @@ Entity_ProcessCoordinates:
 	bcc BranchSimpleProcessingIfLess ; Branch to simple processing if less
 	rep #$30		; Set 16-bit accumulator and index registers
 	pla ; Pull calculation value from stack
-	sta.w $0098	 ; Store in calculation register low
-	stz.w $009a	 ; Clear calculation register high
+	sta.w !calc_scratch_x	 ; Store in calculation register low
+	stz.w !calc_scratch_y	 ; Clear calculation register high
 	lda.w #$000a	; Load division constant (10)
-	sta.w $009c	 ; Store division constant
+	sta.w !calc_scratch_temp1	 ; Store division constant
 	jsl.l ExecuteFinalCalc ; Execute hardware division operation
-	lda.w $009e	 ; Load division result
+	lda.w !calc_result_x	 ; Load division result
 	rts ; Return calculated result
 
 ;Simple calculation processing for basic game states
@@ -3248,14 +3248,14 @@ Idle_StateHandler:
 	sep #$20                             ;02A32E|E220    |
 	rep #$10                             ;02A330|C210    |
 	lda.b #$65                           ;02A332|A965    |
-	sta.w $00a8                          ;02A334|8DA800  |0000A8
+	sta.w !rng_seed_alt                          ;02A334|8DA800  |0000A8
 	jsl.l ExecuteAudioCall                    ;02A337|22839700|009783
 	lda.w !char2_active_flag                          ;02A33B|ADA010  |0110A0
 	and.b #$0f                           ;02A33E|290F    |
 	dec ;02A340|3A      |
 	tax ;02A341|AA      |
 	lda.w Idle_StateHandler.data,X       ;02A342|BD6BA3  |02A36B
-	cmp.w $00a9                          ;02A345|CDA900  |0000A9
+	cmp.w !rng_result                          ;02A345|CDA900  |0000A9
 	bcc +                                ;02A348|9001    |02A34B
 	rts ;02A34A|60      |
 +	lda.w !char1_state_flags                          ;02A34B|AD2F10  |01102F
@@ -3283,9 +3283,9 @@ Idle_StateHandler:
 ;----------------------------------------------------------------------------
 Controller_GameMode:
 	lda.b #$65	  ;02A373|A965    |      ; Load sound effect ID
-	sta.w $00a8	 ;02A375|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A375|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A378|22839700|009783; Call sound processing
-	lda.w $00a9	 ;02A37C|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A37C|ADA900  |0200A9; Read sound result
 	cmp.b #$32	  ;02A37F|C932    |      ; Compare to threshold
 	bcc Controller_MultiSetup ; Continue if below threshold
 	rts ;02A383|60      |      ; Exit if sound busy
@@ -3569,9 +3569,9 @@ Controller_TimingResult:
 	and.b #$08	  ;02A4E8|2908    |      ; Test specific bit
 	beq Controller_TimingStore ; Branch if not set
 	lda.b #$05	  ;02A4EC|A905    |      ; Set sound effect ID
-	sta.w $00a8	 ;02A4EE|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A4EE|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A4F1|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A4F5|ADA900  |0200A9; Get sound result
+	lda.w !rng_result	 ;02A4F5|ADA900  |0200A9; Get sound result
 	bra Controller_TimingFinalize ; Continue
 ;      |        |      ;
 ;      |        |      ;
@@ -3715,9 +3715,9 @@ Menu_StandardPath:
 	lda.b $a0	   ;02A66D|A5A0    |0004A0; Read state
 	beq Menu_SelectNoState ; Branch if zero
 	lda.b #$02	  ;02A671|A902    |      ; Set sound effect ID
-	sta.w $00a8	 ;02A673|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A673|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A676|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A67A|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A67A|ADA900  |0200A9; Read sound result
 	bne Menu_SoundActive ; Branch if sound active
 ;      |        |      ;
 
@@ -3749,9 +3749,9 @@ Menu_SoundActive:
 	xba ;02A69B|EB      |      ; Swap bytes
 	sta.b $a7	   ;02A69C|85A7    |0004A7; Store low calculation
 	lda.b #$08	  ;02A69E|A908    |      ; Set sound ID
-	sta.w $00a8	 ;02A6A0|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A6A0|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A6A3|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A6A7|ADA900  |0200A9; Read sound state
+	lda.w !rng_result	 ;02A6A7|ADA900  |0200A9; Read sound state
 	sta.b $a9	   ;02A6AA|85A9    |0004A9; Store local copy
 ;      |        |      ;
 
@@ -4009,7 +4009,7 @@ System_CommandProcessor:
 	phd ;02A950|0B      |      ; Push direct page
 	jsr.w ProcessEntity ;02A951|20228F  |028F22; Read system state
 	lda.b $50	   ;02A954|A550    |001050; Read command parameter 1
-	sta.w $0438	 ;02A956|8D3804  |020438; Store in system memory
+	sta.w !temp_calc_area_1	 ;02A956|8D3804  |020438; Store in system memory
 	lda.b $52	   ;02A959|A552    |001052; Read command parameter 2
 	sta.w !sys_temp_param	 ;02A95B|8D3A04  |02043A; Store in system memory
 	pld ;02A95E|2B      |      ; Restore direct page
@@ -4021,9 +4021,9 @@ System_CommandProcessor:
 	cmp.b #$01	  ;02A96A|C901    |      ; Test for warning state
 	beq System_WarningHandler ;02A96C|F00E    |02A97C; Branch to warning handler
 	lda.b #$02	  ;02A96E|A902    |      ; Set sound test ID
-	sta.w $00a8	 ;02A970|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A970|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A973|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A977|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A977|ADA900  |0200A9; Read sound result
 	beq System_ErrorHandler ;02A97A|F003    |02A97F; Branch if sound not ready
 ;      |        |      ;
 
@@ -4043,9 +4043,9 @@ System_ErrorHandler:
 	and.b #$08	  ;02A989|2908    |      ; Test select button
 	beq System_SelectDone ;02A98B|F012    |02A99F; Skip if not pressed
 	lda.b #$02	  ;02A98D|A902    |      ; Set sound effect ID
-	sta.w $00a8	 ;02A98F|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A98F|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A992|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A996|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A996|ADA900  |0200A9; Read sound result
 	beq System_SelectDone ;02A999|F004    |02A99F; Skip if sound not ready
 	lda.b #$80	  ;02A99B|A980    |      ; Set alternate state
 	sta.b $51	   ;02A99D|8551    |001051; Store alternate state
@@ -4084,11 +4084,11 @@ Game_StandardProcessing:
 ; Sound System Coordination Loop
 Sound_WaitLoop:
 	lda.b #$06	  ;02A9BA|A906    |      ; Set sound channel ID
-	sta.w $00a8	 ;02A9BC|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A9BC|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A9BF|22839700|009783; Call sound system
 	lda.b #$00	  ;02A9C3|A900    |      ; Clear high byte
 	xba ;02A9C5|EB      |      ; Swap bytes
-	lda.w $00a9	 ;02A9C6|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A9C6|ADA900  |0200A9; Read sound result
 	tax ;02A9C9|AA      |      ; Transfer to index
 	lda.b $58,x	 ;02A9CA|B558    |0011D8; Read sound state array
 	inc a;02A9CC|1A      |      ; Test for active sound
@@ -4126,9 +4126,9 @@ Game_StateNext:
 ; Sound System Priority Processing
 Sound_PriorityProcess:
 	lda.b #$65	  ;02A9EC|A965    |      ; Set sound effect ID
-	sta.w $00a8	 ;02A9EE|8DA800  |0200A8; Store sound parameter
+	sta.w !rng_seed_alt	 ;02A9EE|8DA800  |0200A8; Store sound parameter
 	jsl.l ExecuteAudioCall ;02A9F1|22839700|009783; Call sound system
-	lda.w $00a9	 ;02A9F5|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02A9F5|ADA900  |0200A9; Read sound result
 	sta.b $a0	   ;02A9F8|85A0    |0004A0; Store result
 	phd ;02A9FA|0B      |      ; Push direct page
 	jsr.w ProcessEntity ;02A9FB|20228F  |028F22; Read system state
@@ -4153,7 +4153,7 @@ Game_Priority_Handler:
 	sta.w !sys_temp_param	 ;02AA12|8D3A04  |02043A; Store in system memory
 	lda.b #$10	  ;02AA15|A910    |      ; Set command type
 	sta.b $50	   ;02AA17|8550    |001250; Store command type
-	sta.w $0438	 ;02AA19|8D3804  |020438; Store in system memory
+	sta.w !temp_calc_area_1	 ;02AA19|8D3804  |020438; Store in system memory
 	pld ;02AA1C|2B      |      ; Restore direct page
 	bra Game_CommandProcess ; Branch to processing
 ;      |        |      ;
@@ -4203,7 +4203,7 @@ Game_ErrorState:
 Game_FinalUpdate:
 	phd ;02AA4F|0B      |      ; Push direct page
 	jsr.w ProcessEntity ;02AA50|20228F  |028F22; Read system state
-	lda.w $0439	 ;02AA53|AD3904  |020439; Read final state
+	lda.w !temp_calc_area_2	 ;02AA53|AD3904  |020439; Read final state
 	sta.b $51	   ;02AA56|8551    |001251; Store in result register
 	pld ;02AA58|2B      |      ; Restore direct page
 	rts ;02AA59|60      |      ; Return
@@ -4456,19 +4456,19 @@ Graphics_StoreStateValue:
 	lda.b #$10	  ;02ABFB|A910    |      ; Set sound parameter
 	sta.l $7ec580,x ;02ABFD|9F80C57E|7EC580; Store sound parameter
 	lda.b #$03	  ;02AC01|A903    |      ; Set sound channel
-	sta.w $00a8	 ;02AC03|8DA800  |0200A8; Store sound channel
+	sta.w !rng_seed_alt	 ;02AC03|8DA800  |0200A8; Store sound channel
 	jsl.l ExecuteAudioCall ;02AC06|22839700|009783; Call sound system
-	lda.w $00a9	 ;02AC0A|ADA900  |0200A9; Read sound result
+	lda.w !rng_result	 ;02AC0A|ADA900  |0200A9; Read sound result
 	clc ;02AC0D|18      |      ; Clear carry
 	adc.b #$02	  ;02AC0E|6902    |      ; Add sound offset
 	eor.b #$ff	  ;02AC10|49FF    |      ; Invert result
 	asl a;02AC12|0A      |      ; Shift for processing
 	sta.l $7ec5a0,x ;02AC13|9FA0C57E|7EC5A0; Store sound result
 	lda.b #$07	  ;02AC17|A907    |      ; Set sound effect
-	sta.w $00a8	 ;02AC19|8DA800  |0200A8; Store sound effect
+	sta.w !rng_seed_alt	 ;02AC19|8DA800  |0200A8; Store sound effect
 	jsl.l ExecuteAudioCall ;02AC1C|22839700|009783; Call sound system
 	lda.b #$03	  ;02AC20|A903    |      ; Set sound mode
-	sbc.w $00a9	 ;02AC22|EDA900  |0200A9; Subtract sound result
+	sbc.w !rng_result	 ;02AC22|EDA900  |0200A9; Subtract sound result
 	sta.l $7ec5c0,x ;02AC25|9FC0C57E|7EC5C0; Store processed sound
 	dec.w $04a4	 ;02AC29|CEA404  |0204A4; Decrement buffer counter
 	bne Graphics_ContinueLoop ;02AC2C|D001    |02AC2F; Continue if not zero
@@ -6059,7 +6059,7 @@ Display_ColorLoop2:
 
 ; Display Processing Completion
 Display_ProcessDone:
-	stz.w $0a84	 ;02DA72|9C840A  |020A84; Clear processing flag
+	stz.w !validation_state	 ;02DA72|9C840A  |020A84; Clear processing flag
 	stz.b !SNES_CGSWSEL-$2100 ;02DA75|6430    |002130; Clear color window
 	stz.b !SNES_CGADSUB-$2100 ;02DA77|6431    |002131; Clear color math
 	stz.b !SNES_COLDATA-$2100 ;02DA79|6432    |002132; Clear color data
@@ -6091,7 +6091,7 @@ Display_StateInit:
 	phd ;02DA9B|0B      |      ; Save direct page
 	php ;02DA9C|08      |      ; Save processor status
 	phb ;02DA9D|8B      |      ; Save data bank
-	pea.w $0a00	 ;02DA9E|F4000A  |020A00; Set direct page to $0a00
+	pea.w !secondary_mem_block	 ;02DA9E|F4000A  |020A00; Set direct page to !secondary_mem_block
 	pld ;02DAA1|2B      |      ; Load new direct page
 	sep #$20		;02DAA2|E220    |      ; 8-bit accumulator
 	rep #$10		;02DAA4|C210    |      ; 16-bit index
@@ -6777,7 +6777,7 @@ Graphics_BufferManager:
 	phb ;02E096|8B      |      ; Save data bank
 	phd ;02E097|0B      |      ; Save direct page
 	rep #$30		;02E098|C230    |      ; 16-bit mode
-	pea.w $0a00	 ;02E09A|F4000A  |020A00; Set direct page to $0a00
+	pea.w !secondary_mem_block	 ;02E09A|F4000A  |020A00; Set direct page to !secondary_mem_block
 	pld ;02E09D|2B      |      ; Load new direct page
 	lda.w #$00c0	;02E09E|A9C000  |      ; Graphics buffer offset 1
 	clc ;02E0A1|18      |      ; Clear carry
@@ -7175,7 +7175,7 @@ RealTime_Shutdown:
 DB_Label_02E6ED:
 	php ;02E6ED|08      |      ;  Preserve processor status
 	phd ;02E6EE|0B      |      ;  Preserve direct page
-	pea.w $0a00	 ;02E6EF|F4000A  |020A00;  Set direct page to $0a00
+	pea.w !secondary_mem_block	 ;02E6EF|F4000A  |020A00;  Set direct page to !secondary_mem_block
 	pld ;02E6F2|2B      |      ;  Load new direct page
 	sep #$20		;02E6F3|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E6F5|C210    |      ;  16-bit index registers
@@ -8462,7 +8462,7 @@ DB_Load_02EEBD:
 DB_Label_02EEE7:
 	phk ;02EEE7|4B      |      ;  Preserve program bank
 	plb ;02EEE8|AB      |      ;  Set data bank to program bank
-	pea.w $0a00	 ;02EEE9|F4000A  |020A00;  Set direct page to $0a00
+	pea.w !secondary_mem_block	 ;02EEE9|F4000A  |020A00;  Set direct page to !secondary_mem_block
 	pld ;02EEEC|2B      |      ;  Load direct page
 	sep #$30		;02EEED|E230    |      ;  8-bit accumulator and indexes
 	lda.w $0ae2	 ;02EEEF|ADE20A  |020AE2;  Load graphics processing flag
@@ -9116,7 +9116,7 @@ Sprite_DefaultGraphics:
 
 Entity_InitValidator:
 	phd ;02FE0F|0B      |      ; Preserve direct page register
-	pea.w $0a00	 ;02FE10|F4000A  |020A00; Set direct page to $0a00 for entity operations
+	pea.w !secondary_mem_block	 ;02FE10|F4000A  |020A00; Set direct page to !secondary_mem_block for entity operations
 	pld ;02FE13|2B      |      ; Load new direct page address
 	php ;02FE14|08      |      ; Preserve processor status flags
 	sep #$30		;02FE15|E230    |      ; Set 8-bit accumulator and index registers
@@ -9144,7 +9144,7 @@ Entity_InitBoundary:
 
 Entity_GraphicsCreator:
 	phd ;02FE38|0B      |      ; Preserve direct page register
-	pea.w $0a00	 ;02FE39|F4000A  |020A00; Set direct page for entity operations
+	pea.w !secondary_mem_block	 ;02FE39|F4000A  |020A00; Set direct page for entity operations
 	pld ;02FE3C|2B      |      ; Load new direct page address
 	phy ;02FE3D|5A      |      ; Preserve Y register for restoration
 	php ;02FE3E|08      |      ; Preserve processor status flags

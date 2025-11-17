@@ -2967,9 +2967,9 @@ BattleEffect_StatusIconManager:
 	plx ;01A7F4|FA      |      ;
 	lda.w !vram_transfer_array,y   ;01A7F5|B9280F  |000F28;
 	beq F00a ;01A7F8|F00A    |01A804;
-	lda.w $0f2a,y   ;01A7FA|B92A0F  |000F2A;
+	lda.w !battle_data_f2a,y   ;01A7FA|B92A0F  |000F2A;
 	sta.b $0b,x	 ;01A7FD|950B    |001A7D;
-	lda.w $0f2b,y   ;01A7FF|B92B0F  |000F2B;
+	lda.w !battle_data_f2b,y   ;01A7FF|B92B0F  |000F2B;
 	sta.b $0c,x	 ;01A802|950C    |001A7E;
 
 BattleEffect_ParticleGenerator:
@@ -3547,7 +3547,7 @@ BattleSystem_CoordinateDataLoad:
 	sep #$20		;01AB79|E220    |      ;
 	rep #$10		;01AB7B|C210    |      ;
 	ldy.w !battle_data_index_3	 ;01AB7D|AC3B19  |00193B;
-	lda.w $f0f0,y   ;01AB80|B9F0F0  |00F0F0;
+	lda.w !wram_buffer_f0f0,y   ;01AB80|B9F0F0  |00F0F0;
 	beq .NoSpecialMode ;01AB83|F004    |01AB89;
 	sta.w !battle_temp_data	 ;01AB85|8D4819  |001948;
 	bra .ProcessCharacter ;01AB88|8002    |01AB8C;
@@ -3677,17 +3677,17 @@ BattleChar_LoadData:
 	tay ;01AC2B|A8      |      ;
 	lda.l DATA8_06bd79,x ;01AC2C|BF79BD06|06BD79;
 	tax ;01AC30|AA      |      ;
-	lda.w $d0f4,x   ;01AC31|BDF4D0  |7FD0F4;
+	lda.w !wram_buffer_d0f4,x   ;01AC31|BDF4D0  |7FD0F4;
 	sta.w $d0f4,y   ;01AC34|99F4D0  |7FD0F4;
 	php ;01AC37|08      |      ;
 	rep #$30		;01AC38|C230    |      ;
 	jsr.w BattleChar_TransformIndex ;01AC3A|205CAC  |01AC5C;
-	lda.w $d174,x   ;01AC3D|BD74D1  |7FD174;
+	lda.w !wram_buffer_d174,x   ;01AC3D|BD74D1  |7FD174;
 	sta.w $d174,y   ;01AC40|9974D1  |7FD174;
 	jsr.w BattleChar_TransformIndex ;01AC43|205CAC  |01AC5C;
-	lda.w $cef4,x   ;01AC46|BDF4CE  |7FCEF4;
+	lda.w !wram_buffer_cef4,x   ;01AC46|BDF4CE  |7FCEF4;
 	sta.w $cef4,y   ;01AC49|99F4CE  |7FCEF4;
-	lda.w $cef6,x   ;01AC4C|BDF6CE  |7FCEF6;
+	lda.w !wram_buffer_cef6,x   ;01AC4C|BDF6CE  |7FCEF6;
 	sta.w $cef6,y   ;01AC4F|99F6CE  |7FCEF6;
 	plp ;01AC52|28      |      ;
 	plx ;01AC53|FA      |      ;
@@ -5192,16 +5192,16 @@ BattleAudio_SoundEffectCoordinator:
 	lda.w !tilemap_y_offset	 ;01B710|AD2E19  |01192E;
 	clc ;01B713|18      |      ;
 	adc.b #$08	  ;01B714|6908    |      ;
-	sta.w $0c51	 ;01B716|8D510C  |010C51;
+	sta.w !sprite_data_c51	 ;01B716|8D510C  |010C51;
 	sta.w $0c55	 ;01B719|8D550C  |010C55;
 	lda.b #$50	  ;01B71C|A950    |      ;
 	sta.w !hw_register_2	 ;01B71E|8D050E  |010E05;
 	jsr.w ProcessMemoryWithStateUpdate ;01B721|20D082  |0182D0;
 	lda.b #$2c	  ;01B724|A92C    |      ;
 	jsr.w Sub_01D6A9 ;01B726|20A9D6  |01D6A9;
-	lda.w $0c51	 ;01B729|AD510C  |010C51;
+	lda.w !sprite_data_c51	 ;01B729|AD510C  |010C51;
 	dec a;01B72C|3A      |      ;
-	sta.w $0c51	 ;01B72D|8D510C  |010C51;
+	sta.w !sprite_data_c51	 ;01B72D|8D510C  |010C51;
 	sta.w $0c55	 ;01B730|8D550C  |010C55;
 	jsr.w ProcessMemoryWithStateUpdate ;01B733|20D082  |0182D0;
 	lda.b #$2c	  ;01B736|A92C    |      ;
@@ -5633,7 +5633,7 @@ BattleGraphics_TileCoordProcessor1:
 	rts ;01D050|60      |      ;
 
 BattleGraphics_TileCoordProcessor2:
-	sta.w $0c51	 ;01D051|8D510C  |010C51;
+	sta.w !sprite_data_c51	 ;01D051|8D510C  |010C51;
 	sta.w $0c55	 ;01D054|8D550C  |010C55;
 	clc ;01D057|18      |      ;
 	adc.b #$08	  ;01D058|6908    |      ;
@@ -6029,7 +6029,7 @@ BattlePalette_BufferManager:
 
 	.CopyLoop:
 	pha ;01D2F1|48      |      ;
-	lda.w $c588,x   ;01D2F2|BD88C5  |7FC588;
+	lda.w !wram_buffer_c588,x   ;01D2F2|BD88C5  |7FC588;
 	sta.w $c608,y   ;01D2F5|9908C6  |7FC608;
 	inx ;01D2F8|E8      |      ;
 	inx ;01D2F9|E8      |      ;
@@ -7039,30 +7039,30 @@ animation_loop:
 ; Sophisticated coordinate processing with multi-axis transformation and DMA
 ; Manages complex coordinate calculations with battle integration
 coordinate_transformation_engine:
-	lda.w $0c60	 ; Load X coordinate low
+	lda.w !battle_coord_x_lo	 ; Load X coordinate low
 	dec a; Decrement for transformation
-	sta.w $0c60	 ; Store transformed X low
-	lda.w $0c61	 ; Load X coordinate high
+	sta.w !battle_coord_x_lo	 ; Store transformed X low
+	lda.w !battle_coord_x_hi	 ; Load X coordinate high
 	dec a; Decrement for transformation
-	sta.w $0c61	 ; Store transformed X high
-	lda.w $0c64	 ; Load Y coordinate low
+	sta.w !battle_coord_x_hi	 ; Store transformed X high
+	lda.w !battle_coord_y_lo	 ; Load Y coordinate low
 	inc a; Increment for transformation
-	sta.w $0c64	 ; Store transformed Y low
-	lda.w $0c65	 ; Load Y coordinate high
+	sta.w !battle_coord_y_lo	 ; Store transformed Y low
+	lda.w !battle_coord_y_hi	 ; Load Y coordinate high
 	dec a; Decrement for transformation
-	sta.w $0c65	 ; Store transformed Y high
-	lda.w $0c68	 ; Load Z coordinate low
+	sta.w !battle_coord_y_hi	 ; Store transformed Y high
+	lda.w !battle_coord_z_lo	 ; Load Z coordinate low
 	dec a; Decrement for transformation
-	sta.w $0c68	 ; Store transformed Z low
-	lda.w $0c69	 ; Load Z coordinate high
+	sta.w !battle_coord_z_lo	 ; Store transformed Z low
+	lda.w !battle_coord_z_hi	 ; Load Z coordinate high
 	inc a; Increment for transformation
-	sta.w $0c69	 ; Store transformed Z high
-	lda.w $0c6c	 ; Load W coordinate low
+	sta.w !battle_coord_z_hi	 ; Store transformed Z high
+	lda.w !battle_coord_w_lo	 ; Load W coordinate low
 	inc a; Increment for transformation
-	sta.w $0c6c	 ; Store transformed W low
-	lda.w $0c6d	 ; Load W coordinate high
+	sta.w !battle_coord_w_lo	 ; Store transformed W low
+	lda.w !battle_coord_w_hi	 ; Load W coordinate high
 	inc a; Increment for transformation
-	sta.w $0c6d	 ; Store transformed W high
+	sta.w !battle_coord_w_hi	 ; Store transformed W high
 	rts ; Return from transformation
 
 ; Advanced Battle Timing Synchronization System
@@ -7596,7 +7596,7 @@ battle_environment_location_processing:
 	and.b #$03	  ; Mask location type
 	asl a; Shift for table lookup
 	tax ; Transfer to index
-	lda.w $0094	 ; Load system flags
+	lda.w !sys_flags_94	 ; Load system flags
 	and.b #$80	  ; Test system mode bit
 	beq environment_location_check ; Branch if standard mode
 	sep #$10		; Set 8-bit index mode
