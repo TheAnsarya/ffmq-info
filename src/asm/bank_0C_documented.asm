@@ -468,7 +468,7 @@ Display_SpriteOAMSetup:
 	lda.w #$0009	;0C8249	; Transfer 10 bytes (9+1 for MVN)
 	mvn $0c,$0c	 ;0C824C	; Block move within bank $0c
 	sep #$20		;0C824F	; 8-bit accumulator
-	stz.w $0160	 ;0C8251	; Clear sprite state flag
+	stz.w !animation_command	 ;0C8251	; Clear sprite state flag
 	stz.w !vfx_oam_control	 ;0C8254	; Clear OAM control byte
 	ldx.w #$8671	;0C8257	; Effect script address
 
@@ -558,7 +558,7 @@ Display_EffectScriptInterpreter:
 	cmp.b #$c0	  ;0C82B7	; Command < $c0?
 	bcc BranchHighRangeHandler ;0C82B9	; Branch to high-range handler
 	sbc.b #$40	  ;0C82BB	; Normalize command ($c0+ → $80+)
-	sta.w $0161	 ;0C82BD	; Store normalized command
+	sta.w !animation_command+1	 ;0C82BD	; Store normalized command
 	rep #$30		;0C82C0	; 16-bit A/X/Y
 	lda.w !menu_selection	 ;0C82C2	; Load parameter
 	asl A		   ;0C82C5	; *2
@@ -569,7 +569,7 @@ Display_EffectScriptInterpreter:
 
 ; High-range command handler ($80-$bf) - Triple table dispatch system
 Display_EffectCommandHighRange:	; Process command $80-$bf with triple table lookup
-	sta.w $0161	 ;0C82CF	; Store command
+	sta.w !animation_command+1	 ;0C82CF	; Store command
 	rep #$30		;0C82D2	; 16-bit A/X/Y
 	lda.w !menu_selection	 ;0C82D4	; Load parameter
 	asl A		   ;0C82D7	; *2
@@ -756,7 +756,7 @@ Display_TableEffectExecutor:
 	phx ;0C83CB	; Save X register
 	tax ;0C83CC	; Use A as table index
 	sep #$20		;0C83CD	; 8-bit accumulator
-	ldy.w $0161	 ;0C83CF	; Load command type
+	ldy.w !animation_command+1	 ;0C83CF	; Load command type
 	cpy.w #$00b8	;0C83D2	; Command = $b8 (specific effect)?
 	beq .ProcessEffect ;0C83D5	; Branch if match
 	cpy.w #$0089	;0C83D7	; Command >= $89?

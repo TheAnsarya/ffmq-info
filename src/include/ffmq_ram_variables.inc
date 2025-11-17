@@ -195,7 +195,21 @@
 ; ----------------------------------------------------------------------------
 !controller_data_base   = $50       ; Controller data base address (used with indexed access)
 
-!map_id             = $48       ; Current map ID
+; ----------------------------------------------------------------------------
+; System Pointers and Handlers ($58, $5a, $64)
+; ----------------------------------------------------------------------------
+!sys_routine_ptr        = $58       ; System routine pointer / DMA routine pointer (2 bytes)
+!sys_data_bank          = $5a       ; System data bank / DMA source bank / handler bank
+!sys_variable_64        = $64       ; System variable storage
+
+; ----------------------------------------------------------------------------
+; Screen and Display ($0402)
+; ----------------------------------------------------------------------------
+!screen_y_coord         = $0402     ; Screen Y coordinate
+
+; ----------------------------------------------------------------------------
+; Player State ($40-$5f)
+; ----------------------------------------------------------------------------
 !map_x_pos          = $49       ; Map X coordinate (tile)
 !map_y_pos          = $4a       ; Map Y coordinate (tile)
 !collision_flags    = $4b       ; Collision check results
@@ -246,6 +260,15 @@
 
 !music_track        = $7e       ; Current music track ID
 !sfx_queue          = $7f       ; Sound effect queue
+
+; ----------------------------------------------------------------------------
+; Graphics Processing Variables ($b2-$b5, $ef)
+; ----------------------------------------------------------------------------
+!gfx_proc_value_1       = $b2       ; Graphics processing value 1
+!gfx_proc_value_2       = $b3       ; Graphics processing value 2
+!gfx_proc_value_3       = $b4       ; Graphics processing value 3
+!gfx_proc_value_4       = $b5       ; Graphics processing value 4
+!gfx_temp_variable      = $ef       ; Graphics temporary variable
 
 ; ----------------------------------------------------------------------------
 ; Battle System ($90-$bf)
@@ -559,6 +582,49 @@
 !oam_sprite4_tile   = $0c12     ; Sprite 4 tile index (25 uses)
 !oam_sprite5_tile   = $0c16     ; Sprite 5 tile index (25 uses)
 !oam_sprite_window  = $0c40     ; OAM sprite window/control (18 uses)
+
+; ----------------------------------------------------------------------------
+; Graphics Registers and Buffers ($0c80-$0cff)
+; ----------------------------------------------------------------------------
+; VRAM address registers and tile configuration
+!gfx_reg_c80            = $0c80     ; Graphics register base
+!gfx_reg_c81            = $0c81     ; Graphics base color/register 1
+!gfx_reg_c82            = $0c82     ; Graphics condition flag
+!gfx_reg_c84            = $0c84     ; VRAM base address 1
+!gfx_reg_c85            = $0c85     ; Graphics register 2
+!gfx_reg_c88            = $0c88     ; VRAM base address 2 / position 1
+!gfx_reg_c89            = $0c89     ; Graphics register 3
+!gfx_reg_c8c            = $0c8c     ; VRAM base address 3
+!gfx_reg_c8d            = $0c8d     ; Graphics register 4
+!gfx_reg_c90            = $0c90     ; VRAM base address 4
+!gfx_reg_c91            = $0c91     ; Graphics register 5
+!gfx_reg_c94            = $0c94     ; Graphics secondary base 1
+!gfx_reg_c95            = $0c95     ; Secondary register 1
+!gfx_reg_c98            = $0c98     ; Graphics secondary value
+!gfx_reg_c99            = $0c99     ; Tertiary register 1
+!gfx_reg_c9d            = $0c9d     ; Secondary register 2
+!gfx_reg_ca1            = $0ca1     ; Tertiary register 2
+!gfx_reg_ca5            = $0ca5     ; Secondary register 3
+!gfx_reg_ca9            = $0ca9     ; Tertiary register 3
+!gfx_reg_cad            = $0cad     ; Secondary register 4
+!gfx_reg_cb1            = $0cb1     ; Tertiary register 4
+!gfx_reg_cb5            = $0cb5     ; Secondary register 5
+!gfx_reg_cb9            = $0cb9     ; Tertiary register 5
+!gfx_reg_cbc            = $0cbc     ; Graphics table base address
+
+; VRAM tile addresses and position registers
+!vram_tile_addr_1       = $0cc0     ; VRAM tile address 1
+!vram_tile_addr_2       = $0cc1     ; VRAM tile position 1
+!vram_sprite_tile_1     = $0cc2     ; Sprite tile 1
+!vram_tile_addr_3       = $0cc4     ; VRAM tile address 2
+!vram_tile_addr_4       = $0cc5     ; VRAM tile position 2
+!vram_sprite_tile_3     = $0cc6     ; Sprite tile 3
+!vram_tile_addr_5       = $0cc8     ; VRAM tile address 3
+!vram_tile_addr_6       = $0cc9     ; VRAM tile position 3
+!vram_sprite_tile_2     = $0cca     ; Sprite tile 2
+!vram_tile_addr_7       = $0ccc     ; VRAM tile address 4 / position 5
+!vram_tile_addr_8       = $0ccd     ; VRAM tile position 4
+!vram_sprite_tile_4     = $0cce     ; Sprite tile 4
 
 ; ----------------------------------------------------------------------------
 ; Save Slot Indicators and Data Buffers ($0fe7, $1010, $1050)

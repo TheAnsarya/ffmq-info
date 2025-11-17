@@ -541,7 +541,7 @@ Battle_GfxAddressHigh:
 ;   4. Load enemy formation from $19f1/$19f0
 ;   5. Play battle start sound ($f2)
 ;   6. Load enemy stats from formation tables
-;   7. Clear battle sprite buffers ($0ec8-$0f88 range)
+;   7. Clear battle sprite buffers (!dma_channel_array-$0f88 range)
 
 BattleInit_SetupEncounter:
 	stz.w !special_op_mode	 ; Clear battle phase counter
@@ -578,8 +578,8 @@ BattleInit_SetupEncounter:
 	lda.b #$20	  ; Counter = 32 bytes
 
 BattleInit_ClearBuffer1:	; Clear first buffer section
-	stz.w !dma_channel_array,x   ; Clear byte at $0ec8+X
-	stz.w !vram_transfer_array,x   ; Clear byte at $0f28+X
+	stz.w !dma_channel_array,x   ; Clear byte at !dma_channel_array+X
+	stz.w !vram_transfer_array,x   ; Clear byte at !vram_transfer_array+X
 	inx ; Increment index
 	dec a; Decrement counter
 	bne BattleInit_ClearBuffer1 ; Loop until 32 bytes cleared
@@ -587,7 +587,7 @@ BattleInit_ClearBuffer1:	; Clear first buffer section
 	lda.b #$30	  ; Counter = 48 bytes
 
 BattleInit_ClearBuffer2:	; Clear second buffer section
-	stz.w !dma_channel_array,x   ; Clear byte at $0ec8+X
+	stz.w !dma_channel_array,x   ; Clear byte at !dma_channel_array+X
 	inx ; Increment index
 	dec a; Decrement counter
 	bne BattleInit_ClearBuffer2 ; Loop until 48 bytes cleared
@@ -1246,7 +1246,7 @@ DB_Battle_ConfigByte12:
 ; CodeEnemyTileDataSetup: Enemy Tile Data Setup
 ; -----------------------------------------------------------------------------
 ; Purpose: Configure tile data parameters for enemy rendering
-; Sets: $1924 (tile stride), $0900-$0906 (DMA parameters)
+; Sets: $1924 (tile stride), !dma_param_block_base-!dma_end_addr_param (DMA parameters)
 ; Uses: Multi-table lookup based on enemy attributes
 ;
 ; Process:
@@ -1276,8 +1276,8 @@ BattleEnemy_SetupTileData:
 
 ; Setup DMA parameters
 	ldx.w #$7f80	; DMA dest bank:address high
-	stx.w $0904	 ; Store to DMA dest pointer
-	stz.w $0903	 ; Clear DMA dest pointer low byte
+	stx.w !dma_dest_addr_param+1	 ; Store to DMA dest pointer
+	stz.w !dma_dest_addr_param	 ; Clear DMA dest pointer low byte
 
 	ldx.w !RDMPYL	 ; Load multiply result (enemy_type × 3)
 	rep #$20		; Set A to 16-bit
@@ -1285,7 +1285,7 @@ BattleEnemy_SetupTileData:
 	sta.w !tilemap_wram_source_start_2	 ; Store to DMA source pointer
 	sep #$20		; Set A to 8-bit
 	lda.l DB_Battle_ConfigByte14,x ; Load source bank from table
-	sta.w $0902	 ; Store to DMA source bank
+	sta.w !dma_src_bank_param	 ; Store to DMA source bank
 
 	jsl.l BattleGfx_DecompressLoad ; Call graphics loading routine
 	rtl ; Return
@@ -1365,10 +1365,10 @@ BattleGfx_SetupDMATransfer:
 ; Setup DMA for graphics transfer
 	stx.w !tilemap_wram_source_start_2	 ; Store music/graphics source
 	lda.b #$07	  ; Source bank 7
-	sta.w $0902	 ; Store to DMA source bank
+	sta.w !dma_src_bank_param	 ; Store to DMA source bank
 	ldx.w #$7f90	; Dest = WRAM $7f:90xx
-	stx.w $0904	 ; Store to DMA dest pointer
-	stz.w $0903	 ; Clear dest low byte
+	stx.w !dma_dest_addr_param+1	 ; Store to DMA dest pointer
+	stz.w !dma_dest_addr_param	 ; Clear dest low byte
 	jsl.l BattleGfx_DecompressToWRAM ; Call graphics decompression
 
 BattleLayer_TypeHandlerReturn:
@@ -1452,10 +1452,10 @@ DB_Battle_ConfigByte13:
 ; CodeGraphicsDataDecompressionRleStyle: Graphics Data Decompression (RLE-style)
 ; -----------------------------------------------------------------------------
 ; Purpose: Decompress graphics data from ROM to WRAM using custom format
-; Input: $0900-$0906 = DMA parameters (set by caller)
-;        $0900/$0901 = Source address (16-bit)
-;        $0902 = Source bank
-;        $0903/$0904/$0905 = Destination (24-bit WRAM address)
+; Input: !dma_param_block_base-!dma_end_addr_param = DMA parameters (set by caller)
+;        !dma_param_block_base/$0901 = Source address (16-bit)
+;        !dma_src_bank_param = Source bank
+;        !dma_dest_addr_param/!dma_dest_addr_param+1/!dma_dest_addr_param+2 = Destination (24-bit WRAM address)
 ; Output: Decompressed graphics written to WRAM destination
 ;
 ; Compression Format:
@@ -1467,44 +1467,44 @@ DB_Battle_ConfigByte13:
 ;       - Copy (HHHH+1) bytes from source
 ;   $00 byte = End of data
 ;
-; Uses: Direct page relocation to $0900 for efficient parameter access
-;       mvn instruction to copy routine code to $0918 for local execution
+; Uses: Direct page relocation to !dma_param_block_base for efficient parameter access
+;       mvn instruction to copy routine code to !dma_decompress_routine for local execution
 
 BattleGfx_DecompressLoad:
 	php ; Save processor status
 	phd ; Save direct page register
 	phb ; Save data bank
-	pea.w !tilemap_wram_source_start_2	 ; Set direct page = $0900 (DMA params)
+	pea.w !tilemap_wram_source_start_2	 ; Set direct page = !dma_param_block_base (DMA params)
 	pld ; Pull to direct page register
 	rep #$30		; Set A/X/Y to 16-bit
 
-; Copy decompression routine to $0918 (makes it accessible via DP)
+; Copy decompression routine to !dma_decompress_routine (makes it accessible via DP)
 	ldx.w #$86de	; Source = CODE at $0b86de (routine code)
-	ldy.w #$0918	; Dest = $0918 (in DMA param area)
+	ldy.w #!dma_decompress_routine	; Dest = !dma_decompress_routine (in DMA param area)
 	lda.w #$000b	; Size = 12 bytes (11+1)
 	mvn $0b,$0b	 ; Copy within Bank $0b
 
 ; Setup decompression parameters
-	ldx.b $00	   ; Load source address from DP+$00 ($0900)
+	ldx.b $00	   ; Load source address from DP+$00 (!dma_param_block_base)
 	inx ; Skip first 2 bytes (header?)
 INX_Label:
 	txa ; Transfer to A
 	clc ; Clear carry
 	adc.b [$00]	 ; Add 16-bit value at source (data size?)
-	sta.b $06	   ; Store to DP+$06 ($0906) = end address
+	sta.b $06	   ; Store to DP+$06 (!dma_end_addr_param) = end address
 
 	sep #$20		; Set A to 8-bit
-	lda.b $02	   ; Load source bank from DP+$02 ($0902)
+	lda.b $02	   ; Load source bank from DP+$02 (!dma_src_bank_param)
 	sta.b $1b	   ; Store to DP+$1b ($091b)
 	pha ; Save bank
 	plb ; Set data bank = source bank
 
 ; Setup WRAM write parameters
-	lda.b $05	   ; Load dest bank from DP+$05 ($0905)
+	lda.b $05	   ; Load dest bank from DP+$05 (!dma_dest_addr_param+2)
 	sta.b $1a	   ; Store to DP+$1a ($091a)
 	sta.b $20	   ; Store to DP+$20 ($0920) (backup)
 	sta.b $21	   ; Store to DP+$21 ($0921) (backup)
-	ldy.b $03	   ; Load dest address from DP+$03 ($0903)
+	ldy.b $03	   ; Load dest address from DP+$03 (!dma_dest_addr_param)
 	stz.b $0d	   ; Clear DP+$0d ($090d) = control flags
 
 BattleGfx_DecompressMainLoop:	; Decompression main loop
@@ -1522,7 +1522,7 @@ BattleGfx_DecompressMainLoop:	; Decompression main loop
 	phx ; Save source pointer
 	ldx.b $06	   ; Load end address (for bounds check?)
 	dec a; Decrement count (for loop)
-	jsr.w $0918	 ; Call decompression subroutine (copied code)
+	jsr.w !dma_decompress_routine	 ; Call decompression subroutine (copied code)
 	stx.b $06	   ; Update end address
 	plx ; Restore source pointer
 
@@ -1551,7 +1551,7 @@ BattleGfx_DecompressCopyCmd:
 	tax ; Transfer adjusted dest to X
 	lda.b $08	   ; Load copy count
 	inc a; Increment (copy count+1 bytes)
-	jsr.w $091e	 ; Call copy subroutine
+	jsr.w !dma_copy_routine	 ; Call copy subroutine
 	plx ; Restore source pointer
 	bra BattleGfx_DecompressMainLoop ; Loop to next command
 
@@ -1561,7 +1561,7 @@ BattleGfx_DecompressExit:	; Exit decompression
 	plp ; Restore processor status
 	rtl ; Return to caller
 
-; Decompression subroutine data (copied to $0918)
+; Decompression subroutine data (copied to !dma_decompress_routine)
 ; Format: mvn + rts instructions for block operations
 	db $8b,$54,$7f,$00,$ab,$60 ; phb / mvn $7f,$00 / plb / rts (repeat fill)
 	db $8b,$54,$7f,$00,$ab,$60 ; phb / mvn $7f,$00 / plb / rts (copy)
@@ -1570,7 +1570,7 @@ BattleGfx_DecompressExit:	; Exit decompression
 ; CodeWramGraphicsUploadViaPpu: WRAM Graphics Upload via PPU Registers
 ; -----------------------------------------------------------------------------
 ; Purpose: Write graphics data to WRAM using SNES PPU WRAM registers
-; Input: Same DMA parameters as CodeGraphicsDataDecompressionRleStyle ($0900-$0906)
+; Input: Same DMA parameters as CodeGraphicsDataDecompressionRleStyle (!dma_param_block_base-!dma_end_addr_param)
 ; Method: Direct writes to $2180-$2183 (WRAM Data/Address registers)
 ;
 ; SNES WRAM Registers:
@@ -1594,7 +1594,7 @@ BattleGfx_DecompressToWRAM:
 	phd ; Save direct page
 	sep #$20		; Set A to 8-bit
 	rep #$10		; Set X/Y to 16-bit
-	pea.w !tilemap_wram_source_start_2	 ; Set direct page = $0900
+	pea.w !tilemap_wram_source_start_2	 ; Set direct page = !dma_param_block_base
 	pld ; Pull to DP
 
 	lda.b $02	   ; Load source bank
@@ -2171,7 +2171,7 @@ BattleAnim_SkipTransfer:
 ;   - Upper nibble: Copy-from-offset count
 ; - WRAM graphics upload uses PPU $2180-$2183 registers directly
 ; - OAM buffers: !oam_sprite_window-$0dff (main) + $0e03-$0e1e (extended)
-; - mvn self-modifying code: Copies routines to $0918 for DP access
+; - mvn self-modifying code: Copies routines to !dma_decompress_routine for DP access
 ; - Animation frame counters stored in WRAM $7ec360 range
 ; - 53 unique enemy types with full configurations
 ; - Sprite attributes: Palette (3 bits), priority (2 bits), flip (2 bits)
