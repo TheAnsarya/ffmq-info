@@ -215,11 +215,11 @@ Battle_CheckEscape:
 	lda.B $af                            ;02818B|A5AF    |0004AF;
 	and.B #$80                           ;02818D|2980    |      ;
 	bne Battle_CheckBossFlag                      ;02818F|D076    |028207;
-	lda.W $1110                          ;028191|AD1011  |021110;
+	lda.W !controller1_standard                          ;028191|AD1011  |021110;
 	clc                                  ;028194|18      |      ;
-	adc.W $1190                          ;028195|6D9011  |021190;
+	adc.W !controller2_standard                          ;028195|6D9011  |021190;
 	clc                                  ;028198|18      |      ;
-	adc.W $1190                          ;028199|6D9011  |021190;
+	adc.W !controller2_standard                          ;028199|6D9011  |021190;
 	inc a;02819C|1A      |      ;
 	inc a;02819D|1A      |      ;
 	inc a;02819E|1A      |      ;
@@ -340,7 +340,7 @@ Battle_CalculateEnemyHP:
 	lda.W #$0001                         ;02825E|A90100  |      ;
 	sta.B $a2                            ;028261|85A2    |0004A2;
 	ldx.W #$0000                         ;028263|A20000  |      ;
-	lda.W $1121                          ;028266|AD2111  |021121;
+	lda.W !controller1_extended                          ;028266|AD2111  |021121;
 	and.W #$00f0                         ;028269|29F000  |      ;
 	bne Battle_AddEnemyHP                      ;02826C|D009    |028277;
 	lda.W $1124                          ;02826E|AD2411  |021124;
@@ -349,7 +349,7 @@ Battle_CalculateEnemyHP:
 	sta.B $a2                            ;028275|85A2    |0004A2;
 ;      |        |      ;
 Battle_AddEnemyHP:
-	lda.W $11a1                          ;028277|ADA111  |0211A1;
+	lda.W !controller2_extended                          ;028277|ADA111  |0211A1;
 	and.W #$00f0                         ;02827A|29F000  |      ;
 	bne Battle_SumEnemy2HP                      ;02827D|D00C    |02828B;
 	lda.W $11a4                          ;02827F|ADA411  |0211A4;
@@ -360,7 +360,7 @@ Battle_AddEnemyHP:
 	sta.B $a2                            ;028289|85A2    |0004A2;
 ;      |        |      ;
 Battle_SumEnemy2HP:
-	lda.W $1221                          ;02828B|AD2112  |021221;
+	lda.W !controller3_extended                          ;02828B|AD2112  |021221;
 	and.W #$00f0                         ;02828E|29F000  |      ;
 	bne Battle_SumEnemy3HP                      ;028291|D00C    |02829F;
 	lda.W $1224                          ;028293|AD2412  |021224;
@@ -1074,9 +1074,9 @@ DB_DATA8_028715:
 Battle_ProcessInput:
 	sep #$20                             ;028725|E220    |      ;
 	rep #$10                             ;028727|C210    |      ;
-	lda.W $1121                          ;028729|AD2111  |021121;
-	and.W $11a1                          ;02872C|2DA111  |0211A1;
-	and.W $1221                          ;02872F|2D2112  |021221;
+	lda.W !controller1_extended                          ;028729|AD2111  |021121;
+	and.W !controller2_extended                          ;02872C|2DA111  |0211A1;
+	and.W !controller3_extended                          ;02872F|2D2112  |021221;
 	and.B #$80                           ;028732|2980    |      ;
 	sta.B $95                            ;028734|8595    |000495;
 	lda.w !char1_status                          ;028736|AD2110  |021021;
@@ -2930,18 +2930,18 @@ Battle_ProcessTargetDeath:
 ;      |        |      ;
 	lda.B #$02                           ;029626|A902    |      ;
 	sta.B $be                            ;029628|85BE    |0004BE;
-	lda.W $1121                          ;02962A|AD2111  |021121;
+	lda.W !controller1_extended                          ;02962A|AD2111  |021121;
 	and.B #$80                           ;02962D|2980    |      ;
 	bne Battle_DisplayDamage                      ;02962F|D01B    |02964C;
 	inc.B $be                            ;029631|E6BE    |0004BE;
-	lda.W $11a1                          ;029633|ADA111  |0211A1;
+	lda.W !controller2_extended                          ;029633|ADA111  |0211A1;
 	and.B #$80                           ;029636|2980    |      ;
 	bne Battle_DisplayDamage                      ;029638|D012    |02964C;
 	lda.B $b4                            ;02963A|A5B4    |0004B4;
 	cmp.B #$02                           ;02963C|C902    |      ;
 	beq Battle_TargetDefeated                      ;02963E|F009    |029649;
 	inc.B $be                            ;029640|E6BE    |0004BE;
-	lda.W $1221                          ;029642|AD2112  |021221;
+	lda.W !controller3_extended                          ;029642|AD2112  |021221;
 	and.B #$80                           ;029645|2980    |      ;
 	bne Battle_DisplayDamage                      ;029647|D003    |02964C;
 ;      |        |      ;
@@ -4454,21 +4454,21 @@ Battle_ProcessMissAnimation:
 ;      |        |      ;
 ;      |        |      ;
 Battle_DisplayMiss:
-	lda.W $1121                          ;02A139|AD2111  |021121;
+	lda.W !controller1_extended                          ;02A139|AD2111  |021121;
 	and.B #$c0                           ;02A13C|29C0    |      ;
 	bne Battle_MissComplete                      ;02A13E|D005    |02A145;
 	lda.B $e2                            ;02A140|A5E2    |0004E2;
 	sta.W $0ab4                          ;02A142|8DB40A  |020AB4;
 ;      |        |      ;
 Battle_MissComplete:
-	lda.W $11a1                          ;02A145|ADA111  |0211A1;
+	lda.W !controller2_extended                          ;02A145|ADA111  |0211A1;
 	and.B #$c0                           ;02A148|29C0    |      ;
 	bne Battle_ProcessCounter                      ;02A14A|D005    |02A151;
 	lda.B $e2                            ;02A14C|A5E2    |0004E2;
 	sta.W $0ab5                          ;02A14E|8DB50A  |020AB5;
 ;      |        |      ;
 Battle_ProcessCounter:
-	lda.W $1221                          ;02A151|AD2112  |021221;
+	lda.W !controller3_extended                          ;02A151|AD2112  |021221;
 	and.B #$c0                           ;02A154|29C0    |      ;
 	bne Battle_CounterAttackCheck                      ;02A156|D005    |02A15D;
 	lda.B $e2                            ;02A158|A5E2    |0004E2;
@@ -5248,21 +5248,21 @@ Battle_ProcessShield:
 	sta.B $a4                            ;02A6C9|85A4    |0004A4;
 	ldx.W #$0403                         ;02A6CB|A20304  |      ;
 	stx.B $a5                            ;02A6CE|86A5    |0004A5;
-	lda.W $1121                          ;02A6D0|AD2111  |021121;
+	lda.W !controller1_extended                          ;02A6D0|AD2111  |021121;
 	bmi Battle_CalculateShieldBlock                      ;02A6D3|3003    |02A6D8;
-	lda.W $1110                          ;02A6D5|AD1011  |021110;
+	lda.W !controller1_standard                          ;02A6D5|AD1011  |021110;
 ;      |        |      ;
 Battle_CalculateShieldBlock:
 	sta.B $a7                            ;02A6D8|85A7    |0004A7;
-	lda.W $11a1                          ;02A6DA|ADA111  |0211A1;
+	lda.W !controller2_extended                          ;02A6DA|ADA111  |0211A1;
 	bmi Battle_ApplyShieldReduction                      ;02A6DD|3003    |02A6E2;
-	lda.W $1190                          ;02A6DF|AD9011  |021190;
+	lda.W !controller2_standard                          ;02A6DF|AD9011  |021190;
 ;      |        |      ;
 Battle_ApplyShieldReduction:
 	sta.B $a8                            ;02A6E2|85A8    |0004A8;
-	lda.W $1221                          ;02A6E4|AD2112  |021221;
+	lda.W !controller3_extended                          ;02A6E4|AD2112  |021221;
 	bmi Battle_ShieldBlockSuccess                      ;02A6E7|3003    |02A6EC;
-	lda.W $1210                          ;02A6E9|AD1012  |021210;
+	lda.W !controller3_standard                          ;02A6E9|AD1012  |021210;
 ;      |        |      ;
 Battle_ShieldBlockSuccess:
 	sta.B $a9                            ;02A6EC|85A9    |0004A9;

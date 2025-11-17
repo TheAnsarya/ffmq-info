@@ -2161,18 +2161,18 @@ Coord_Transform:
 ;Manages multiple game controllers and validates controller states
 	lda.b #$02	  ; Initialize to 2 controllers
 	sta.b $be	   ; Store controller count
-	lda.w $1121	 ; Load controller 1 state
+	lda.w !controller1_extended	 ; Load controller 1 state
 	and.b #$80	  ; Test for controller 1 connection
 	bne Controller_Process ; Branch if controller 1 connected
 	inc.b $be	   ; Increment to controller 2
-	lda.w $11a1	 ; Load controller 2 state
+	lda.w !controller2_extended	 ; Load controller 2 state
 	and.b #$80	  ; Test for controller 2 connection
 	bne Controller_Process ; Branch if controller 2 connected
 	lda.b $b4	   ; Load controller validation flag
 	cmp.b #$02	  ; Check for validation mode
 	beq Controller_Fallback ; Branch to validation handler
 	inc.b $be	   ; Increment to controller 3
-	lda.w $1221	 ; Load controller 3 state
+	lda.w !controller3_extended	 ; Load controller 3 state
 	and.b #$80	  ; Test for controller 3 connection
 	bne Controller_Process ; Branch if controller 3 connected
 
@@ -3785,23 +3785,23 @@ Controller_MultiCoord:
 	sta.b $a4	   ;02A6C9|85A4    |0004A4; Store priority base
 	ldx.w #$0403	;02A6CB|A20304  |      ; Set controller indices
 	stx.b $a5	   ;02A6CE|86A5    |0004A5; Store index pair
-	lda.w $1121	 ;02A6D0|AD2111  |021121; Read controller 1 extended
+	lda.w !controller1_extended	 ;02A6D0|AD2111  |021121; Read controller 1 extended
 	bmi Controller_Read1Extended ;02A6D3|3003    |02A6D8; Branch if negative
-	lda.w $1110	 ;02A6D5|AD1011  |021110; Read controller 1 standard
+	lda.w !controller1_standard	 ;02A6D5|AD1011  |021110; Read controller 1 standard
 ;      |        |      ;
 
 Controller_Read1Extended:
 	sta.b $a7	   ;02A6D8|85A7    |0004A7; Store controller 1 data
-	lda.w $11a1	 ;02A6DA|ADA111  |0211A1; Read controller 2 extended
+	lda.w !controller2_extended	 ;02A6DA|ADA111  |0211A1; Read controller 2 extended
 	bmi Controller_Read2Extended ;02A6DD|3003    |02A6E2; Branch if negative
-	lda.w $1190	 ;02A6DF|AD9011  |021190; Read controller 2 standard
+	lda.w !controller2_standard	 ;02A6DF|AD9011  |021190; Read controller 2 standard
 ;      |        |      ;
 
 Controller_Read2Extended:
 	sta.b $a8	   ;02A6E2|85A8    |0004A8; Store controller 2 data
-	lda.w $1221	 ;02A6E4|AD2112  |021221; Read controller 3 extended
+	lda.w !controller3_extended	 ;02A6E4|AD2112  |021221; Read controller 3 extended
 	bmi Controller_Read3Extended ;02A6E7|3003    |02A6EC; Branch if negative
-	lda.w $1210	 ;02A6E9|AD1012  |021210; Read controller 3 standard
+	lda.w !controller3_standard	 ;02A6E9|AD1012  |021210; Read controller 3 standard
 ;      |        |      ;
 
 Controller_Read3Extended:

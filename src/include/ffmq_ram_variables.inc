@@ -379,7 +379,7 @@
 ; ============================================================================
 ; Command execution and state machine control
 !control_region_1   = $1050     ; Control region 1 initialization state
-!control_region_2   = $1051     ; Control region 2 initialization state  
+!control_region_2   = $1051     ; Control region 2 initialization state
 !control_region_3   = $1052     ; Control region 3 initialization state (10 uses)
 !menu_command_id    = $10d0     ; Menu/system command ID (28 uses)
 !menu_command_param = $10d1     ; Menu/system command parameter (26 uses)
@@ -392,6 +392,28 @@
 !ram_10a0           = $10a0     ; Buffer region (9 uses)
 !ram_10b0           = $10b0     ; Buffer region (8 uses)
 !ram_10b1           = $10b1     ; Buffer region (13 uses)
+
+; ============================================================================
+; Controller State Registers ($1100-$1221)
+; ============================================================================
+; SNES controller input state (standard + extended formats)
+!controller1_standard   = $1110     ; Controller 1 standard state (8 uses)
+!controller1_extended   = $1121     ; Controller 1 extended state (15 uses)
+!controller2_standard   = $1190     ; Controller 2 standard state (10 uses)
+!controller2_extended   = $11a1     ; Controller 2 extended state (15 uses)
+!controller3_standard   = $1210     ; Controller 3 standard state
+!controller3_extended   = $1221     ; Controller 3 extended state (14 uses)
+
+; Other $11xx buffer variables
+!ram_1100           = $1100     ; Buffer region start (9 uses)
+!ram_1116           = $1116     ; Position coordinate high byte
+!ram_1144           = $1144     ; Buffer region
+!ram_1146           = $1146     ; Buffer region
+!ram_1148           = $1148     ; Buffer region
+!ram_114a           = $114a     ; Buffer region
+!ram_1158           = $1158     ; Buffer region
+!ram_115a           = $115a     ; Buffer region
+!ram_115c           = $115c     ; Buffer region
 
 ; ============================================================================
 ; Graphics System Variables ($1900-$1aff)
