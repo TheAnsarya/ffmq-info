@@ -1085,7 +1085,7 @@ Display_WaitVBlankAndUpdate:
 	sta.w !vfx_anim_frames,X   ;0C8616	; Store new frame number
 	tax ;0C8619	; Use frame as index
 	sep #$20		;0C861A	; 8-bit accumulator
-	lda.w DB_DATA8_0C8659,X ;0C861C	; Load tile number from table
+	lda.w DB_Sprite_AnimationFrameTable,X ;0C861C	; Load tile number from table
 	sta.w $0002,Y   ;0C861F	; Update sprite tile
 	cmp.b #$44	  ;0C8622	; Tile = $44?
 	php ;0C8624	; Save comparison result
@@ -1122,7 +1122,7 @@ Display_WaitVBlankAndUpdate:
 ; Animation Frame Table (14 frames of sprite tile numbers)
 ; ==============================================================================
 
-DB_DATA8_0C8659:
+DB_Sprite_AnimationFrameTable:
 	db $00,$04,$04,$00,$00,$08,$08,$08,$0c,$40,$40,$44,$44,$00,$00,$00 ; Sprite animation sequence
 
 ; [Additional sprite configuration data continues...]
@@ -1283,7 +1283,7 @@ Display_Mode7TilemapSetup:
 ; Controls Mode 7 scroll offsets per scanline for perspective effect.
 ; ==============================================================================
 
-DB_DATA8_0C886B:
+DB_Sprite_ConfigTable:
 	db $ff,$10,$00,$d1,$0e,$01,$00 ;0C886B	; HDMA: 255 lines, value=$0010, then $01d1
 
 ; ==============================================================================
@@ -1305,7 +1305,7 @@ Display_AnimatedVerticalScroll:
 	jsl.l CWaitTimingRoutine ;0C887A	; Wait for VBLANK
 	sta.b !SNES_BG1VOFS-$2100 ;0C887E	; Set BG1 vertical scroll ($210e)
 	stz.b !SNES_BG1VOFS-$2100 ;0C8880	; High byte = 0
-	lda.w DB_DATA8_0C88B0,X ;0C8882	; Load animation tile pattern
+	lda.w DB_Sprite_PatternTable,X ;0C8882	; Load animation tile pattern
 	inx ;0C8885	; Next table entry
 	phx ;0C8886	; Save index
 	jsr.w DrawTilePatternGrid ;0C8887	; Draw tile pattern (3×3 grid)
@@ -1345,7 +1345,7 @@ Display_AnimatedVerticalScroll:
 ; Values correspond to VRAM tile addresses for 3×3 pattern drawing.
 ; ==============================================================================
 
-DB_DATA8_0C88B0:
+DB_Sprite_PatternTable:
 	db $11,$15,$15,$11,$11,$19,$19,$19,$1d,$51,$51,$55,$55,$11 ;0C88B0
 
 ; ==============================================================================
@@ -1885,7 +1885,7 @@ DB_DATA16_0C8B66:	; Sine/cosine table 1 (48 entries)
 	db $ff		 ;0C8B91
 	db $00		 ;0C8B92
 
-DB_DATA8_0C8B93:	; Animation speed table (30 bytes)
+DB_Sprite_AnimationSpeedTable:	; Animation speed table (30 bytes)
 	db $01,$00,$00,$01,$02,$03,$04,$05,$06,$07,$08,$0a,$0c,$0e,$10,$12 ;0C8B93
 	db $14,$16,$18,$1c,$20,$24,$28,$2c,$30,$00 ;0C8BA3
 
@@ -2025,7 +2025,7 @@ Display_TitleScreenInit:
 ; Defines sprite positions and attributes for title screen logo/effects.
 ; ==============================================================================
 
-DB_DATA8_0C8C5E:
+DB_Sprite_SequenceTable:
 	db $28,$27,$10,$01,$38,$27,$12,$01,$48,$27,$14,$01,$58,$27,$16,$01 ;0C8C5E
 	db $68,$27,$18,$01,$80,$27,$10,$01,$90,$27,$16,$01,$a0,$27,$14,$01 ;0C8C6E
 	db $b0,$27,$1a,$01,$c0,$27,$16,$01,$d0,$27,$1c,$01,$e0,$27,$1e,$01 ;0C8C7E
@@ -2043,7 +2043,7 @@ DB_DATA8_0C8C5E:
 ; Additional sprite/effect configuration for title animation.
 ; ==============================================================================
 
-DB_DATA8_0C8CDE:
+DB_Sprite_TileIndexTable:
 	db $90,$b7,$a0,$30,$a0,$b7,$a2,$30,$b8,$b7,$a4,$30 ;0C8CDE
 	db $c8,$b7,$a6,$30,$30,$c3,$a8,$30,$40,$c3,$aa,$30,$50,$c3,$ac,$30 ;0C8CEA
 	db $60,$c3,$ae,$30,$78,$c3,$e6,$30,$90,$c3,$e8,$30,$a0,$c3,$ea,$30 ;0C8CFA
@@ -2057,7 +2057,7 @@ DB_DATA8_0C8CDE:
 ; Offset = 0 marks end of table.
 ; ==============================================================================
 
-DB_DATA8_0C8D1E:
+DB_Sprite_AttributeTable:
 	db $01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$03,$01 ;0C8D1E
 	db $ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff ;0C8D2E
 	db $02,$01,$ff,$69,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02 ;0C8D3E
@@ -3892,10 +3892,10 @@ SpriteGraphicsData_Part4:
 ; 4x4 tile arrangement patterns for map rendering
 ; Format: Usually groups of 4-5 bytes defining tile IDs + control byte
 
-DB_DATA8_0CEF85:
+DB_Sprite_MetaData1:
 	db $d7,$d7,$d7,$d7 ; Fill pattern marker
 
-DB_DATA8_0CEF89:
+DB_Sprite_MetaData2:
 	db $55		 ; Control byte (flip/priority)
 	db $00		 ; Spacer
 	db $20,$21,$22,$23,$55 ; Pattern 1: 4 tiles + control

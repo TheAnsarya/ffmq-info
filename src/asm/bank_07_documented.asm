@@ -23,42 +23,42 @@
 	org $078000	 ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_078000:
+DB_Graphics_PaletteData1:
 	db $48		 ;078000|        |      ;
 ;      |        |      ;
-DB_DATA8_078001:
+DB_Graphics_PaletteData2:
 	db $22		 ;078001|        |      ;
 ;      |        |      ;
-DB_DATA8_078002:
+DB_Graphics_PaletteData3:
 	db $00		 ;078002|        |      ;
 ;      |        |      ;
-DB_DATA8_078003:
+DB_Graphics_PaletteData4:
 	db $00		 ;078003|        |      ;
 ;      |        |      ;
-DB_DATA8_078004:
+DB_Graphics_PaletteData5:
 	db $ff		 ;078004|        |      ;
 ;      |        |      ;
-DB_DATA8_078005:
+DB_Graphics_PaletteData6:
 	db $7f		 ;078005|        |      ;
 ;      |        |      ;
-DB_DATA8_078006:
+DB_Graphics_PaletteData7:
 	db $4f		 ;078006|        |      ;
 ;      |        |      ;
-DB_DATA8_078007:
+DB_Graphics_PaletteData8:
 	db $3e,$48,$22 ;078007|        |      ;
 ;      |        |      ;
-DB_DATA8_07800a:
+DB_Graphics_PaletteData9:
 	db $40,$51	 ;07800A|        |      ;
 ;      |        |      ;
-DB_DATA8_07800c:
+DB_Graphics_PaletteData10:
 	db $ff,$7f,$00,$00,$48,$22,$00,$00,$1f,$00,$ff,$03,$48,$22,$40,$51 ;07800C|        |      ;
 	db $3f,$03,$ff,$03,$48,$22,$00,$00,$ff,$7f,$00,$00,$00,$00,$00,$00 ;07801C|        |      ;
 	db $3f,$03,$4f,$3e ;07802C|        |      ;
 ;      |        |      ;
-DB_DATA8_078030:
+DB_Graphics_ConfigByte:
 	db $00		 ;078030|        |      ;
 ;      |        |      ;
-DB_DATA8_078031:
+DB_Graphics_TileDataTable:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$33,$3c,$fa,$06,$00,$00,$08 ;078031|        |      ;
 	db $00,$00,$00,$18,$10,$19,$14,$03,$02,$80,$80,$00,$00,$3a,$28,$00 ;078041|        |      ;
 	db $00,$00,$c0,$dc,$94,$00,$00,$00,$00,$74,$4c,$00,$00,$00,$00,$01 ;078051|        |      ;
@@ -371,7 +371,7 @@ DB_Label_07905C:
 	lda.l UNREACH_0CD501,x ;079089|BF01D50C|0CD501;
 	asl a;07908D|0A      |      ;
 	tax ;07908E|AA      |      ;
-	jsr.w (DB_DATA8_0790bb,x) ;07908F|FCBB90  |0790BB;
+	jsr.w (DB_Graphics_PatternTable,x) ;07908F|FCBB90  |0790BB;
 ;      |        |      ;
 DB_Label_079092:
 	rep #$30		;079092|C230    |      ;
@@ -398,7 +398,7 @@ DB_Load_0790AD:
 	jmp.w DB_Label_07905C ;0790B8|4C5C90  |07905C;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_0790bb:
+DB_Graphics_PatternTable:
 	db $c5,$90,$2a,$91,$53,$91,$74,$91,$c9,$91 ;0790BB|        |      ;
 	sep #$20		;0790C5|E220    |      ;
 	rep #$10		;0790C7|C210    |      ;
@@ -1042,7 +1042,7 @@ DB_Load_0791D0:
 	db $f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00 ;07AF21|        |07AF23;
 	db $f0,$00,$20,$00,$00,$00,$03,$03,$03,$02 ;07AF31|        |07AF33;
 ;      |        |      ;
-DB_DATA8_07af3b:
+DB_Graphics_SpriteTable:
 	db $00,$00	 ;07AF3B|        |      ;
 	db $00,$00,$09,$00,$09,$00,$09,$00,$09,$00,$12,$00 ;07AF3D|        |      ;
 	db $68,$00,$0b,$01,$29,$01,$7f,$01,$c7,$01,$d7,$01,$34,$02,$b4,$02 ;07AF49|        |      ;
@@ -1062,7 +1062,7 @@ DB_DATA8_07af3b:
 	db $59,$22,$77,$22,$95,$22,$b3,$22,$d8,$22,$82,$23,$1e,$24,$c1,$24 ;07AFF5|        |007722;
 	db $25,$25,$2e,$25,$c3,$25,$51,$26,$ed,$26,$f6,$26,$84,$27 ;07B005|        |000025;
 ;      |        |      ;
-DB_DATA8_07b013:
+DB_Graphics_AnimationTable:
 	db $00,$00,$00,$df,$20,$60,$e5,$00,$ff ;07B013|        |      ;
 	db $28,$28,$00,$ef,$00,$00,$19,$00,$ff,$1c,$1c,$34,$01,$60,$40,$59 ;07B01C|        |      ;
 	db $21,$f4,$ac,$8f,$8e,$4a,$03,$30,$fe,$ad,$90,$8f,$2a,$03,$40,$f4 ;07B02C|        |0000F4;
@@ -1742,7 +1742,7 @@ DB_DATA8_07b013:
 	db $d3,$4a,$0e,$bc,$19,$5c,$00,$d4,$4b,$0e,$be,$19,$5c,$00,$d5,$4b ;07D7DF|        |00004A;
 	db $0d,$bd,$19,$5c,$ff ;07D7EF|        |0019BD;
 ;      |        |      ;
-DB_DATA8_07d7f4:
+DB_Graphics_EffectTable:
 	db $00		 ;07D7F4|        |      ;
 ;      |        |      ;
 DB_DATA8_07d7f5:

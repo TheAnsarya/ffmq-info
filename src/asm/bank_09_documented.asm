@@ -355,19 +355,19 @@
 ; Format: [Pointer_Low, Pointer_High, Bank, Count, Flags]
 ; ==============================================================================
 
-DB_DATA8_098460:
+DB_Config_PointerLow:
 	db $f5		 ;098460	; Pointer low byte
 
-DB_DATA8_098461:
+DB_Config_PointerHigh:
 	db $85		 ;098461	; Pointer high byte
 
-DB_DATA8_098462:
+DB_Config_BankByte:
 	db $09		 ;098462	; Bank $09
 
-DB_DATA8_098463:
+DB_Config_EntryCount:
 	db $04		 ;098463	; Count: 4 entries
 
-DB_DATA8_098464:
+DB_Config_DataTable:
 	db $00,$f5,$85,$09,$03,$00,$f5,$85,$09,$01,$00,$ad,$88,$09,$05,$00 ;098464
 	db $ad,$88,$09,$14,$00,$ad,$88,$09,$00,$00,$05,$8e,$09,$02,$00,$05 ;098474
 	db $8e,$09,$01,$00 ;098484
