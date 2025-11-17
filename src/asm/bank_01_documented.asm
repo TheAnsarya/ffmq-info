@@ -26,7 +26,7 @@ lorom:
 ; $dd/$de/$10/$11/$13 are common values (likely AI mode flags)
 ; ===========================================================================
 
-DB_DATA8_018000:
+DB_EnemyAI_PriorityTable:
 	db $1b,$3b,$19,$1a,$10,$15,$39,$18,$0c,$09,$16,$21,$33,$06,$0d,$0b
 	db $27,$1d,$05,$30,$0e,$25,$1e
 	db $31,$22,$1f,$0f,$34
@@ -41,7 +41,7 @@ DB_DATA8_018000:
 	db $10,$10,$10,$10
 	db $11
 
-DB_DATA8_018032:
+DB_EnemyAI_BehaviorTable:
 ; AI behavior table - extensive use of $dd, $de, $10, $11, $13
 ; Likely: $dd=disabled, $de=dead, $10=normal, $11=defend, $13=special
 	db $13,$de,$11,$de,$10,$de,$de,$de,$de,$dd,$de,$12,$dd,$10,$de,$11
@@ -470,7 +470,7 @@ Battle_InitializationSystem:
 	asl a;01822D|0A      |      ;
 	asl a;01822E|0A      |      ;
 	tax ;01822F|AA      |      ;
-	lda.w DB_DATA8_018242,x ;018230|BD4282  |018242;
+	lda.w DB_Battle_LargeDataTable,x ;018230|BD4282  |018242;
 	sta.w ;018233|8D890A  |010A89;
 	lda.w DATA8_018243,x ;018236|BD4382  |018243;
 	sta.w ;018239|8D8A0A  |010A8A;
@@ -478,7 +478,7 @@ Battle_InitializationSystem:
 	sta.w ;01823F|8D950A  |010A95;
 	db ,,,,,,,,,,,,,, ;018242|        |      ;
 ;      |        |      ;
-DB_DATA8_018242:
+DB_Battle_LargeDataTable:
 	db ,,,,,,,,,,,,,,, ;018251|        |      ;
 	db ,,,,,,,,,,,,,,, ;018261|        |      ;
 	db ,,,,,,,,,,,,,,, ;018271|        |      ;
@@ -605,10 +605,10 @@ ExecuteBattleCommand:
 	asl a;0182F7|0A      |      ;
 	tax ;0182F8|AA      |      ;
 	sep #$20   ;0182F9|E220    |      ;
-	jmp.w (DB_DATA8_0182fe,x) ;0182FB|7CFE82  |0182FE;
+	jmp.w (DB_Battle_JumpTable1,x) ;0182FB|7CFE82  |0182FE;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_0182fe:
+DB_Battle_JumpTable1:
 	db ,,,,,,,,,,,,,,, ;0182FE|        |      ;
 	db ,,,,,,,,,,,,,,, ;01830E|        |      ;
 	db ,		   ;01831E|        |      ;
@@ -624,10 +624,10 @@ BattleRtlExit:
 	rtl ;01832E|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_01832f:
+DB_Battle_SingleByte:
 	db ;01832F|        |      ;
 ;      |        |      ;
-DB_DATA8_018330:
+DB_Battle_SmallTable:
 	db ,,,,,,	  ;018330|        |      ;
 	php ;018337|08      |      ;
 	phb ;018338|8B      |      ;
@@ -644,7 +644,7 @@ DB_DATA8_018330:
 	lda.w ;01834D|AD461A  |011A46;
 	asl a;018350|0A      |      ;
 	tax ;018351|AA      |      ;
-	jsr.w (DB_DATA8_01835b,x) ;018352|FC5B83  |01835B;
+	jsr.w (DB_BattleGraphics_JumpTable,x) ;018352|FC5B83  |01835B;
 	stz.w ;018355|9C461A  |011A46;
 ;      |        |      ;
 ProcessBattleGraphicsRtl:
@@ -653,7 +653,7 @@ ProcessBattleGraphicsRtl:
 	rtl ;01835A|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_01835b:
+DB_BattleGraphics_JumpTable:
 	db ,,,,,,,,,,,,,,, ;01835B|        |      ;
 	db ,		   ;01836B|        |      ;
 ;      |        |      ;
@@ -663,15 +663,15 @@ DB_Load_01836D:
 	xba ;018371|EB      |      ;
 ;      |        |      ;
 DB_Load_018372:
-	lda.w DB_DATA8_01839f,x ;018372|BD9F83  |01839F;
+	lda.w DB_Battle_PointerTable1,x ;018372|BD9F83  |01839F;
 	sta.w ;018375|8D2121  |012121;
 	ldy.w #		 ;018378|A00022  |      ;
 	sty.w ;01837B|8C0043  |014300;
-	ldy.w DB_DATA8_0183a0,x ;01837E|BCA083  |0183A0;
+	ldy.w DB_Battle_PointerTable2,x ;01837E|BCA083  |0183A0;
 	sty.w ;018381|8C0243  |014302;
 	lda.b #		 ;018384|A97F    |      ;
 	sta.w ;018386|8D0443  |014304;
-	lda.w DB_DATA8_0183a2,x ;018389|BDA283  |0183A2;
+	lda.w DB_Battle_PointerTable3,x ;018389|BDA283  |0183A2;
 	tay ;01838C|A8      |      ;
 	sty.w ;01838D|8C0543  |014305;
 	lda.b #		 ;018390|A901    |      ;
@@ -684,13 +684,13 @@ DB_Load_018372:
 	bne DB_Load_018372 ;01839C|D0D4    |018372;
 	rts ;01839E|60      |      ;
 ;      |        |      ;
-DB_DATA8_01839f:
+DB_Battle_PointerTable1:
 	db ;01839F|        |      ;
 ;      |        |      ;
-DB_DATA8_0183a0:
+DB_Battle_PointerTable2:
 	db ,		   ;0183A0|        |      ;
 ;      |        |      ;
-DB_DATA8_0183a2:
+DB_Battle_PointerTable3:
 	db ,,,,,,,,,,,,,,, ;0183A2|        |      ;
 	db ,,,,,,,,,,,, ;0183B2|        |      ;
 ;      |        |      ;
@@ -894,7 +894,7 @@ DB_Load_018547:
 	and.b #		 ;01854D|2903    |      ;
 	asl a;01854F|0A      |      ;
 	tax ;018550|AA      |      ;
-	jsr.w (DB_DATA8_018557,x) ;018551|FC5785  |018557;
+	jsr.w (DB_Battle_ConfigTable,x) ;018551|FC5785  |018557;
 ;      |        |      ;
 CleanBattleExit:
 	plb ;018554|AB      |      ;
@@ -902,7 +902,7 @@ CleanBattleExit:
 	rtl ;018556|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DB_DATA8_018557:
+DB_Battle_ConfigTable:
 	db ,,,,,,,	 ;018557|        |      ;
 	lda.w ;01855F|AD1001  |010110;
 	bpl DB_Load_018568 ;018562|1004    |018568;
@@ -1009,8 +1009,8 @@ BattleSprite_CalculatePositionWithClipping:
 	sta.b $0c	   ;01A127|850C    |001A6E;
 	rep #$20		;01A129|C220    |      ;
 	ldx.b $04	   ;01A12B|A604    |001A66;
-	ldy.w DB_DATA8_01a63c,x ;01A12D|BC3CA6  |01A63C;
-	lda.w DB_DATA8_01a63a,x ;01A130|BD3AA6  |01A63A;
+	ldy.w DB_Battle_ParamTable3,x ;01A12D|BC3CA6  |01A63C;
+	lda.w DB_Battle_ParamTable2,x ;01A130|BD3AA6  |01A63A;
 	tax ;01A133|AA      |      ;
 	lda.b $0c	   ;01A134|A50C    |001A6E;
 	cmp.w #$00e8	;01A136|C9E800  |      ;
@@ -1069,8 +1069,8 @@ BattleSprite_SetupMultiSpriteOAM:
 BattleSprite_HideOffScreen:
 	rep #$20		;01A186|C220    |      ;
 	ldx.b $04	   ;01A188|A604    |001A66;
-	ldy.w DB_DATA8_01a63c,x ;01A18A|BC3CA6  |01A63C;
-	lda.w DB_DATA8_01a63a,x ;01A18D|BD3AA6  |01A63A;
+	ldy.w DB_Battle_ParamTable3,x ;01A18A|BC3CA6  |01A63C;
+	lda.w DB_Battle_ParamTable2,x ;01A18D|BD3AA6  |01A63A;
 	tax ;01A190|AA      |      ;
 
 	.HideSprite:
@@ -1726,7 +1726,7 @@ BattleBackground_TileProcessor:
 	asl a;01A585|0A      |      ;
 	tax ;01A586|AA      |      ;
 	rep #$30		;01A587|C230    |      ;
-	lda.l DB_DATA8_01a5e0,x ;01A589|BFE0A501|01A5E0;
+	lda.l DB_Battle_ParamTable1,x ;01A589|BFE0A501|01A5E0;
 	sta.b $04	   ;01A58D|8504    |00192F;
 	ldy.w #$0060	;01A58F|A06000  |      ;
 
@@ -1799,7 +1799,7 @@ BattleSprite_PriorityHandler:
 ; Complex addressing tables for multi-bank graphics coordination
 ; ==============================================================================
 
-DB_DATA8_01a5e0:
+DB_Battle_ParamTable1:
 	db $00,$02,$80,$02,$00,$03,$80,$03,$00,$04,$00,$06,$00,$0e,$00,$16 ; 01A5E0
 	db $00,$08,$80,$08,$00,$09,$80,$09,$00,$0a,$80,$0a,$00,$0b,$80,$0b ; 01A5F0
 	db $00,$0c	 ; 01A600
@@ -1818,10 +1818,10 @@ DB_DATA8_01a5e0:
 ; Sprite positioning and attribute data for battle system
 ; ==============================================================================
 
-DB_DATA8_01a63a:
+DB_Battle_ParamTable2:
 	db $80,$00	 ; 01A63A
 
-DB_DATA8_01a63c:
+DB_Battle_ParamTable3:
 	db $08,$02,$90,$00,$09,$02,$a0,$00,$0a,$02,$b0,$00,$0b,$02,$e0,$00 ; 01A63C
 	db $0e,$02,$f0,$00,$0f,$02,$00,$01,$10,$02,$10,$01,$11,$02,$20,$01 ; 01A64C
 	db $12,$02,$30,$01,$13,$02,$40,$01,$14,$02,$50,$01,$15,$02,$60,$01 ; 01A65C
@@ -1941,8 +1941,8 @@ BattleChar_StateInitializer:
 	sta.b $0c	   ;01A127|850C    |001A6E;
 	rep #$20		;01A129|C220    |      ;
 	ldx.b $04	   ;01A12B|A604    |001A66;
-	ldy.w DB_DATA8_01a63c,x ;01A12D|BC3CA6  |01A63C;
-	lda.w DB_DATA8_01a63a,x ;01A130|BD3AA6  |01A63A;
+	ldy.w DB_Battle_ParamTable3,x ;01A12D|BC3CA6  |01A63C;
+	lda.w DB_Battle_ParamTable2,x ;01A130|BD3AA6  |01A63A;
 	tax ;01A133|AA      |      ;
 	lda.b $0c	   ;01A134|A50C    |001A6E;
 	cmp.w #$00e8	;01A136|C9E800  |      ;
@@ -2001,8 +2001,8 @@ BattleChar_AnimationSetup:
 BattleChar_BufferManager:
 	rep #$20		;01A186|C220    |      ;
 	ldx.b $04	   ;01A188|A604    |001A66;
-	ldy.w DB_DATA8_01a63c,x ;01A18A|BC3CA6  |01A63C;
-	lda.w DB_DATA8_01a63a,x ;01A18D|BD3AA6  |01A63A;
+	ldy.w DB_Battle_ParamTable3,x ;01A18A|BC3CA6  |01A63C;
+	lda.w DB_Battle_ParamTable2,x ;01A18D|BD3AA6  |01A63A;
 	tax ;01A190|AA      |      ;
 
 BattleChar_CoordinateProcessor:
@@ -2658,7 +2658,7 @@ BattleBackground_TileProcessor_1:
 	asl a;01A585|0A      |      ;
 	tax ;01A586|AA      |      ;
 	rep #$30		;01A587|C230    |      ;
-	lda.l DB_DATA8_01a5e0,x ;01A589|BFE0A501|01A5E0;
+	lda.l DB_Battle_ParamTable1,x ;01A589|BFE0A501|01A5E0;
 	sta.b $04	   ;01A58D|8504    |00192F;
 	ldy.w #$0060	;01A58F|A06000  |      ;
 
@@ -3102,7 +3102,7 @@ BattleGraphics_LoadCharacterSprite:
 	asl a;01A8CC|0A      |      ;
 	tax ;01A8CD|AA      |      ;
 	rep #$30		;01A8CE|C230    |      ;
-	lda.l DB_DATA8_01a5e0,x ;01A8D0|BFE0A501|01A5E0;
+	lda.l DB_Battle_ParamTable1,x ;01A8D0|BFE0A501|01A5E0;
 	sta.b $04	   ;01A8D4|8504    |00192F;
 
 ; ==============================================================================
@@ -3624,7 +3624,7 @@ BattleMenu_ClearStructure:
 
 	db $fe,$ff,$02,$00,$00,$00,$00,$00,$02,$00,$fe,$ff,$00,$00 ; 01ABEB
 
-DB_DATA8_01abf9:
+DB_Battle_StateTable:
 	db $10		 ;01ABF9|        |      ;
 
 BattleTable_Initialize:
@@ -4251,7 +4251,7 @@ BattleChar_ValidateAndSetup:
 	asl a;01AFE7|0A      |      ;
 	phx ;01AFE8|DA      |      ;
 	tax ;01AFE9|AA      |      ;
-	lda.l DB_DATA8_01a63a,x ;01AFEA|BF3AA601|01A63A;
+	lda.l DB_Battle_ParamTable2,x ;01AFEA|BF3AA601|01A63A;
 	tay ;01AFEE|A8      |      ;
 	plx ;01AFEF|FA      |      ;
 	lda.w !battle_status_array+1,x   ;01AFF0|BD731A  |001A73;
@@ -4322,7 +4322,7 @@ BattleCommand_ProcessHub:
 	asl a;01B056|0A      |      ;
 	phx ;01B057|DA      |      ;
 	tax ;01B058|AA      |      ;
-	lda.l DB_DATA8_01a63a,x ;01B059|BF3AA601|01A63A;
+	lda.l DB_Battle_ParamTable2,x ;01B059|BF3AA601|01A63A;
 	tay ;01B05D|A8      |      ;
 	plx ;01B05E|FA      |      ;
 	lda.w !battle_status_array+1,x   ;01B05F|BD731A  |001A73;
@@ -4382,7 +4382,7 @@ BattleChar_RestoreSystem:
 	asl a;01B0CD|0A      |      ;
 	phx ;01B0CE|DA      |      ;
 	tax ;01B0CF|AA      |      ;
-	lda.l DB_DATA8_01a63a,x ;01B0D0|BF3AA601|01A63A;
+	lda.l DB_Battle_ParamTable2,x ;01B0D0|BF3AA601|01A63A;
 	tay ;01B0D4|A8      |      ;
 	plx ;01B0D5|FA      |      ;
 	lda.w !battle_status_array+1,x   ;01B0D6|BD731A  |001A73;
@@ -4558,7 +4558,7 @@ BattleChar_ValidateEngine:
 ; Complex system dispatchers with jump table management
 ; ==============================================================================
 
-DB_DATA8_01b1fb:
+DB_BattleAnimation_Table1:
 	dw BattleSystem_Dispatcher0 ;01B1FB|0BB2    |01B20B;
 	dw BattleGraphics_LoadEngine ;01B1FD|59B2    |01B259;
 	dw BattleScene_StateManager ;01B1FF|A4B2    |01B2A4;
@@ -4575,7 +4575,7 @@ BattleFormation_InitializePositions:
 	and.b #$0f	  ;01B212|290F    |      ;
 	asl a;01B214|0A      |      ;
 	tax ;01B215|AA      |      ;
-	jsr.w (DB_DATA8_01b1fb,x) ;01B216|FCFBB1  |01B1FB;
+	jsr.w (DB_BattleAnimation_Table1,x) ;01B216|FCFBB1  |01B1FB;
 	rts ;01B219|60      |      ;
 
 
@@ -4596,7 +4596,7 @@ BattleFormation_CalculateSpacing:
 	lsr a;01B220|4A      |      ;
 	lsr a;01B221|4A      |      ;
 	tax ;01B222|AA      |      ;
-	lda.w DB_DATA8_01b23b,x ;01B223|BD3BB2  |01B23B;
+	lda.w DB_BattleAnimation_Table2,x ;01B223|BD3BB2  |01B23B;
 	beq F030 ;01B226|F030    |01B258;
 	lda.w !battle_gfx_index	 ;01B228|ADEE19  |0119EE;
 	and.b #$0f	  ;01B22B|290F    |      ;
@@ -4609,7 +4609,7 @@ BattleFormation_CalculateSpacing:
 	lda.w !battle_gfx_index	 ;01B235|ADEE19  |0119EE;
 	sta.w !battle_unit_flags,x   ;01B238|9D801A  |001A80;
 
-DB_DATA8_01b23b:
+DB_BattleAnimation_Table2:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B23B
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B24B
 
@@ -4628,7 +4628,7 @@ BattleGraphics_LoadEngine:
 	lsr a;01B25F|4A      |      ;
 	lsr a;01B260|4A      |      ;
 	tax ;01B261|AA      |      ;
-	lda.w DB_DATA8_01b277,x ;01B262|BD77B2  |01B277;
+	lda.w DB_BattleAnimation_Table3,x ;01B262|BD77B2  |01B277;
 	beq F03c ;01B265|F03C    |01B2A3;
 	lda.w !battle_gfx_index	 ;01B267|ADEE19  |0119EE;
 	and.b #$0f	  ;01B26A|290F    |      ;
@@ -4640,7 +4640,7 @@ BattleGraphics_LoadEngine:
 	tax ;01B273|AA      |      ;
 	lda.w !battle_gfx_attrib	 ;01B274|ADEF19  |0119EF;
 
-DB_DATA8_01b277:
+DB_BattleAnimation_Table3:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B277
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B287
 	db $9d,$81,$1a,$60 ; 01B297
@@ -4663,7 +4663,7 @@ BattleScene_StateManager:
 	lsr a;01B2AA|4A      |      ;
 	lsr a;01B2AB|4A      |      ;
 	tax ;01B2AC|AA      |      ;
-	lda.w DB_DATA8_01b2c2,x ;01B2AD|BDC2B2  |01B2C2;
+	lda.w DB_BattleAnimation_Table4,x ;01B2AD|BDC2B2  |01B2C2;
 	beq F040 ;01B2B0|F040    |01B2F2;
 	lda.w !battle_gfx_index	 ;01B2B2|ADEE19  |0119EE;
 	and.b #$0f	  ;01B2B5|290F    |      ;
@@ -4675,7 +4675,7 @@ BattleScene_StateManager:
 	tax ;01B2BE|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B2BF|ADEE19  |0119EE;
 
-DB_DATA8_01b2c2:
+DB_BattleAnimation_Table4:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B2C2
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B2D2
 	db $9d,$82,$1a,$a9,$01,$8d,$eb,$19,$60 ; 01B2E2
@@ -4700,7 +4700,7 @@ BattleFormation_FinalizeSetup:
 	lsr a;01B2F9|4A      |      ;
 	lsr a;01B2FA|4A      |      ;
 	tax ;01B2FB|AA      |      ;
-	lda.w DB_DATA8_01b311,x ;01B2FC|BD11B3  |01B311;
+	lda.w DB_BattleAnimation_Table5,x ;01B2FC|BD11B3  |01B311;
 	beq F045 ;01B2FF|F045    |01B346;
 	lda.w !battle_gfx_index	 ;01B301|ADEE19  |0119EE;
 	and.b #$0f	  ;01B304|290F    |      ;
@@ -4712,7 +4712,7 @@ BattleFormation_FinalizeSetup:
 	tax ;01B30D|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B30E|ADEE19  |0119EE;
 
-DB_DATA8_01b311:
+DB_BattleAnimation_Table5:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B311
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B321
 	db $9d,$83,$1a,$a9,$02,$8d,$eb,$19,$4c,$7b,$b3 ; 01B331
@@ -4740,7 +4740,7 @@ BattleAI_EvaluateTargets:
 	lsr a;01B34D|4A      |      ;
 	lsr a;01B34E|4A      |      ;
 	tax ;01B34F|AA      |      ;
-	lda.w DB_DATA8_01b365,x ;01B350|BD65B3  |01B365;
+	lda.w DB_BattleAnimation_Table6,x ;01B350|BD65B3  |01B365;
 	beq F044 ;01B353|F044    |01B399;
 	lda.w !battle_gfx_index	 ;01B355|ADEE19  |0119EE;
 	and.b #$0f	  ;01B358|290F    |      ;
@@ -4752,7 +4752,7 @@ BattleAI_EvaluateTargets:
 	tax ;01B361|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B362|ADEE19  |0119EE;
 
-DB_DATA8_01b365:
+DB_BattleAnimation_Table6:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B365
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B375
 	db $9d,$84,$1a,$a9,$03,$8d,$eb,$19,$4c,$7b,$b3 ; 01B385
@@ -4780,7 +4780,7 @@ BattleAI_SelectSkill:
 	lsr a;01B3A0|4A      |      ;
 	lsr a;01B3A1|4A      |      ;
 	tax ;01B3A2|AA      |      ;
-	lda.w DB_DATA8_01b3b8,x ;01B3A3|BDB8B3  |01B3B8;
+	lda.w DB_BattleAnimation_Table7,x ;01B3A3|BDB8B3  |01B3B8;
 	beq F047 ;01B3A6|F047    |01B3EF;
 	lda.w !battle_gfx_index	 ;01B3A8|ADEE19  |0119EE;
 	and.b #$0f	  ;01B3AB|290F    |      ;
@@ -4792,7 +4792,7 @@ BattleAI_SelectSkill:
 	tax ;01B3B4|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B3B5|ADEE19  |0119EE;
 
-DB_DATA8_01b3b8:
+DB_BattleAnimation_Table7:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B3B8
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B3C8
 	db $9d,$85,$1a,$a9,$04,$8d,$eb,$19,$4c,$7b,$b3 ; 01B3D8
@@ -4828,7 +4828,7 @@ BattleAI_CalculateThreat:
 	lsr a;01B3F6|4A      |      ;
 	lsr a;01B3F7|4A      |      ;
 	tax ;01B3F8|AA      |      ;
-	lda.w DB_DATA8_01b40e,x ;01B3F9|BD0EB4  |01B40E;
+	lda.w DB_BattleAnimation_Table8,x ;01B3F9|BD0EB4  |01B40E;
 	beq B03c ;01B3FC|F045    |01B443;
 	lda.w !battle_gfx_index	 ;01B3FE|ADEE19  |0119EE;
 	and.b #$0f	  ;01B401|290F    |      ;
@@ -4840,7 +4840,7 @@ BattleAI_CalculateThreat:
 	tax ;01B40A|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B40B|ADEE19  |0119EE;
 
-DB_DATA8_01b40e:
+DB_BattleAnimation_Table8:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B40E
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B41E
 	db $9d,$86,$1a,$a9,$05,$8d,$eb,$19,$4c,$7b,$b3 ; 01B42E
@@ -4863,7 +4863,7 @@ BattleAI_DetermineAction:
 	lsr a;01B44A|4A      |      ;
 	lsr a;01B44B|4A      |      ;
 	tax ;01B44C|AA      |      ;
-	lda.w DB_DATA8_01b462,x ;01B44D|BD62B4  |01B462;
+	lda.w DB_BattleAnimation_Table9,x ;01B44D|BD62B4  |01B462;
 	beq F0452 ;01B450|F045    |01B497;
 	lda.w !battle_gfx_index	 ;01B452|ADEE19  |0119EE;
 	and.b #$0f	  ;01B455|290F    |      ;
@@ -4875,7 +4875,7 @@ BattleAI_DetermineAction:
 	tax ;01B45E|AA      |      ;
 	lda.w !battle_gfx_index	 ;01B45F|ADEE19  |0119EE;
 
-DB_DATA8_01b462:
+DB_BattleAnimation_Table9:
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B462
 	db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B472
 	db $9d,$87,$1a,$a9,$06,$8d,$eb,$19,$4c,$7b,$b3 ; 01B482
@@ -5290,7 +5290,7 @@ BattleSprite_ProcessingEngine:
 	asl a;01B79F|0A      |      ;
 	asl a;01B7A0|0A      |      ;
 	tax ;01B7A1|AA      |      ;
-	lda.l DB_DATA8_01a63a,x ;01B7A2|BF3AA601|01A63A;
+	lda.l DB_Battle_ParamTable2,x ;01B7A2|BF3AA601|01A63A;
 	tay ;01B7A6|A8      |      ;
 	plx ;01B7A7|FA      |      ;
 	lda.b $01,x	 ;01B7A8|B501    |001A73;
@@ -6569,7 +6569,7 @@ BattleMagic_SuccessCheck:
 
 	.ValidTarget_CastSpell:
 	pha ;01D6B2|48      |      ;
-	jsr.w (DB_DATA8_01d6cb,x) ;01D6B3|FCCBD6  |01D6CB;
+	jsr.w (DB_Battle_EffectTable,x) ;01D6B3|FCCBD6  |01D6CB;
 	pla ;01D6B6|68      |      ;
 	dec a;01D6B7|3A      |      ;
 	bne .ValidTarget_CastSpell ;01D6B8|D0F8    |01D6B2;
@@ -6589,7 +6589,7 @@ BattleMagic_SuccessCheck:
 	ldx.w #$0004	;01D6C6|A20400  |      ;
 	bra .MagicLoop_CastSpell ;01D6C9|80E3    |01D6AE;
 
-DB_DATA8_01d6cb:
+DB_Battle_EffectTable:
 	db $d1,$d6,$d0,$82,$d9,$82 ;01D6CB|        |      ;
 	jsl.l CallExternalThreadManager ;01D6D1|22A09600|0096A0;
 	rts ;01D6D5|60      |      ;
@@ -7405,7 +7405,7 @@ battle_state_processing:
 	jsr.w .BattleDefeat_FadeStart ; Execute battle state function
 	asl a; Shift for table lookup
 	tax ; Transfer to index
-	jmp.w (DB_DATA8_01f3cb,x) ; Jump to battle function
+	jmp.w (DB_Battle_GraphicsTable1,x) ; Jump to battle function
 battle_world_map_processing:
 	lda.w !world_map_flag	 ; Load world map flag
 	bne world_map_complete ; Branch if set
@@ -7415,7 +7415,7 @@ world_map_complete:
 	jsr.w .BattleDefeat_FadeStart ; Execute world map function
 	asl a; Shift for table lookup
 	tax ; Transfer to index
-	jmp.w (DB_DATA8_01f3e1,x) ; Jump to world map function
+	jmp.w (DB_Battle_GraphicsTable2,x) ; Jump to world map function
 
 ; Advanced Animation and Graphics State Control
 ; Sophisticated animation control with graphics state management and memory coordination
@@ -7461,7 +7461,7 @@ animation_setup:
 	stz.w !battle_entity_state	 ; Clear animation flag
 	lda.b #$10	  ; Set graphics value
 	sta.w !graphics_state_param	 ; Store graphics state
-	lda.w DB_DATA8_01f400,x ; Load animation data
+	lda.w DB_Battle_GraphicsTable4,x ; Load animation data
 	sta.w !env_state_param	 ; Store animation parameter
 	lda.w Battle_AnimationModeTable,x ; Load animation mode
 	sta.w !battle_render_temp	 ; Store animation mode
@@ -7601,7 +7601,7 @@ battle_environment_location_processing:
 	beq environment_location_check ; Branch if standard mode
 	sep #$10		; Set 8-bit index mode
 	rep #$10		; Set 16-bit index mode
-	jmp.w (DB_DATA8_01f40f,x) ; Jump to location function
+	jmp.w (DB_Battle_GraphicsTable5,x) ; Jump to location function
 environment_location_check:
 	lda.w !location_identifier	 ; Load location identifier
 	cmp.b #$26	  ; Compare with location range start
@@ -7622,7 +7622,7 @@ environment_processing_standard:
 	tax ; Transfer to index
 	sep #$10		; Set 8-bit index mode
 	rep #$10		; Set 16-bit index mode
-	jmp.w (DB_DATA8_01f417,x) ; Jump to location processor
+	jmp.w (DB_Battle_GraphicsTable6,x) ; Jump to location processor
 environment_location_error:
 	lda.b #$bf	  ; Load error flag
 	trb.w !battle_state_primary	 ; Test and reset error bit
@@ -7680,7 +7680,7 @@ battle_animation_state_setup:
 	asl a; Shift for table lookup
 	tax ; Transfer to index
 	inc.w !battle_anim_counter	 ; Increment animation frame counter
-	jmp.w (DB_DATA8_01f3f7,x) ; Jump to animation state function
+	jmp.w (DB_Battle_GraphicsTable3,x) ; Jump to animation state function
 
 ; Advanced Multi-Path Battle Processing Engine
 ; Sophisticated multi-path processing with pathfinding and coordinate management
@@ -8499,20 +8499,20 @@ Advanced_Environment_Validation:
 
 ; Battle Data Tables and References
 ; Complex data structures for battle processing
-DB_DATA8_01f3cb:
+DB_Battle_GraphicsTable1:
 	db $05,$ea,$62,$ea,$62,$ea,$62,$ea,$62,$ea,$f6,$f0,$01,$f1
 	db $05,$ea
 	db $24,$ef,$09,$f1,$d9,$eb
 
-DB_DATA8_01f3e1:
+DB_Battle_GraphicsTable2:
 	db $24,$f1,$35,$f1,$35,$f1,$35,$f1,$35,$f1,$14,$f1
 	db $91,$f1,$05,$ea
 	db $9d,$f1,$1c,$f1,$9d,$f1
 
-DB_DATA8_01f3f7:
+DB_Battle_GraphicsTable3:
 	db $a6,$ec,$65,$ea,$65,$ea,$65,$ea,$65
 
-DB_DATA8_01f400:
+DB_Battle_GraphicsTable4:
 	db $ea,$00,$02,$03,$01
 	db $00
 	db $02
@@ -8533,10 +8533,10 @@ Battle_AnimationModeTable:
 	db $04
 
 ; Advanced Graphics and Animation Data Tables
-DB_DATA8_01f40f:
+DB_Battle_GraphicsTable5:
 	db $1f,$ec,$29,$ec,$33,$ec,$0c,$ec
 
-DB_DATA8_01f417:
+DB_Battle_GraphicsTable6:
 	db $5e,$ec,$5e,$ec
 	db $5e,$ec
 	db $82,$ec,$82,$ec,$82,$ec,$b5,$ec,$b5,$ec,$d5,$ec,$da,$ed,$da,$ed
