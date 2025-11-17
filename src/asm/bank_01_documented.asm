@@ -6994,7 +6994,7 @@ dma_memory_channel_configuration_system:
 	lda.b #$78	  ; Load DMA mode constant
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
-	sta.w $0c62	 ; Configure DMA channel 1
+	sta.w !battle_coord_y	 ; Configure DMA channel 1
 	inc a; Increment for next channel
 	sta.w $0c66	 ; Configure DMA channel 2
 	inc a; Increment for next channel
@@ -7014,7 +7014,7 @@ graphics_buffer_animation_engine:
 	lda.b #$7c	  ; Load animation mode constant
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
-	sta.w $0c62	 ; Set graphics buffer 1
+	sta.w !battle_coord_y	 ; Set graphics buffer 1
 	inc a; Increment for next buffer
 	sta.w $0c66	 ; Set graphics buffer 2
 	inc a; Increment for next buffer
@@ -8166,7 +8166,7 @@ Special_Graphics_Continue:
 	tay ; Transfer back to counter
 
 Special_Graphics_Direct:
-	sty.w $0a9c	 ; Store special graphics result
+	sty.w !graphics_mode_flags	 ; Store special graphics result
 	inc.w !graphics_status	 ; Increment special completion counter
 	rep #$10		; Set 16-bit index mode
 	ldx.w #$7003	; Set special completion mode

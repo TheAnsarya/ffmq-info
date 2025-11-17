@@ -1153,7 +1153,7 @@ Init_VBlankDMA:
 	ldy.w #$3000	; Y = $3000 (destination address)
 	lda.w #$0006	; A = $0006 (copy 7 bytes)
 	mvn $7e,$00	 ; Copy from bank $00 to bank $7e
-; Source: $00b81b → Dest: $7e3000
+; Source: $00b81b → Dest: bg3_tilemap_buffer
 
 ; ---------------------------------------------------------------------------
 ; Copy DMA Channel Configuration
@@ -7899,7 +7899,7 @@ Cmd_MultiCommandSeq:
 	sep #$20		; 8-bit A
 	sta.w !sys_operation_type	 ; Store parameter
 	xba ; Swap bytes
-	sta.w $0a9c	 ; Store parameter
+	sta.w !graphics_mode_flags	 ; Store parameter
 
 	ldx.b $17	   ; X = current pointer
 	lda.b $19	   ; A = current bank
@@ -14078,7 +14078,7 @@ WRAM_BattleMenu_Init:
 	jsr.w WRAM_ClearBuffer2 ; Clear WRAM buffer 2 ($7f51b7)
 	jsr.w WRAM_ClearBuffer3 ; Clear WRAM buffer 3 ($7f536e)
 	jsr.w WRAM_ClearBuffer4 ; Clear WRAM buffer 4 ($7f551e)
-	jsr.w WRAM_FillData ; Jump to JumpCodeWramE3000 (WRAM $7e3000)
+	jsr.w WRAM_FillData ; Jump to JumpCodeWramE3000 (WRAM bg3_tilemap_buffer)
 	ldx.w #$c51b	; Source data pointer
 	ldy.w #$5000	; Dest: WRAM $7f5000
 	lda.w #$0006	; 7 bytes
@@ -14215,7 +14215,7 @@ WRAM_FillData_Jump:
 ; Screen Setup Routines
 ;-------------------------------------------------------------------------------
 Screen_Setup1:
-	jsr.w WRAM_FillData ; Clear WRAM $7e3000
+	jsr.w WRAM_FillData ; Clear WRAM bg3_tilemap_buffer
 	lda.w #$0060	; Value $60
 	ldx.w #$3025	; Address $7e3025
 	jsr.w Screen_FillWords ; Fill 8 words
