@@ -922,7 +922,7 @@ DB_Label_0D8292:
 	rep #$20		;0D829C|C220    |      ; 16-bit accumulator
 
 ; ------------------------------------------------------------------------------
-; Clear channel buffers ($0688-$06a7 and $06c8-$06e7)
+; Clear channel buffers (!audio_pattern_buffer-$06a7 and $06c8-$06e7)
 ; These store active channel states for music playback
 ; ------------------------------------------------------------------------------
 	ldx.w #$0000	;0D829E|A20000  |      ; Start at offset 0
@@ -971,7 +971,7 @@ Pattern_Table_Processing_Loop:
 ; Search for matching pattern in channel buffer
 ; ------------------------------------------------------------------------------
 DB_Label_0D82CD:
-	cmp.w $0628,y   ;0D82CD|D92806  |000628; Compare with channel entry
+	cmp.w !audio_channel_assign,y   ;0D82CD|D92806  |000628; Compare with channel entry
 	beq DB_Store_0D82E1 ;0D82D0|F00F    |0D82E1; If match found
 	iny ;0D82D2|C8      |      ; Next channel
 	iny ;0D82D3|C8      |      ; (2 bytes per channel)
@@ -990,7 +990,7 @@ DB_Label_0D82CD:
 ; Match found - update channel buffer
 ; ------------------------------------------------------------------------------
 DB_Store_0D82E1:
-	sta.w $0688,y   ;0D82E1|998806  |000688; Store to channel buffer
+	sta.w !audio_pattern_buffer,y   ;0D82E1|998806  |000688; Store to channel buffer
 
 DB_Label_0D82E4:
 	inx ;0D82E4|E8      |      ; Next table entry
@@ -1166,7 +1166,7 @@ Channel_Reallocation_Pattern_Swap:
 ; Find patterns to swap out
 ; ------------------------------------------------------------------------------
 DB_Load_0D8395:
-	lda.w $0688,y   ;0D8395|B98806  |000688; Check pattern buffer
+	lda.w !audio_pattern_buffer,y   ;0D8395|B98806  |000688; Check pattern buffer
 	beq DB_Label_0D83A2 ;0D8398|F008    |0D83A2; If empty, found slot
 DB_Label_0D839A:
 	iny ;0D839A|C8      |      ; Next slot
@@ -1199,7 +1199,7 @@ DB_Label_0D83A9:
 Perform_Pattern_Swap:
 	stz.b $28,x	 ;0D83B1|7428    |000628; Clear old channel
 	stz.b $88,x	 ;0D83B3|7488    |000688; Clear old pattern
-	sta.w $0628,y   ;0D83B5|992806  |000628; Assign new channel
+	sta.w !audio_channel_assign,y   ;0D83B5|992806  |000628; Assign new channel
 	lda.b $48,x	 ;0D83B8|B548    |000648; Get old RAM address
 	sta.w !SNES_APUIO2 ;0D83BA|8D4221  |002142; Send to SPC700
 	sep #$20		;0D83BD|E220    |      ; 8-bit accumulator
@@ -1215,7 +1215,7 @@ DB_Label_0D83C4:
 ; ------------------------------------------------------------------------------
 ; Send additional swap parameters
 ; ------------------------------------------------------------------------------
-	lda.w $0648,y   ;0D83CD|B94806  |000648; Get new data address
+	lda.w !audio_ram_addr_start,y   ;0D83CD|B94806  |000648; Get new data address
 	sta.w !SNES_APUIO2 ;0D83D0|8D4221  |002142; Send to SPC700
 	sep #$20		;0D83D3|E220    |      ; 8-bit accumulator
 	lda.b $10	   ;0D83D5|A510    |000610; Get handshake
@@ -1232,10 +1232,10 @@ DB_Label_0D83DA:
 ; ------------------------------------------------------------------------------
 	lda.b $68,x	 ;0D83E3|B568    |000668; Get pattern size
 	sta.w !SNES_APUIO2 ;0D83E5|8D4221  |002142; Send to SPC700
-	sta.w $0668,y   ;0D83E8|996806  |000668; Store in new slot
+	sta.w !audio_pattern_size,y   ;0D83E8|996806  |000668; Store in new slot
 	clc ;0D83EB|18      |      ; Clear carry
-	adc.w $0648,y   ;0D83EC|794806  |000648; Add base address
-	sta.w $064a,y   ;0D83EF|994A06  |00064A; Store end address
+	adc.w !audio_ram_addr_start,y   ;0D83EC|794806  |000648; Add base address
+	sta.w !audio_ram_addr_end,y   ;0D83EF|994A06  |00064A; Store end address
 	sep #$20		;0D83F2|E220    |      ; 8-bit accumulator
 	lda.b $10	   ;0D83F4|A510    |000610; Get handshake
 	sta.w !SNES_APUIO0 ;0D83F6|8D4021  |002140; Send to SPC700
@@ -1320,7 +1320,7 @@ SFX_Data_Transfer_Loop:
 ; ------------------------------------------------------------------------------
 DB_Load_0D8448:
 	ldy.b $24	   ;0D8448|A424    |000624; Get channel index
-	sta.w $0628,y   ;0D844A|992806  |000628; Assign to channel
+	sta.w !audio_channel_assign,y   ;0D844A|992806  |000628; Assign to channel
 	dec a;0D844D|3A      |      ; Convert to 0-based
 	sta.w !SNES_WRMPYB ;0D844E|8D0342  |004203; Multiply (SFX# × 3)
 	nop ;0D8451|EA      |      ; Wait for multiply
