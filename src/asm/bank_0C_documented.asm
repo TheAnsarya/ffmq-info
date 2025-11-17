@@ -79,21 +79,21 @@ Display_ShowCharStats:
 	tax ;0C8025	; Transfer to X
 	sep #$20		;0C8026	; 8-bit accumulator
 	lda.b $64	   ;0C8028	; Load character index
-	sta.w $00ef	 ;0C802A	; Store to temp variable
+	sta.w !gfx_temp_variable	 ;0C802A	; Store to temp variable
 	lda.l DATA8_07EE84,X ;0C802D	; Load stat byte 0
 	sta.w !menu_selection	 ;0C8031	; Store to display buffer
 	lda.l DATA8_07EE85,X ;0C8034	; Load stat byte 1
 	jsr.w Display_ProcessStatValue ;0C8038	; Process stat value
-	sta.w $00b5	 ;0C803B	; Store processed value
+	sta.w !gfx_proc_value_4	 ;0C803B	; Store processed value
 	lda.l DATA8_07EE86,X ;0C803E	; Load stat byte 2
 	jsr.w Display_ProcessStatValue ;0C8042	; Process stat value
-	sta.w $00b2	 ;0C8045	; Store processed value
+	sta.w !gfx_proc_value_1	 ;0C8045	; Store processed value
 	lda.l DATA8_07EE87,X ;0C8048	; Load stat byte 3
 	jsr.w Display_ProcessStatValue ;0C804C	; Process stat value
-	sta.w $00b4	 ;0C804F	; Store processed value
+	sta.w !gfx_proc_value_3	 ;0C804F	; Store processed value
 	lda.l DATA8_07EE88,X ;0C8052	; Load stat byte 4
 	jsr.w Display_ProcessStatValue ;0C8056	; Process stat value
-	sta.w $00b3	 ;0C8059	; Store processed value
+	sta.w !gfx_proc_value_2	 ;0C8059	; Store processed value
 	ldx.w #$a433	;0C805C	; Load display routine address
 	stx.b $17	   ;0C805F	; Store to jump pointer
 	lda.b #$03	  ;0C8061	; Bank $03
@@ -246,7 +246,7 @@ Display_InitScreen:
 
 Display_MainScreenSetup:
 	lda.b #$0c	  ;0C8103	; Bank $0c
-	sta.w $005a	 ;0C8105	; Set data bank
+	sta.w !sys_data_bank	 ;0C8105	; Set data bank
 	ldx.w #$90d7	;0C8108	; Address of palette DMA code
 	stx.w $0058	 ;0C810B	; Set DMA routine pointer
 	lda.b #$40	  ;0C810E	; VBLANK DMA flag
@@ -296,18 +296,18 @@ Display_WindowEffectSetup:
 Display_VRAMAddressCalc:
 	clc ;0C8157	; Clear carry
 	rep #$30		;0C8158	; 16-bit A/X/Y
-	lda.w $0c84	 ;0C815A	; Load VRAM base address 1
+	lda.w !gfx_reg_c84	 ;0C815A	; Load VRAM base address 1
 	adc.w #$0804	;0C815D	; Add tile offset
-	sta.w $0cc0	 ;0C8160	; Store calculated address
-	lda.w $0c88	 ;0C8163	; Load VRAM base address 2
+	sta.w !vram_tile_addr_1	 ;0C8160	; Store calculated address
+	lda.w !gfx_reg_c88	 ;0C8163	; Load VRAM base address 2
 	adc.w #$0804	;0C8166	; Add tile offset
-	sta.w $0cc4	 ;0C8169	; Store calculated address
-	lda.w $0c8c	 ;0C816C	; Load VRAM base address 3
+	sta.w !vram_tile_addr_3	 ;0C8169	; Store calculated address
+	lda.w !gfx_reg_c8c	 ;0C816C	; Load VRAM base address 3
 	adc.w #$0804	;0C816F	; Add tile offset
-	sta.w $0cc8	 ;0C8172	; Store calculated address
-	lda.w $0c90	 ;0C8175	; Load VRAM base address 4
+	sta.w !vram_tile_addr_5	 ;0C8172	; Store calculated address
+	lda.w !gfx_reg_c90	 ;0C8175	; Load VRAM base address 4
 	adc.w #$0c90	;0C8178	; Add tile offset
-	sta.w $0ccc	 ;0C817B	; Store calculated address
+	sta.w !vram_tile_addr_7	 ;0C817B	; Store calculated address
 	sep #$20		;0C817E	; 8-bit accumulator
 	lda.b #$80	  ;0C8180	; VRAM increment mode (increment on $2119 write)
 	jsl.l CWaitTimingRoutine ;0C8182	; Wait for VBLANK
@@ -392,7 +392,7 @@ Display_ColorAdditionSetup:
 
 Display_PaletteLoadSetup:
 	lda.b #$0c	  ;0C81DA	; Bank $0c
-	sta.w $005a	 ;0C81DC	; Set DMA source bank
+	sta.w !sys_data_bank	 ;0C81DC	; Set DMA source bank
 	ldx.w #$81ef	;0C81DF	; Palette DMA routine address
 	stx.w $0058	 ;0C81E2	; Set DMA routine pointer
 	lda.b #$40	  ;0C81E5	; VBLANK DMA flag
@@ -526,7 +526,7 @@ Display_EffectScriptInterpreter:
 ; Wait until condition met (command 00)
 	.WaitCondition:
 	jsr.w WaitOneFrame ;0C8297	; Wait one frame
-	lda.w $0c82	 ;0C829A	; Load condition flag
+	lda.w !gfx_reg_c82	 ;0C829A	; Load condition flag
 	bne .WaitCondition ;0C829D	; Loop until flag clears
 	rts ;0C829F	; Return from effect script
 
@@ -621,15 +621,15 @@ Display_EffectTableLookup:
 	pha ;0C8325	; Save offset
 	adc.w #$0c80	;0C8326	; Add table base 1
 	tay ;0C8329	; Use as index
-	lda.w $0c80	 ;0C832A	; Load value from table
+	lda.w !gfx_reg_c80	 ;0C832A	; Load value from table
 	sta.w $0000,Y   ;0C832D	; Store to destination
 	pla ;0C8330	; Restore offset
 	asl A		   ;0C8331	; *2 (*8 total)
 	adc.w #$0c94	;0C8332	; Add table base 2
 	tay ;0C8335	; Use as index
-	lda.w $0c94	 ;0C8336	; Load first value
+	lda.w !gfx_reg_c94	 ;0C8336	; Load first value
 	sta.w $0000,Y   ;0C8339	; Store to destination
-	lda.w $0c98	 ;0C833C	; Load second value
+	lda.w !gfx_reg_c98	 ;0C833C	; Load second value
 	sta.w $0004,Y   ;0C833F	; Store to destination+4
 	ldy.w !menu_selection	 ;0C8342	; Load parameter
 	lda.w #$0003	;0C8345	; bit shift value = 3
@@ -815,18 +815,18 @@ Display_ScreenScrollEffect:
 	.ScrollLoop:
 	pha ;0C8423	; Save counter
 	sec ;0C8424	; Set carry for subtraction
-	lda.w $0cc1	 ;0C8425	; Load window position 1
+	lda.w !vram_tile_addr_2	 ;0C8425	; Load window position 1
 	sbc.b #$04	  ;0C8428	; Scroll -4 pixels
-	sta.w $0cc1	 ;0C842A	; Update position 1
-	sta.w $0cc5	 ;0C842D	; Update position 2
-	sta.w $0cc9	 ;0C8430	; Update position 3
-	sta.w $0ccd	 ;0C8433	; Update position 4
-	lda.w $0ccc	 ;0C8436	; Load position 5
+	sta.w !vram_tile_addr_2	 ;0C842A	; Update position 1
+	sta.w !vram_tile_addr_4	 ;0C842D	; Update position 2
+	sta.w !vram_tile_addr_6	 ;0C8430	; Update position 3
+	sta.w !vram_tile_addr_8	 ;0C8433	; Update position 4
+	lda.w !vram_tile_addr_7	 ;0C8436	; Load position 5
 	sbc.b #$04	  ;0C8439	; Scroll -4 pixels
-	sta.w $0ccc	 ;0C843B	; Update position 5
-	lda.w $0cc0	 ;0C843E	; Load position 6
+	sta.w !vram_tile_addr_7	 ;0C843B	; Update position 5
+	lda.w !vram_tile_addr_1	 ;0C843E	; Load position 6
 	adc.b #$03	  ;0C8441	; Scroll +3 pixels
-	sta.w $0cc0	 ;0C8443	; Update position 6
+	sta.w !vram_tile_addr_1	 ;0C8443	; Update position 6
 	jsr.w WaitOneFrame ;0C8446	; Wait one frame
 	pla ;0C8449	; Restore counter
 	dec A		   ;0C844A	; Decrement
@@ -889,7 +889,7 @@ Display_FadeStageExecutor:
 	.FadeCurveLoop:									; Loop through fade curve
 	jsr.w ($0210,X) ;0C84A4	; Call effect function (indirect)
 	sec ;0C84A7	; Set carry
-	lda.w $0c81	 ;0C84A8	; Load base color value
+	lda.w !gfx_reg_c81	 ;0C84A8	; Load base color value
 	sbc.w $0000,Y   ;0C84AB	; Subtract curve value
 	jsr.w ($0212,X) ;0C84AE	; Call adjustment function (indirect)
 	iny ;0C84B1	; Next curve entry
@@ -901,7 +901,7 @@ Display_FadeStageExecutor:
 	dey ;0C84B8	; Previous curve entry
 	jsr.w ($0210,X) ;0C84B9	; Call effect function
 	clc ;0C84BC	; Clear carry
-	lda.w $0c81	 ;0C84BD	; Load base color
+	lda.w !gfx_reg_c81	 ;0C84BD	; Load base color
 	adc.w $0000,Y   ;0C84C0	; Add curve value
 	jsr.w ($0212,X) ;0C84C3	; Call adjustment function
 	cpy.w #$85b2	;0C84C6	; Back at start?
@@ -913,16 +913,16 @@ Display_FadeFunction1:
 	tya ;0C84CC	; Transfer Y to A
 	bit.b #$01	  ;0C84CD	; Test bit 0 (odd/even)
 	beq .Return	 ;0C84CF	; Skip if even frame
-	dec.w $0c88	 ;0C84D1	; Adjust position 1
+	dec.w !gfx_reg_c88	 ;0C84D1	; Adjust position 1
 	dec.w $0ca4	 ;0C84D4	; Adjust position 2
 	dec.w $0ca8	 ;0C84D7	; Adjust position 3
-	inc.w $0c90	 ;0C84DA	; Adjust position 4
+	inc.w !gfx_reg_c90	 ;0C84DA	; Adjust position 4
 	inc.w $0cb4	 ;0C84DD	; Adjust position 5
 	inc.w $0cb8	 ;0C84E0	; Adjust position 6
-	inc.w $0c84	 ;0C84E3	; Adjust position 7
+	inc.w !gfx_reg_c84	 ;0C84E3	; Adjust position 7
 	inc.w $0c9c	 ;0C84E6	; Adjust position 8
 	inc.w $0ca0	 ;0C84E9	; Adjust position 9
-	dec.w $0c8c	 ;0C84EC	; Adjust position 10
+	dec.w !gfx_reg_c8c	 ;0C84EC	; Adjust position 10
 	dec.w $0cac	 ;0C84EF	; Adjust position 11
 	dec.w $0cb0	 ;0C84F2	; Adjust position 12
 
@@ -934,16 +934,16 @@ Display_FadeFunction2:
 	tya ;0C84F6	; Transfer Y to A
 	bit.b #$01	  ;0C84F7	; Test bit 0
 	beq .Return	 ;0C84F9	; Skip if even
-	inc.w $0c88	 ;0C84FB	; Adjust opposite direction
+	inc.w !gfx_reg_c88	 ;0C84FB	; Adjust opposite direction
 	inc.w $0ca4	 ;0C84FE	; Adjust position
 	inc.w $0ca8	 ;0C8501	; Adjust position
-	dec.w $0c90	 ;0C8504	; Adjust position
+	dec.w !gfx_reg_c90	 ;0C8504	; Adjust position
 	dec.w $0cb4	 ;0C8507	; Adjust position
 	dec.w $0cb8	 ;0C850A	; Adjust position
-	dec.w $0c84	 ;0C850D	; Adjust position
+	dec.w !gfx_reg_c84	 ;0C850D	; Adjust position
 	dec.w $0c9c	 ;0C8510	; Adjust position
 	dec.w $0ca0	 ;0C8513	; Adjust position
-	inc.w $0c8c	 ;0C8516	; Adjust position
+	inc.w !gfx_reg_c8c	 ;0C8516	; Adjust position
 	inc.w $0cac	 ;0C8519	; Adjust position
 	inc.w $0cb0	 ;0C851C	; Adjust position
 
@@ -955,25 +955,25 @@ Display_FadeFunction3:
 	tya ;0C8520	; Transfer Y
 	bit.b #$01	  ;0C8521	; Test bit 0
 	beq .AdjustRemaining ;0C8523	; Skip if even
-	dec.w $0c88	 ;0C8525	; Adjust subset of positions
+	dec.w !gfx_reg_c88	 ;0C8525	; Adjust subset of positions
 	dec.w $0ca4	 ;0C8528	; Adjust position
 	dec.w $0ca8	 ;0C852B	; Adjust position
-	inc.w $0c90	 ;0C852E	; Adjust position
+	inc.w !gfx_reg_c90	 ;0C852E	; Adjust position
 	inc.w $0cb4	 ;0C8531	; Adjust position
 	inc.w $0cb8	 ;0C8534	; Adjust position
 
 	.AdjustRemaining:
-	dec.w $0c84	 ;0C8537	; Adjust remaining positions
+	dec.w !gfx_reg_c84	 ;0C8537	; Adjust remaining positions
 	dec.w $0c9c	 ;0C853A	; Adjust position
 	dec.w $0ca0	 ;0C853D	; Adjust position
-	inc.w $0c8c	 ;0C8540	; Adjust position
+	inc.w !gfx_reg_c8c	 ;0C8540	; Adjust position
 	inc.w $0cac	 ;0C8543	; Adjust position
 	inc.w $0cb0	 ;0C8546	; Adjust position
 	rts ;0C8549	; Return
 
 ; [Fade function 4 - complex bidirectional fade]
 Display_FadeFunction4:
-	lda.w $0c81	 ;0C854A	; Load base value
+	lda.w !gfx_reg_c81	 ;0C854A	; Load base value
 	pha ;0C854D	; Save to stack
 	lda.w !vfx_fade_state	 ;0C854E	; Load fade direction flag
 	bcs .AddCurve   ;0C8551	; Branch if carry set
@@ -1011,7 +1011,7 @@ Display_FadeFunction4:
 
 Display_ScreenColorValueUpdater:
 	sec ;0C8575	; Set carry
-	sta.w $0c81	 ;0C8576	; Store to register 1
+	sta.w !gfx_reg_c81	 ;0C8576	; Store to register 1
 	sta.w $0c85	 ;0C8579	; Store to register 2
 	sta.w $0c89	 ;0C857C	; Store to register 3
 	sta.w $0c8d	 ;0C857F	; Store to register 4
@@ -1059,11 +1059,11 @@ Display_WaitVBlankAndUpdate:
 	and.b #$04	  ;0C85E1	; Test bit 2 (every 4 frames)
 	lsr A		   ;0C85E3	; Shift to bit 1
 	adc.b #$4c	  ;0C85E4	; Base tile number = $4c or $4e
-	sta.w $0cc2	 ;0C85E6	; Update sprite tile 1
-	sta.w $0cca	 ;0C85E9	; Update sprite tile 2
+	sta.w !vram_sprite_tile_1	 ;0C85E6	; Update sprite tile 1
+	sta.w !vram_sprite_tile_2	 ;0C85E9	; Update sprite tile 2
 	eor.b #$02	  ;0C85EC	; Toggle between tiles ($4c↔$4e)
-	sta.w $0cc6	 ;0C85EE	; Update sprite tile 3
-	sta.w $0cce	 ;0C85F1	; Update sprite tile 4
+	sta.w !vram_sprite_tile_3	 ;0C85EE	; Update sprite tile 3
+	sta.w !vram_sprite_tile_4	 ;0C85F1	; Update sprite tile 4
 	rep #$30		;0C85F4	; 16-bit A/X/Y
 	lda.w #$0005	;0C85F6	; Loop counter = 5 sprites
 	sta.w !vfx_sprite_counter	 ;0C85F9	; Store counter
@@ -1440,7 +1440,7 @@ Display_SetupNMIOAMTransfer:
 	plb ;0C8911	; Set data bank
 	sep #$20		;0C8912	; 8-bit accumulator
 	lda.b #$0c	  ;0C8914	; Handler bank = $0c
-	sta.w $005a	 ;0C8916	; Store NMI handler bank
+	sta.w !sys_data_bank	 ;0C8916	; Store NMI handler bank
 	ldx.w #$8929	;0C8919	; Handler address = $0c8929
 	stx.w $0058	 ;0C891C	; Store NMI handler pointer
 	lda.b #$40	  ;0C891F	; Flag bit 6
@@ -1659,11 +1659,11 @@ Display_SpritePositionCalculator:
 	and.w #$00ff	;0C8A54	; Mask to 8-bit
 	eor.w #$ffff	;0C8A57	; Invert bits
 	adc.w #$603f	;0C8A5A	; Add screen offset ($6040 - 1)
-	sta.w $0402	 ;0C8A5D	; Store screen Y coordinate
+	sta.w !screen_y_coord	 ;0C8A5D	; Store screen Y coordinate
 
 	sep #$20		;0C8A60	; 8-bit accumulator
 	lda.b #$0c	  ;0C8A62	; NMI handler bank
-	sta.w $005a	 ;0C8A64	; Store handler bank
+	sta.w !sys_data_bank	 ;0C8A64	; Store handler bank
 	ldy.w #$8b0c	;0C8A67	; Handler routine address
 	sty.w $0058	 ;0C8A6A	; Store handler pointer
 	lda.b #$40	  ;0C8A6D	; Flag bit 6
@@ -1682,13 +1682,13 @@ Display_HardwareMultiplySetup:
 
 	.SetMultiplicand:
 	sta.w !WRMPYA	 ;0C8A78	; Set multiplicand register ($4202)
-	sta.w $0064	 ;0C8A7B	; Store to variable
+	sta.w !sys_variable_64	 ;0C8A7B	; Store to variable
 	jsr.w Display_ReadMultiplyMatrixElement ;0C8A7E	; Read Mode 7 matrix element
 	sty.w $0062	 ;0C8A81	; Store matrix A value
 	inx ;0C8A84	; Next matrix element
 	inx ;0C8A85	; (word offset)
 	jsr.w Display_ReadMultiplyMatrixElement ;0C8A86	; Read Mode 7 matrix element
-	sty.w $0064	 ;0C8A89	; Store matrix B value
+	sty.w !sys_variable_64	 ;0C8A89	; Store matrix B value
 	inx ;0C8A8C	; Next matrix element
 	inx ;0C8A8D	; (word offset)
 
@@ -1713,7 +1713,7 @@ Display_HardwareMultiplySetup:
 	sta.b !SNES_M7D-$2100 ;0C8AAC	; Write M7D high
 
 ; Update Mode 7 matrix B register ($211c)
-	lda.w $0064	 ;0C8AAE	; Load matrix B low byte
+	lda.w !sys_variable_64	 ;0C8AAE	; Load matrix B low byte
 	sta.b !SNES_M7B-$2100 ;0C8AB1	; Write M7B low ($211c)
 	xba ;0C8AB3	; Swap A/B bytes
 	lda.w $0065	 ;0C8AB4	; Load matrix B high byte
@@ -1758,7 +1758,7 @@ Display_ReadMultiplyMatrixElement:
 
 	.LargePositive:								; Large positive value path
 	stz.w !WRDIVL	 ;0C8AE6	; Clear dividend high byte
-	lda.w $0064	 ;0C8AE9	; Load multiplier value
+	lda.w !sys_variable_64	 ;0C8AE9	; Load multiplier value
 	sta.w !WRDIVH	 ;0C8AEC	; Set divisor register
 	bra .CommonMultiply ;0C8AEF	; Continue to multiply
 
@@ -1813,16 +1813,16 @@ Display_ReadMultiplyMatrixElement:
 	stz.b !SNES_DMA1CNTL-$4300 ;0C8B11	; Clear DMA1 count ($4315)
 	lda.b #$7f	  ;0C8B13	; Source bank = $7f
 	sta.b !SNES_DMA0ADDRH-$4300 ;0C8B15	; Set DMA0 source bank ($4304)
-	ldy.w $0402	 ;0C8B17	; Load Y coordinate offset
+	ldy.w !screen_y_coord	 ;0C8B17	; Load Y coordinate offset
 	ldx.w #$0008	;0C8B1A	; Row count = 8
-	stx.w $0064	 ;0C8B1D	; Store row counter
+	stx.w !sys_variable_64	 ;0C8B1D	; Store row counter
 	ldx.w #$0414	;0C8B20	; Data buffer address
 	lda.w $0063	 ;0C8B23	; Load Y position
 	jsr.w UpdateVerticalSpritePositions ;0C8B26	; Update vertical sprite positions
 
 ; Update horizontal sprite positions
 	ldx.w #$000b	;0C8B29	; Column count = 11
-	stx.w $0064	 ;0C8B2C	; Store column counter
+	stx.w !sys_variable_64	 ;0C8B2C	; Store column counter
 	ldy.w #$6000	;0C8B2F	; VRAM address = $6000
 	ldx.w !JOY_DOWN	 ;0C8B32	; Load X coordinate offset
 	lda.w $0062	 ;0C8B35	; Load X position
@@ -1860,7 +1860,7 @@ Display_SpriteCoordinateDMA:
 	adc.w #$0080	;0C8B55	; Advance by 128 (next row in 32×32 tilemap)
 	tax ;0C8B58	; Update VRAM address
 	tya ;0C8B59	; Transfer source address to A
-	adc.w $0064	 ;0C8B5A	; Add row/column stride
+	adc.w !sys_variable_64	 ;0C8B5A	; Add row/column stride
 	tay ;0C8B5D	; Update source address
 	pla ;0C8B5E	; Restore count
 	sep #$20		;0C8B5F	; 8-bit accumulator
@@ -2476,7 +2476,7 @@ DB_Label_0C9053:
 	plb ;0C905B|AB      |      ; Restore data bank
 	sep #$20		;0C905C|E220    |      ; 8-bit accumulator
 	lda.b #$0c	  ;0C905E|A90C    |      ; Bank $0c for subroutine
-	sta.w $005a	 ;0C9060|8D5A00  |00005A; Store at $005a (bank byte)
+	sta.w !sys_data_bank	 ;0C9060|8D5A00  |00005A; Store at $005a (bank byte)
 	ldx.w #$9075	;0C9063|A27590  |      ; Address $0c:9075 (DMA routine)
 	stx.w $0058	 ;0C9066|8E5800  |000058; Store at $0058-$0059 (address)
 
