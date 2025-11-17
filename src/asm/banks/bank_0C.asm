@@ -1054,7 +1054,7 @@ TransferOAMToVRAM:
 	stx.W !SNES_OAMADDL                   ;0C892C|8E0221  |002102;
 	ldx.W #$0400                         ;0C892F|A20004  |      ;
 	stx.B !SNES_DMA5PARAM-$4300           ;0C8932|8650    |004350;
-	ldx.W #$0c00                         ;0C8934|A2000C  |      ;
+	ldx.W #!oam_sprite_buffer                         ;0C8934|A2000C  |      ;
 	stx.B !SNES_DMA5ADDRL-$4300           ;0C8937|8652    |004352;
 	lda.B #$00                           ;0C8939|A900    |      ;
 	sta.B !SNES_DMA5ADDRH-$4300           ;0C893B|8554    |004354;
@@ -1071,7 +1071,7 @@ OAM_PrepareTransfer:
 	stx.W !SNES_OAMADDL                   ;0C894D|8E0221  |002102;
 	ldx.W #$0400                         ;0C8950|A20004  |      ;
 	stx.W !SNES_DMA5PARAM                 ;0C8953|8E5043  |004350;
-	ldx.W #$0c00                         ;0C8956|A2000C  |      ;
+	ldx.W #!oam_sprite_buffer                         ;0C8956|A2000C  |      ;
 	stx.W !SNES_DMA5ADDRL                 ;0C8959|8E5243  |004352;
 	lda.B #$00                           ;0C895C|A900    |      ;
 	sta.W !SNES_DMA5ADDRH                 ;0C895E|8D5443  |004354;
@@ -1173,7 +1173,7 @@ Graphics_DecompressLoop:
 	sta.B !SNES_COLDATA-$2100             ;0C8A0F|8532    |002132;
 	lda.B #$08                           ;0C8A11|A908    |      ;
 	ldy.W #$000c                         ;0C8A13|A00C00  |      ;
-	ldx.W #$0c04                         ;0C8A16|A2040C  |      ;
+	ldx.W #!oam_sprite1_x                         ;0C8A16|A2040C  |      ;
 ;      |        |      ;
 Graphics_ProcessCommand:
 	pha                                  ;0C8A19|48      |      ;
@@ -1388,7 +1388,7 @@ InitializeWorldData:
 	lda.W #$0003                         ;0C8BC3|A90300  |      ;
 	mvn $00,$0c                          ;0C8BC6|54000C  |      ;
 	ldx.W #$8c5e                         ;0C8BC9|A25E8C  |      ;
-	ldy.W #$0c04                         ;0C8BCC|A0040C  |      ;
+	ldy.W #!oam_sprite1_x                         ;0C8BCC|A0040C  |      ;
 	lda.W #$007b                         ;0C8BCF|A97B00  |      ;
 	mvn $00,$0c                          ;0C8BD2|54000C  |      ;
 	ldy.W #$0e00                         ;0C8BD5|A0000E  |      ;
@@ -1515,9 +1515,9 @@ ConfigureHDMAChannels:
 	jsr.W ProcessWorldMapInput                    ;0C8D99|20988F  |0C8F98;
 	rep #$30                             ;0C8D9C|C230    |      ;
 	lda.W #$5555                         ;0C8D9E|A95555  |      ;
-	sta.W $0c00                          ;0C8DA1|8D000C  |000C00;
-	ldx.W #$0c00                         ;0C8DA4|A2000C  |      ;
-	ldy.W #$0c02                         ;0C8DA7|A0020C  |      ;
+	sta.W !oam_sprite_buffer                          ;0C8DA1|8D000C  |000C00;
+	ldx.W #!oam_sprite_buffer                         ;0C8DA4|A2000C  |      ;
+	ldy.W #!oam_sprite0_tile                         ;0C8DA7|A0020C  |      ;
 	lda.W #$021d                         ;0C8DAA|A91D02  |      ;
 	mvn $00,$00                          ;0C8DAD|540000  |      ;
 	jsr.W OAM_PrepareTransfer                    ;0C8DB0|204889  |0C8948;

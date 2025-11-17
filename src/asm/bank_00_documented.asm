@@ -678,7 +678,7 @@ Init_NewGameState:
 ; $00 = Target register low byte
 	stx.w !SNES_DMA5PARAM ; $4350 = DMA5 parameters
 
-	ldx.w #$0c00	; X = $0c00
+	ldx.w #!oam_sprite_buffer	; X = !oam_sprite_buffer
 	stx.w !SNES_DMA5ADDRL ; $4352-$4353 = Source address $xx0C00
 
 	lda.b #$00	  ; A = $00
@@ -1939,7 +1939,7 @@ DMA_UpdateOAM:
 ; $00 = Target register low byte ($2104 = OAMDATA)
 	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
-	ldx.w #$0c00	; X = $0c00 (source address)
+	ldx.w #!oam_sprite_buffer	; X = !oam_sprite_buffer (source address)
 	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source in bank $00: $000c00
 
 	lda.b #$00	  ; A = $00
@@ -2314,7 +2314,7 @@ Init_New_Game:
 	ldx.w #$0400	; DMA params for OAM
 	stx.w !SNES_DMA5PARAM ; $4350-4351
 
-	ldx.w #$0c00	; Source = $000c00
+	ldx.w #!oam_sprite_buffer	; Source = $000c00
 	stx.w !SNES_DMA5ADDRL ; $4352-4353
 
 	lda.b #$00	  ; Source bank = $00
@@ -3239,9 +3239,9 @@ GameLoop_TimeBasedEvents:
 ; Set Direct Page for Character Status Access
 ; ---------------------------------------------------------------------------
 
-	lda.w #$0c00	; A = $0c00
-	tcd ; D = $0c00 (Direct Page = $0c00)
-; Allows $01 to access $0c01, etc.
+	lda.w #!oam_sprite_buffer	; A = !oam_sprite_buffer
+	tcd ; D = !oam_sprite_buffer (Direct Page = !oam_sprite_buffer)
+; Allows $01 to access !oam_sprite0_y, etc.
 
 	sep #$30		; 8-bit A, X, Y
 
@@ -3364,7 +3364,7 @@ Update_CharacterStatusDisplay:
 ; Parameters:
 ;   X = Character offset ($40, $50, $60, $70, $80, or $90)
 ;
-; Character Display Structure (at $0c00 + X):
+; Character Display Structure (at !oam_sprite_buffer + X):
 ;   +$02: Status tile base value
 ;   +$06: Status tile 1
 ;   +$0a: Status tile 2
@@ -3375,18 +3375,18 @@ Update_CharacterStatusDisplay:
 ;   Then writes base+0, base+1, base+2, base+3 to tile slots
 ; ===========================================================================
 
-	lda.b $02,x	 ; A = [$0c02+X] (current tile base)
+	lda.b $02,x	 ; A = [!oam_sprite0_tile+X] (current tile base)
 	eor.b #$04	  ; A = A XOR $04 (toggle bit 2 for animation)
-	sta.b $02,x	 ; [$0c02+X] = new tile base
+	sta.b $02,x	 ; [!oam_sprite0_tile+X] = new tile base
 
 	inc a; A = base + 1
-	sta.w $0c06,x   ; [$0c06+X] = base + 1 (tile 1)
+	sta.w !oam_sprite1_tile,x   ; [!oam_sprite1_tile+X] = base + 1 (tile 1)
 
 	inc a; A = base + 2
-	sta.w $0c0a,x   ; [$0c0a+X] = base + 2 (tile 2)
+	sta.w !oam_sprite2_tile,x   ; [!oam_sprite2_tile+X] = base + 2 (tile 2)
 
 	inc a; A = base + 3
-	sta.w $0c0e,x   ; [$0c0e+X] = base + 3 (tile 3)
+	sta.w !oam_sprite3_tile,x   ; [!oam_sprite3_tile+X] = base + 3 (tile 3)
 
 	rts ; Return
 
@@ -3406,7 +3406,7 @@ Input_HandlerTable:
 ; ===========================================================================
 
 ; Note: This data is being used as code by the previous instruction
-; sta.w $0c0a,X at Input_HandlerTable continues from Update_CharacterStatusDisplay
+; sta.w !oam_sprite2_tile,X at Input_HandlerTable continues from Update_CharacterStatusDisplay
 ; The actual table starts here with word addresses:
 
 ; Handler jump table data (12 entries x 2 bytes = 24 bytes)
@@ -13838,7 +13838,7 @@ SystemData_Config15:
 Menu_SaveDelete:
 	lda.w #$0301	; Menu mode $0301
 	sta.b $03	   ; Store in $03
-	ldx.w #$0c00	; Load $0c00
+	ldx.w #!oam_sprite_buffer	; Load !oam_sprite_buffer
 	stx.b $8e	   ; Store in $8e
 
 Menu_SaveDelete_InputLoop:
@@ -13874,7 +13874,7 @@ Menu_SaveDelete_Confirm:
 	lda.b $9e	   ; Load result
 	bit.w #$8000	; Test bit 15
 	bne Menu_SaveDelete_Exit ; If set, return
-	bit.w #$0c00	; Test bits 10-11
+	bit.w #!oam_sprite_buffer	; Test bits 10-11
 	beq Menu_SaveDelete_InputLoop ; If clear, loop
 
 Menu_SaveDelete_UpdateCursor:
@@ -13922,7 +13922,7 @@ Menu_Scroll_InputLoop:
 	jsr.w AnalysisLdaCcb0JslCodeMenu ; Poll input
 	bit.w #$0300	; Test Y/X buttons
 	bne Menu_Scroll_Process ; If pressed, process
-	bit.w #$0c00	; Test L/R buttons
+	bit.w #!oam_sprite_buffer	; Test L/R buttons
 	bne Menu_Scroll_Display ; If pressed, refresh
 	bit.w #$8000	; Test A button
 	beq Menu_Scroll_InputLoop ; If not pressed, loop
@@ -13992,7 +13992,7 @@ Menu_Scroll2_InputLoop:
 	jsr.w AnalysisLdaCcb0JslCodeMenu ; Poll input
 	bit.w #$0300	; Test Y/X buttons
 	bne Menu_Scroll2_Process ; If pressed, process
-	bit.w #$0c00	; Test L/R buttons
+	bit.w #!oam_sprite_buffer	; Test L/R buttons
 	bne Menu_Scroll2_Display ; If pressed, refresh
 	bit.w #$8000	; Test A button
 	beq Menu_Scroll2_InputLoop ; If not pressed, loop

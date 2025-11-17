@@ -1,4 +1,4 @@
-﻿;==============================================================================
+;==============================================================================
 ; Final Fantasy Mystic Quest - NMI (VBlank) Interrupt Handler Analysis
 ;==============================================================================
 ; NMI Vector: $00ffe6 → Points to $011b
@@ -109,7 +109,7 @@
 ; From CodeAnalysis analysis:
 ;
 ; Two OAM transfers happen per frame during NMI:
-; 1. Main OAM ($0c00): 512 bytes → $2102 (OAMADDL)
+; 1. Main OAM (!oam_sprite_buffer): 512 bytes → $2102 (OAMADDL)
 ;    - Sprite positions, tile numbers, attributes
 ;    - Size: $01f0 bytes (from DMA params)
 ;

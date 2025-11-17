@@ -1452,7 +1452,7 @@ Display_SetupNMIOAMTransfer:
 ; NMI OAM DMA Routine - Executed during VBLANK
 ; ==============================================================================
 ; Called automatically by NMI handler when bit 6 of $00e2 is set.
-; Transfers 544 bytes ($220) from $0c00 to OAM ($2104).
+; Transfers 544 bytes ($220) from !oam_sprite_buffer to OAM ($2104).
 ; Uses DMA channel 5 for maximum speed (single VBLANK period).
 ; ==============================================================================
 
@@ -1460,7 +1460,7 @@ Display_SetupNMIOAMTransfer:
 	stx.w !SNES_OAMADDL ;0C892C	; Set OAM write address ($2102)
 	ldx.w #$0400	;0C892F	; DMA mode: CPU→PPU, auto-increment
 	stx.b !SNES_DMA5PARAM-$4300 ;0C8932	; Set DMA5 parameters ($4350)
-	ldx.w #$0c00	;0C8934	; Source address = $0c00 (sprite buffer)
+	ldx.w #!oam_sprite_buffer	;0C8934	; Source address = !oam_sprite_buffer (sprite buffer)
 	stx.b !SNES_DMA5ADDRL-$4300 ;0C8937	; Set DMA5 source address ($4352)
 	lda.b #$00	  ;0C8939	; Source bank = $00
 	sta.b !SNES_DMA5ADDRH-$4300 ;0C893B	; Set DMA5 source bank ($4354)
@@ -1484,7 +1484,7 @@ Display_DirectOAMDMATransfer:
 	stx.w !SNES_OAMADDL ;0C894D	; Set OAM write address ($2102)
 	ldx.w #$0400	;0C8950	; DMA mode: CPU→PPU, auto-increment
 	stx.w !SNES_DMA5PARAM ;0C8953	; Set DMA5 parameters ($4350)
-	ldx.w #$0c00	;0C8956	; Source address = $0c00
+	ldx.w #!oam_sprite_buffer	;0C8956	; Source address = !oam_sprite_buffer
 	stx.w !SNES_DMA5ADDRL ;0C8959	; Set DMA5 source address ($4352)
 	lda.b #$00	  ;0C895C	; Source bank = $00
 	sta.w !SNES_DMA5ADDRH ;0C895E	; Set DMA5 source bank ($4354)
@@ -1605,7 +1605,7 @@ Display_Mode7RotationSequence:
 ; Fade-in sequence (8 steps)
 	lda.b #$08	  ;0C8A11	; Loop counter = 8 brightness levels
 	ldy.w #$000c	;0C8A13	; Sprite count = 12
-	ldx.w #$0c04	;0C8A16	; Sprite data buffer base
+	ldx.w #!oam_sprite1_x	;0C8A16	; Sprite data buffer base
 
 	.FadeBrightnessLoop:						; Fade brightness loop
 	pha ;0C8A19	; Save brightness level
@@ -1914,7 +1914,7 @@ Display_TitleScreenInit:
 
 ; Transfer sprite attribute data
 	ldx.w #$8c5e	;0C8BC9	; Source: Sprite data table
-	ldy.w #$0c04	;0C8BCC	; Dest: $0c04 (sprite buffer)
+	ldy.w #!oam_sprite1_x	;0C8BCC	; Dest: !oam_sprite1_x (sprite buffer)
 	lda.w #$007b	;0C8BCF	; Transfer 124 bytes
 	mvn $00,$0c	 ;0C8BD2	; Block move
 
@@ -2099,9 +2099,9 @@ Display_TitleScreenVRAMSetup:
 ; Fill OAM sprite buffer with pattern
 	rep #$30		;0C8D9C	; 16-bit A/X/Y
 	lda.w #$5555	;0C8D9E	; Fill pattern = $5555
-	sta.w $0c00	 ;0C8DA1	; Write to sprite buffer start
-	ldx.w #$0c00	;0C8DA4	; Source = $0c00
-	ldy.w #$0c02	;0C8DA7	; Dest = $0c02
+	sta.w !oam_sprite_buffer	 ;0C8DA1	; Write to sprite buffer start
+	ldx.w #!oam_sprite_buffer	;0C8DA4	; Source = !oam_sprite_buffer
+	ldy.w #!oam_sprite0_tile	;0C8DA7	; Dest = !oam_sprite0_tile
 	lda.w #$021d	;0C8DAA	; Transfer 542 bytes (fill entire OAM)
 	mvn $00,$00	 ;0C8DAD	; Block move within Bank $00
 
@@ -3279,7 +3279,7 @@ DB_Load_0CA37F:
 ; DMA transfer for palette data
 	rep #$30		;0CA3A9|C230    |      ; 16-bit mode
 	ldx.w #$a4bb	;0CA3AB|A2BBA4  |      ; Source: palette data table
-	ldy.w #$0c00	;0CA3AE|A0000C  |      ; Dest: CGRAM address $0c00
+	ldy.w #!oam_sprite_buffer	;0CA3AE|A0000C  |      ; Dest: CGRAM address !oam_sprite_buffer
 	lda.w #$006f	;0CA3B1|A96F00  |      ; Transfer $6f bytes (111 colors)
 	mvn $00,$0c	 ;0CA3B4|54000C  |      ; Block move from Bank $0c to Bank $00
 

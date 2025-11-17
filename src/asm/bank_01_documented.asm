@@ -1044,21 +1044,21 @@ BattleSprite_SetupMultiSpriteOAM:
 
 	.StandardSetup:
 	sep #$20		;01A15E|E220    |      ;
-	sta.w $0c00,x   ;01A160|9D000C  |010C00;
-	sta.w $0c08,x   ;01A163|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A160|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A163|9D080C  |010C08;
 	clc ;01A166|18      |      ;
 	adc.b #$08	  ;01A167|6908    |      ;
-	sta.w $0c04,x   ;01A169|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A169|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A16C|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A16F|A50C    |001A6E;
-	sta.w $0c01,x   ;01A171|9D010C  |010C01;
-	sta.w $0c05,x   ;01A174|9D050C  |010C05;
+	sta.w !oam_sprite0_y,x   ;01A171|9D010C  |010C01;
+	sta.w !oam_sprite1_y,x   ;01A174|9D050C  |010C05;
 	clc ;01A177|18      |      ;
 	adc.b #$08	  ;01A178|6908    |      ;
-	sta.w $0c09,x   ;01A17A|9D090C  |010C09;
-	sta.w $0c0d,x   ;01A17D|9D0D0C  |010C0D;
+	sta.w !oam_sprite2_y,x   ;01A17A|9D090C  |010C09;
+	sta.w !oam_sprite3_y,x   ;01A17D|9D0D0C  |010C0D;
 	lda.b #$00	  ;01A180|A900    |      ;
-	sta.w $0c00,y   ;01A182|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A182|99000C  |010C00;
 	rts ;01A185|60      |      ;
 
 ; ==============================================================================
@@ -1075,13 +1075,13 @@ BattleSprite_HideOffScreen:
 
 	.HideSprite:
 	lda.w #$e080	;01A191|A980E0  |      ;
-	sta.w $0c00,x   ;01A194|9D000C  |010C00;
-	sta.w $0c04,x   ;01A197|9D040C  |010C04;
-	sta.w $0c08,x   ;01A19A|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A194|9D000C  |010C00;
+	sta.w !oam_sprite1_x,x   ;01A197|9D040C  |010C04;
+	sta.w !oam_sprite2_x,x   ;01A19A|9D080C  |010C08;
 	sta.w $0c0c,x   ;01A19D|9D0C0C  |010C0C;
 	sep #$20		;01A1A0|E220    |      ;
 	lda.b #$55	  ;01A1A2|A955    |      ;
-	sta.w $0c00,y   ;01A1A4|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1A4|99000C  |010C00;
 	rts ;01A1A7|60      |      ;
 
 ; ==============================================================================
@@ -1091,22 +1091,22 @@ BattleSprite_HideOffScreen:
 
 BattleSprite_SetupRightEdgeClip:
 	sep #$20		;01A1A8|E220    |      ;
-	sta.w $0c00,x   ;01A1AA|9D000C  |010C00;
-	sta.w $0c08,x   ;01A1AD|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A1AA|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A1AD|9D080C  |010C08;
 	lda.b #$80	  ;01A1B0|A980    |      ;
-	sta.w $0c04,x   ;01A1B2|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A1B2|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A1B5|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A1B8|A50C    |001A6E;
-	sta.w $0c01,x   ;01A1BA|9D010C  |010C01;
+	sta.w !oam_sprite0_y,x   ;01A1BA|9D010C  |010C01;
 	clc ;01A1BD|18      |      ;
 	adc.b #$08	  ;01A1BE|6908    |      ;
-	sta.w $0c09,x   ;01A1C0|9D090C  |010C09;
+	sta.w !oam_sprite2_y,x   ;01A1C0|9D090C  |010C09;
 	lda.b #$e0	  ;01A1C3|A9E0    |      ;
-	sta.w $0c05,x   ;01A1C5|9D050C  |010C05;
-	sta.w $0c0d,x   ;01A1C8|9D0D0C  |010C0D;
+	sta.w !oam_sprite1_y,x   ;01A1C5|9D050C  |010C05;
+	sta.w !oam_sprite3_y,x   ;01A1C8|9D0D0C  |010C0D;
 	sep #$20		;01A1CB|E220    |      ;
 	lda.b #$44	  ;01A1CD|A944    |      ;
-	sta.w $0c00,y   ;01A1CF|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1CF|99000C  |010C00;
 	rts ;01A1D2|60      |      ;
 
 ; ==============================================================================
@@ -1118,21 +1118,21 @@ BattleSprite_SetupLeftEdgeClip:
 	sep #$20		;01A1D3|E220    |      ;
 	clc ;01A1D5|18      |      ;
 	adc.b #$08	  ;01A1D6|6908    |      ;
-	sta.w $0c04,x   ;01A1D8|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A1D8|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A1DB|9D0C0C  |010C0C;
 	lda.b #$80	  ;01A1DE|A980    |      ;
-	sta.w $0c00,x   ;01A1E0|9D000C  |010C00;
-	sta.w $0c08,x   ;01A1E3|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A1E0|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A1E3|9D080C  |010C08;
 	lda.b $0c	   ;01A1E6|A50C    |001A6E;
-	sta.w $0c05,x   ;01A1E8|9D050C  |010C05;
+	sta.w !oam_sprite1_y,x   ;01A1E8|9D050C  |010C05;
 	clc ;01A1EB|18      |      ;
 	adc.b #$08	  ;01A1EC|6908    |      ;
-	sta.w $0c0d,x   ;01A1EE|9D0D0C  |010C0D;
+	sta.w !oam_sprite3_y,x   ;01A1EE|9D0D0C  |010C0D;
 	lda.b #$e0	  ;01A1F1|A9E0    |      ;
-	sta.w $0c01,x   ;01A1F3|9D010C  |010C01;
-	sta.w $0c09,x   ;01A1F6|9D090C  |010C09;
+	sta.w !oam_sprite0_y,x   ;01A1F3|9D010C  |010C01;
+	sta.w !oam_sprite2_y,x   ;01A1F6|9D090C  |010C09;
 	lda.b #$55	  ;01A1F9|A955    |      ;
-	sta.w $0c00,y   ;01A1FB|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1FB|99000C  |010C00;
 	rts ;01A1FE|60      |      ;
 
 ; ==============================================================================
@@ -1142,21 +1142,21 @@ BattleSprite_SetupLeftEdgeClip:
 
 BattleSprite_SetupFullVisible:
 	sep #$20		;01A1FF|E220    |      ;
-	sta.w $0c00,x   ;01A201|9D000C  |010C00;
-	sta.w $0c08,x   ;01A204|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A201|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A204|9D080C  |010C08;
 	clc ;01A207|18      |      ;
 	adc.b #$08	  ;01A208|6908    |      ;
-	sta.w $0c04,x   ;01A20A|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A20A|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A20D|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A210|A50C    |001A6E;
-	sta.w $0c01,x   ;01A212|9D010C  |010C01;
-	sta.w $0c05,x   ;01A215|9D050C  |010C05;
+	sta.w !oam_sprite0_y,x   ;01A212|9D010C  |010C01;
+	sta.w !oam_sprite1_y,x   ;01A215|9D050C  |010C05;
 	clc ;01A218|18      |      ;
 	adc.b #$08	  ;01A219|6908    |      ;
-	sta.w $0c09,x   ;01A21B|9D090C  |010C09;
-	sta.w $0c0d,x   ;01A21E|9D0D0C  |010C0D;
+	sta.w !oam_sprite2_y,x   ;01A21B|9D090C  |010C09;
+	sta.w !oam_sprite3_y,x   ;01A21E|9D0D0C  |010C0D;
 	lda.b #$11	  ;01A221|A911    |      ;
-	sta.w $0c00,y   ;01A223|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A223|99000C  |010C00;
 	rts ;01A226|60      |      ;
 
 ; ==============================================================================
@@ -1976,21 +1976,21 @@ BattleChar_GraphicsLoader:
 
 BattleChar_AnimationSetup:
 	sep #$20		;01A15E|E220    |      ;
-	sta.w $0c00,x   ;01A160|9D000C  |010C00;
-	sta.w $0c08,x   ;01A163|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A160|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A163|9D080C  |010C08;
 	clc ;01A166|18      |      ;
 	adc.b #$08	  ;01A167|6908    |      ;
-	sta.w $0c04,x   ;01A169|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A169|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A16C|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A16F|A50C    |001A6E;
-	sta.w $0c01,x   ;01A171|9D010C  |010C01;
-	sta.w $0c05,x   ;01A174|9D050C  |010C05;
+	sta.w !oam_sprite0_y,x   ;01A171|9D010C  |010C01;
+	sta.w !oam_sprite1_y,x   ;01A174|9D050C  |010C05;
 	clc ;01A177|18      |      ;
 	adc.b #$08	  ;01A178|6908    |      ;
-	sta.w $0c09,x   ;01A17A|9D090C  |010C09;
-	sta.w $0c0d,x   ;01A17D|9D0D0C  |010C0D;
+	sta.w !oam_sprite2_y,x   ;01A17A|9D090C  |010C09;
+	sta.w !oam_sprite3_y,x   ;01A17D|9D0D0C  |010C0D;
 	lda.b #$00	  ;01A180|A900    |      ;
-	sta.w $0c00,y   ;01A182|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A182|99000C  |010C00;
 	rts ;01A185|60      |      ;
 
 ; ==============================================================================
@@ -2007,13 +2007,13 @@ BattleChar_BufferManager:
 
 BattleChar_CoordinateProcessor:
 	lda.w #$e080	;01A191|A980E0  |      ;
-	sta.w $0c00,x   ;01A194|9D000C  |010C00;
-	sta.w $0c04,x   ;01A197|9D040C  |010C04;
-	sta.w $0c08,x   ;01A19A|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A194|9D000C  |010C00;
+	sta.w !oam_sprite1_x,x   ;01A197|9D040C  |010C04;
+	sta.w !oam_sprite2_x,x   ;01A19A|9D080C  |010C08;
 	sta.w $0c0c,x   ;01A19D|9D0C0C  |010C0C;
 	sep #$20		;01A1A0|E220    |      ;
 	lda.b #$55	  ;01A1A2|A955    |      ;
-	sta.w $0c00,y   ;01A1A4|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1A4|99000C  |010C00;
 	rts ;01A1A7|60      |      ;
 
 ; ==============================================================================
@@ -2023,22 +2023,22 @@ BattleChar_CoordinateProcessor:
 
 BattleChar_SpriteController:
 	sep #$20		;01A1A8|E220    |      ;
-	sta.w $0c00,x   ;01A1AA|9D000C  |010C00;
-	sta.w $0c08,x   ;01A1AD|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A1AA|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A1AD|9D080C  |010C08;
 	lda.b #$80	  ;01A1B0|A980    |      ;
-	sta.w $0c04,x   ;01A1B2|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A1B2|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A1B5|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A1B8|A50C    |001A6E;
-	sta.w $0c01,x   ;01A1BA|9D010C  |010C01;
+	sta.w !oam_sprite0_y,x   ;01A1BA|9D010C  |010C01;
 	clc ;01A1BD|18      |      ;
 	adc.b #$08	  ;01A1BE|6908    |      ;
-	sta.w $0c09,x   ;01A1C0|9D090C  |010C09;
+	sta.w !oam_sprite2_y,x   ;01A1C0|9D090C  |010C09;
 	lda.b #$e0	  ;01A1C3|A9E0    |      ;
-	sta.w $0c05,x   ;01A1C5|9D050C  |010C05;
-	sta.w $0c0d,x   ;01A1C8|9D0D0C  |010C0D;
+	sta.w !oam_sprite1_y,x   ;01A1C5|9D050C  |010C05;
+	sta.w !oam_sprite3_y,x   ;01A1C8|9D0D0C  |010C0D;
 	sep #$20		;01A1CB|E220    |      ;
 	lda.b #$44	  ;01A1CD|A944    |      ;
-	sta.w $0c00,y   ;01A1CF|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1CF|99000C  |010C00;
 	rts ;01A1D2|60      |      ;
 
 ; ==============================================================================
@@ -2050,21 +2050,21 @@ BattleChar_PositionEngine:
 	sep #$20		;01A1D3|E220    |      ;
 	clc ;01A1D5|18      |      ;
 	adc.b #$08	  ;01A1D6|6908    |      ;
-	sta.w $0c04,x   ;01A1D8|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A1D8|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A1DB|9D0C0C  |010C0C;
 	lda.b #$80	  ;01A1DE|A980    |      ;
-	sta.w $0c00,x   ;01A1E0|9D000C  |010C00;
-	sta.w $0c08,x   ;01A1E3|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A1E0|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A1E3|9D080C  |010C08;
 	lda.b $0c	   ;01A1E6|A50C    |001A6E;
-	sta.w $0c05,x   ;01A1E8|9D050C  |010C05;
+	sta.w !oam_sprite1_y,x   ;01A1E8|9D050C  |010C05;
 	clc ;01A1EB|18      |      ;
 	adc.b #$08	  ;01A1EC|6908    |      ;
-	sta.w $0c0d,x   ;01A1EE|9D0D0C  |010C0D;
+	sta.w !oam_sprite3_y,x   ;01A1EE|9D0D0C  |010C0D;
 	lda.b #$e0	  ;01A1F1|A9E0    |      ;
-	sta.w $0c01,x   ;01A1F3|9D010C  |010C01;
-	sta.w $0c09,x   ;01A1F6|9D090C  |010C09;
+	sta.w !oam_sprite0_y,x   ;01A1F3|9D010C  |010C01;
+	sta.w !oam_sprite2_y,x   ;01A1F6|9D090C  |010C09;
 	lda.b #$55	  ;01A1F9|A955    |      ;
-	sta.w $0c00,y   ;01A1FB|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A1FB|99000C  |010C00;
 	rts ;01A1FE|60      |      ;
 
 ; ==============================================================================
@@ -2074,21 +2074,21 @@ BattleChar_PositionEngine:
 
 BattleChar_DisplayManager:
 	sep #$20		;01A1FF|E220    |      ;
-	sta.w $0c00,x   ;01A201|9D000C  |010C00;
-	sta.w $0c08,x   ;01A204|9D080C  |010C08;
+	sta.w !oam_sprite_buffer,x   ;01A201|9D000C  |010C00;
+	sta.w !oam_sprite2_x,x   ;01A204|9D080C  |010C08;
 	clc ;01A207|18      |      ;
 	adc.b #$08	  ;01A208|6908    |      ;
-	sta.w $0c04,x   ;01A20A|9D040C  |010C04;
+	sta.w !oam_sprite1_x,x   ;01A20A|9D040C  |010C04;
 	sta.w $0c0c,x   ;01A20D|9D0C0C  |010C0C;
 	lda.b $0c	   ;01A210|A50C    |001A6E;
-	sta.w $0c01,x   ;01A212|9D010C  |010C01;
-	sta.w $0c05,x   ;01A215|9D050C  |010C05;
+	sta.w !oam_sprite0_y,x   ;01A212|9D010C  |010C01;
+	sta.w !oam_sprite1_y,x   ;01A215|9D050C  |010C05;
 	clc ;01A218|18      |      ;
 	adc.b #$08	  ;01A219|6908    |      ;
-	sta.w $0c09,x   ;01A21B|9D090C  |010C09;
-	sta.w $0c0d,x   ;01A21E|9D0D0C  |010C0D;
+	sta.w !oam_sprite2_y,x   ;01A21B|9D090C  |010C09;
+	sta.w !oam_sprite3_y,x   ;01A21E|9D0D0C  |010C0D;
 	lda.b #$11	  ;01A221|A911    |      ;
-	sta.w $0c00,y   ;01A223|99000C  |010C00;
+	sta.w !oam_sprite_buffer,y   ;01A223|99000C  |010C00;
 	rts ;01A226|60      |      ;
 
 ; ==============================================================================
@@ -4255,13 +4255,13 @@ BattleChar_ValidateAndSetup:
 	tay ;01AFEE|A8      |      ;
 	plx ;01AFEF|FA      |      ;
 	lda.w !battle_status_array+1,x   ;01AFF0|BD731A  |001A73;
-	sta.w $0c02,y   ;01AFF3|99020C  |010C02;
+	sta.w !oam_sprite0_tile,y   ;01AFF3|99020C  |010C02;
 	lda.w !battle_status_array+3,x   ;01AFF6|BD751A  |001A75;
-	sta.w $0c06,y   ;01AFF9|99060C  |010C06;
+	sta.w !oam_sprite1_tile,y   ;01AFF9|99060C  |010C06;
 	lda.w !battle_status_array+5,x   ;01AFFC|BD771A  |001A77;
-	sta.w $0c0a,y   ;01AFFF|990A0C  |010C0A;
+	sta.w !oam_sprite2_tile,y   ;01AFFF|990A0C  |010C0A;
 	lda.w !battle_status_array+7,x   ;01B002|BD791A  |001A79;
-	sta.w $0c0e,y   ;01B005|990E0C  |010C0E;
+	sta.w !oam_sprite3_tile,y   ;01B005|990E0C  |010C0E;
 
 	.Return:
 	rts ;01B008|60      |      ;
@@ -4326,7 +4326,7 @@ BattleCommand_ProcessHub:
 	tay ;01B05D|A8      |      ;
 	plx ;01B05E|FA      |      ;
 	lda.w !battle_status_array+1,x   ;01B05F|BD731A  |001A73;
-	sta.w $0c10,y   ;01B062|99100C  |010C10;
+	sta.w !oam_sprite4_x,y   ;01B062|99100C  |010C10;
 	lda.w !battle_status_array+3,x   ;01B065|BD751A  |001A75;
 	sta.w $0c14,y   ;01B068|99140C  |010C14;
 	lda.w !battle_status_array+5,x   ;01B06B|BD771A  |001A77;
@@ -4398,7 +4398,7 @@ BattleChar_RestoreSystem:
 	lda.w !battle_status_array+11,x   ;01B0F4|BD7D1A  |001A7D;
 	sta.w $0c3c,y   ;01B0F7|993C0C  |010C3C;
 	lda.w !battle_status_array+13,x   ;01B0FA|BD7F1A  |001A7F;
-	sta.w $0c40,y   ;01B0FD|99400C  |010C40;
+	sta.w !oam_sprite_window,y   ;01B0FD|99400C  |010C40;
 	lda.w !battle_unit_state,x   ;01B100|BD811A  |001A81;
 	sta.w $0c44,y   ;01B103|99440C  |010C44;
 
@@ -5294,13 +5294,13 @@ BattleSprite_ProcessingEngine:
 	tay ;01B7A6|A8      |      ;
 	plx ;01B7A7|FA      |      ;
 	lda.b $01,x	 ;01B7A8|B501    |001A73;
-	sta.w $0c02,y   ;01B7AA|99020C  |010C02;
+	sta.w !oam_sprite0_tile,y   ;01B7AA|99020C  |010C02;
 	lda.b $03,x	 ;01B7AD|B503    |001A75;
-	sta.w $0c06,y   ;01B7AF|99060C  |010C06;
+	sta.w !oam_sprite1_tile,y   ;01B7AF|99060C  |010C06;
 	lda.b $05,x	 ;01B7B2|B505    |001A77;
-	sta.w $0c0a,y   ;01B7B4|990A0C  |010C0A;
+	sta.w !oam_sprite2_tile,y   ;01B7B4|990A0C  |010C0A;
 	lda.b $07,x	 ;01B7B7|B507    |001A79;
-	sta.w $0c0e,y   ;01B7B9|990E0C  |010C0E;
+	sta.w !oam_sprite3_tile,y   ;01B7B9|990E0C  |010C0E;
 
 	.NextSprite:
 	rep #$30		;01B7BC|C230    |      ;

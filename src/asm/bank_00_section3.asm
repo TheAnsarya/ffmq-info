@@ -42,11 +42,11 @@ StatusIcon_ToggleTileFrame:
 
 ; Update adjacent sprite tiles
 	inc					 a; Next tile
-	sta.W				   $0c06,x   ; Store to OAM +4
+	sta.W				   !oam_sprite1_tile,x   ; Store to OAM +4
 	inc					 a; Next tile
-	sta.W				   $0c0a,x   ; Store to OAM +8
+	sta.W				   !oam_sprite2_tile,x   ; Store to OAM +8
 	inc					 a; Next tile
-	sta.W				   $0c0e,x   ; Store to OAM +12
+	sta.W				   !oam_sprite3_tile,x   ; Store to OAM +12
 	rts							   ; Return
 
 ; ===========================================================================

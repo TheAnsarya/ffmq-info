@@ -6163,8 +6163,8 @@ Display_VBlankWait:
 
 ; Pattern Data Initialization
 	lda.w #$fefe	;02DB0C|A9FEFE  |      ; Pattern fill value
-	sta.w $0c40	 ;02DB0F|8D400C  |7E0C40; Store pattern in buffer
-	ldx.w #$0c40	;02DB12|A2400C  |      ; Source address
+	sta.w !oam_sprite_window	 ;02DB0F|8D400C  |7E0C40; Store pattern in buffer
+	ldx.w #!oam_sprite_window	;02DB12|A2400C  |      ; Source address
 	ldy.w #$0c41	;02DB15|A0410C  |      ; Destination address
 	lda.w #$01be	;02DB18|A9BE01  |      ; Transfer count (447 bytes)
 	mvn $02,$02	 ;02DB1B|540202  |      ; Block move within bank
@@ -6305,7 +6305,7 @@ Object_ManagementEngine:
 	asl a;02DBEC|0A      |      ; Multiply by 4
 	tax ;02DBED|AA      |      ; Transfer to index
 	phd ;02DBEE|0B      |      ; Save direct page
-	pea.w $0c00	 ;02DBEF|F4000C  |020C00; Set direct page to $0c00
+	pea.w !oam_sprite_buffer	 ;02DBEF|F4000C  |020C00; Set direct page to !oam_sprite_buffer
 	pld ;02DBF2|2B      |      ; Load new direct page
 
 ; Graphics Tile Configuration
@@ -6392,7 +6392,7 @@ Object_ManagementEngine:
 
 ; Secondary Object Graphics Setup
 	phd ;02DC73|0B      |      ; Save direct page
-	pea.w $0c00	 ;02DC74|F4000C  |020C00; Set direct page to $0c00
+	pea.w !oam_sprite_buffer	 ;02DC74|F4000C  |020C00; Set direct page to !oam_sprite_buffer
 	pld ;02DC77|2B      |      ; Load new direct page
 	sta.b $02,x	 ;02DC78|9502    |000C02; Set tile 1
 	inc a;02DC7A|1A      |      ; Next tile
@@ -7776,13 +7776,13 @@ DB_Label_02EACA:
 
 ; Entity Sprite Configuration Setup
 	lda.b #$01	  ;02EADB|A901    |      ;  Load sprite enable flag
-	sta.w $0c03,x   ;02EADD|9D030C  |020C03;  Enable entity sprite
+	sta.w !oam_sprite0_attrs,x   ;02EADD|9D030C  |020C03;  Enable entity sprite
 	lda.b #$fe	  ;02EAE0|A9FE    |      ;  Load sprite priority flag
-	sta.w $0c02,x   ;02EAE2|9D020C  |020C02;  Set sprite priority
+	sta.w !oam_sprite0_tile,x   ;02EAE2|9D020C  |020C02;  Set sprite priority
 	lda.b #$ff	  ;02EAE5|A9FF    |      ;  Load sprite configuration mask
-	sta.w $0c00,x   ;02EAE7|9D000C  |020C00;  Set sprite base configuration
+	sta.w !oam_sprite_buffer,x   ;02EAE7|9D000C  |020C00;  Set sprite base configuration
 	lda.b #$c0	  ;02EAEA|A9C0    |      ;  Load sprite active flag
-	sta.w $0c01,x   ;02EAEC|9D010C  |020C01;  Mark sprite as active
+	sta.w !oam_sprite0_y,x   ;02EAEC|9D010C  |020C01;  Mark sprite as active
 
 ; Advanced bit Processing with Coordinate Calculation
 	rep #$30		;02EAEF|C230    |      ;  16-bit registers and indexes
@@ -8797,10 +8797,10 @@ DB_Label_02F670:
 	sep #$20		;02F6AE|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02F6B0|C210    |      ;  16-bit index registers
 	lda.b #$ff	  ;02F6B2|A9FF    |      ;  Load sprite deallocation marker
-	sta.w $0c00,y   ;02F6B4|99000C  |020C00;  Clear sprite configuration
-	sta.w $0c01,y   ;02F6B7|99010C  |020C01;  Clear sprite position Y
-	sta.w $0c02,y   ;02F6BA|99020C  |020C02;  Clear sprite tile index
-	sta.w $0c03,y   ;02F6BD|99030C  |020C03;  Clear sprite attributes
+	sta.w !oam_sprite_buffer,y   ;02F6B4|99000C  |020C00;  Clear sprite configuration
+	sta.w !oam_sprite0_y,y   ;02F6B7|99010C  |020C01;  Clear sprite position Y
+	sta.w !oam_sprite0_tile,y   ;02F6BA|99020C  |020C02;  Clear sprite tile index
+	sta.w !oam_sprite0_attrs,y   ;02F6BD|99030C  |020C03;  Clear sprite attributes
 
 ; Entity Cleanup Completion
 DB_Label_02F6C0:

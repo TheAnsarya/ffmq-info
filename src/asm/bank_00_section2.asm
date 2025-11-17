@@ -217,7 +217,7 @@ GameLoop_ProcessTimeEvents:
 	beq					 Time_Events_Done ; If clear, no status animation
 
 ; Process character status animation
-	lda.W				   #$0c00	; Direct page = $0c00
+	lda.W				   #!oam_sprite_buffer	; Direct page = !oam_sprite_buffer
 	tcd							   ; Set DP to character data area
 
 	sep					 #$30		; 8-bit A, X, Y

@@ -929,7 +929,7 @@ CopyWram7F0000ToVram:
 
 
 ; ROUTINE:  ($0184b8)
-;		copy $0c00 bytes from WRAM $7f4000 to VRAM $6100 through DMA (channel 0)
+;		copy !oam_sprite_buffer bytes from WRAM $7f4000 to VRAM $6100 through DMA (channel 0)
 ; A => 8bit, XY => 16bit
 CopyWram7F4000ToVram:
 	ldx #$6100
@@ -942,8 +942,8 @@ CopyWram7F4000ToVram:
 	stx $4302			; source offset => $4000
 	lda #$7f
 	sta $4304			; source bank => $7f
-	ldx #$0c00
-	stx $4305			; dma transfer size => $0c00
+	ldx #!oam_sprite_buffer
+	stx $4305			; dma transfer size => !oam_sprite_buffer
 	lda #$01
 	sta $420b			; start dma transfer on channel 0
 	rts					; exit routine
@@ -2770,8 +2770,8 @@ ClearOAM:
 	ldx #$0400			; dma control => $00, auto increment, write same address twice
 	stx $4350			; destination => $04, OAM data register [OAMDATA]
 
-	ldx #$0c00
-	stx $4352			; source offset => $0c00
+	ldx #!oam_sprite_buffer
+	stx $4352			; source offset => !oam_sprite_buffer
 	lda #$00
 	sta $4354			; source bank => $00
 	ldx #$0220

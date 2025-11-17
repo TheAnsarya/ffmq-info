@@ -140,7 +140,7 @@ Init_TitleScreen:
 	stx.W !SNES_OAMADDL                   ;008131|8E0221  |002102;
 	ldx.W #$0400                         ;008134|A20004  |      ;
 	stx.W !SNES_DMA5PARAM                 ;008137|8E5043  |004350;
-	ldx.W #$0c00                         ;00813A|A2000C  |      ;
+	ldx.W #!oam_sprite_buffer                         ;00813A|A2000C  |      ;
 	stx.W !SNES_DMA5ADDRL                 ;00813D|8E5243  |004352;
 	lda.B #$00                           ;008140|A900    |      ;
 	sta.W !SNES_DMA5ADDRH                 ;008142|8D5443  |004354;
@@ -1410,7 +1410,7 @@ VBlank_TileReturn:
 VBlank_OAMTransfer:
 	ldx.W #$0400                         ;008543|A20004  |      ;
 	stx.B !SNES_DMA5PARAM-$4300           ;008546|8650    |004350;
-	ldx.W #$0c00                         ;008548|A2000C  |      ;
+	ldx.W #!oam_sprite_buffer                         ;008548|A2000C  |      ;
 	stx.B !SNES_DMA5ADDRL-$4300           ;00854B|8652    |004352;
 	lda.B #$00                           ;00854D|A900    |      ;
 	sta.B !SNES_DMA5ADDRH-$4300           ;00854F|8554    |004354;
@@ -1964,7 +1964,7 @@ Frame_UpdateCharSprites:
 	lda.W #$0080                         ;0089C7|A98000  |      ;
 	and.w !system_flags_8                          ;0089CA|2DDE00  |0200DE;
 	beq Frame_SpriteReturn               ;0089CD|F057    |008A26;
-	lda.W #$0c00                         ;0089CF|A9000C  |      ;
+	lda.W #!oam_sprite_buffer                         ;0089CF|A9000C  |      ;
 	tcd                                  ;0089D2|5B      |      ;
 	sep #$30                             ;0089D3|E230    |      ;
 	dec.w !anim_frame_timer                          ;0089D5|CE0D01  |02010D;
@@ -2021,13 +2021,13 @@ Char_AnimateSprite:
 	eor.B #$04                           ;008A2C|4904    |      ;
 	sta.B $02,x                          ;008A2E|9502    |000C02;
 	inc a;008A30|1A      |      ;
-	sta.W $0c06,x                        ;008A31|9D060C  |020C06;
+	sta.W !oam_sprite1_tile,x                        ;008A31|9D060C  |020C06;
 	inc a;008A34|1A      |      ;
 ;      |        |      ;
 Char_UpdateAllTiles:
-	sta.W $0c0a,x                        ;008A35|9D0A0C  |020C0A;
+	sta.W !oam_sprite2_tile,x                        ;008A35|9D0A0C  |020C0A;
 	inc a;008A38|1A      |      ;
-	sta.W $0c0e,x                        ;008A39|9D0E0C  |020C0E;
+	sta.W !oam_sprite3_tile,x                        ;008A39|9D0E0C  |020C0E;
 	rts                                  ;008A3C|60      |      ;
 ;      |        |      ;
 	db $cf,$8a,$f8,$8a,$68,$8b,$68,$8b,$61,$8a,$5d,$8a,$59,$8a,$55,$8a;008A3D|        |      ;
@@ -2607,7 +2607,7 @@ Main_HandleVBlank_Jump:
 ;
 ;   Example:
 ;     Previous: $0800 (Up pressed)
-;     Current:  $0C00 (Up + Down pressed)
+;     Current:  !oam_sprite_buffer (Up + Down pressed)
 ;     Newly pressed: $0400 (Down is new)
 ;     Released: $0000 (nothing released)
 ;
@@ -16300,7 +16300,7 @@ ColorSelect_PaletteData3:
 	db $78,$3f,$20,$58,$5f,$20,$38,$7f,$38,$00,$94,$92,$03;00C33B|        |      ;
 	lda.W #$0301                         ;00C348|A90103  |      ;
 	sta.B $03                            ;00C34B|8503    |000003;
-	ldx.W #$0c00                         ;00C34D|A2000C  |      ;
+	ldx.W #!oam_sprite_buffer                         ;00C34D|A2000C  |      ;
 	stx.B $8e                            ;00C350|868E    |00008E;
 ;      |        |      ;
 FileSelect_WaitInput:
@@ -16337,7 +16337,7 @@ FileSelect_Confirm:
 	lda.B $9e                            ;00C391|A59E    |00009E;
 	bit.W #$8000                         ;00C393|890080  |      ;
 	bne FileSelect_Cancel                      ;00C396|D0CC    |00C364;
-	bit.W #$0c00                         ;00C398|89000C  |      ;
+	bit.W #!oam_sprite_buffer                         ;00C398|89000C  |      ;
 	beq FileSelect_WaitInput                      ;00C39B|F0B5    |00C352;
 ;      |        |      ;
 FileSelect_UpdateCursor:
@@ -16380,7 +16380,7 @@ BattleSpeed_WaitInput:
 	jsr.W Input_WaitForButton                    ;00C3EA|2030B9  |00B930;
 	bit.W #$0300                         ;00C3ED|890003  |      ;
 	bne BattleSpeed_ProcessSelection                      ;00C3F0|D015    |00C407;
-	bit.W #$0c00                         ;00C3F2|89000C  |      ;
+	bit.W #!oam_sprite_buffer                         ;00C3F2|89000C  |      ;
 	bne BattleSpeed_RefreshDisplay                      ;00C3F5|D042    |00C439;
 	bit.W #$8000                         ;00C3F7|890080  |      ;
 	beq BattleSpeed_WaitInput                      ;00C3FA|F0EB    |00C3E7;
@@ -16444,7 +16444,7 @@ MessageSpeed_WaitInput:
 	jsr.W Input_WaitForButton                    ;00C456|2030B9  |00B930;
 	bit.W #$0300                         ;00C459|890003  |      ;
 	bne MessageSpeed_ProcessSelection                      ;00C45C|D015    |00C473;
-	bit.W #$0c00                         ;00C45E|89000C  |      ;
+	bit.W #!oam_sprite_buffer                         ;00C45E|89000C  |      ;
 	bne MessageSpeed_RefreshDisplay                      ;00C461|D031    |00C494;
 	bit.W #$8000                         ;00C463|890080  |      ;
 	beq MessageSpeed_WaitInput                      ;00C466|F0EB    |00C453;

@@ -371,6 +371,34 @@
 !tilemap_wram_source_start_2    = $0900     ; Tilemap source start 2 (legacy label)
 !ram_0900                       = $0900     ; Legacy label
 
+; ============================================================================
+; OAM Sprite Buffer ($0c00-$0c1f+)
+; ============================================================================
+; SNES OAM (Object Attribute Memory) sprite buffer - 128 sprites × 4 bytes
+; Each sprite: X position, Y position, tile index, attributes
+; Structure: $0c00+n*4 = X, $0c01+n*4 = Y, $0c02+n*4 = tile, $0c03+n*4 = attrs
+!oam_sprite_buffer  = $0c00     ; OAM sprite buffer base (156 uses)
+!oam_sprite0_x      = $0c00     ; Sprite 0 X position
+!oam_sprite0_y      = $0c01     ; Sprite 0 Y position (46 uses)
+!oam_sprite0_tile   = $0c02     ; Sprite 0 tile index (54 uses)
+!oam_sprite0_attrs  = $0c03     ; Sprite 0 attributes (20 uses)
+!oam_sprite1_x      = $0c04     ; Sprite 1 X position (23 uses)
+!oam_sprite1_y      = $0c05     ; Sprite 1 Y position (18 uses)
+!oam_sprite1_tile   = $0c06     ; Sprite 1 tile index (31 uses)
+!oam_sprite1_attrs  = $0c07     ; Sprite 1 attributes
+!oam_sprite2_x      = $0c08     ; Sprite 2 X position (16 uses)
+!oam_sprite2_y      = $0c09     ; Sprite 2 Y position (18 uses)
+!oam_sprite2_tile   = $0c0a     ; Sprite 2 tile index (34 uses)
+!oam_sprite2_attrs  = $0c0b     ; Sprite 2 attributes
+!oam_sprite3_x      = $0c0c     ; Sprite 3 X position
+!oam_sprite3_y      = $0c0d     ; Sprite 3 Y position (18 uses)
+!oam_sprite3_tile   = $0c0e     ; Sprite 3 tile index (33 uses)
+!oam_sprite3_attrs  = $0c0f     ; Sprite 3 attributes
+!oam_sprite4_x      = $0c10     ; Sprite 4 X position (18 uses)
+!oam_sprite4_tile   = $0c12     ; Sprite 4 tile index (25 uses)
+!oam_sprite5_tile   = $0c16     ; Sprite 5 tile index (25 uses)
+!oam_sprite_window  = $0c40     ; OAM sprite window/control (18 uses)
+
 !ram_1031                       = $1031     ; Legacy label
 !ram_1031_long                  = $001031   ; Legacy label (long address)
 

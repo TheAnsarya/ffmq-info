@@ -131,13 +131,13 @@ BattleSprite_UpdateOAM:
 	tay ;0B8087	; Transfer to Y
 	plx ;0B8088	; Restore X
 	lda.w $1a73,x   ;0B8089	; Load sprite X position
-	sta.w $0c02,y   ;0B808C	; Store to OAM
+	sta.w !oam_sprite0_tile,y   ;0B808C	; Store to OAM
 	lda.w $1a75,x   ;0B808F	; Load sprite Y position
-	sta.w $0c06,y   ;0B8092	; Store to OAM
+	sta.w !oam_sprite1_tile,y   ;0B8092	; Store to OAM
 	lda.w $1a77,x   ;0B8095	; Load sprite tile index
-	sta.w $0c0a,y   ;0B8098	; Store to OAM
+	sta.w !oam_sprite2_tile,y   ;0B8098	; Store to OAM
 	lda.w $1a79,x   ;0B809B	; Load sprite attributes
-	sta.w $0c0e,y   ;0B809E	; Store to OAM
+	sta.w !oam_sprite3_tile,y   ;0B809E	; Store to OAM
 
 BattleSprite_AnimationExit:
 	ply ;0B80A1	; Restore Y
@@ -268,14 +268,14 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 ;      - Update sprite attributes in $1a80 range
 ;      - Load animation frame data from tables
 ;      - Call CallAnimationLoader (sprite rendering routine in Bank $01)
-;      - Update OAM data at $0c02+ (Object Attribute Memory mirror)
+;      - Update OAM data at !oam_sprite0_tile+ (Object Attribute Memory mirror)
 ;   7. Restore processor state and return
 ;
 ; OAM Data Structure:
-;   - $0c02+: Sprite X position
-;   - $0c06+: Sprite Y position
-;   - $0c0a+: Sprite tile index
-;   - $0c0e+: Sprite attributes (palette, flip, priority)
+;   - !oam_sprite0_tile+: Sprite X position
+;   - !oam_sprite1_tile+: Sprite Y position
+;   - !oam_sprite2_tile+: Sprite tile index
+;   - !oam_sprite3_tile+: Sprite attributes (palette, flip, priority)
 ;
 ; Animation Frame Lookup:
 ;   - $1a82,X contains animation frame index
@@ -330,13 +330,13 @@ BattleSprite_UpdateOAM_1:	; OAM Data Update Routine
 
 ; Copy sprite data to OAM mirror
 	lda.w $1a73,x   ; Load sprite X position
-	sta.w $0c02,y   ; Store to OAM X position
+	sta.w !oam_sprite0_tile,y   ; Store to OAM X position
 	lda.w $1a75,x   ; Load sprite Y position
-	sta.w $0c06,y   ; Store to OAM Y position
+	sta.w !oam_sprite1_tile,y   ; Store to OAM Y position
 	lda.w $1a77,x   ; Load sprite tile index
-	sta.w $0c0a,y   ; Store to OAM tile index
+	sta.w !oam_sprite2_tile,y   ; Store to OAM tile index
 	lda.w $1a79,x   ; Load sprite attributes
-	sta.w $0c0e,y   ; Store to OAM attributes
+	sta.w !oam_sprite3_tile,y   ; Store to OAM attributes
 
 BattleSprite_AnimationExit_1:	; Exit routine
 	ply ; Restore Y register
@@ -789,7 +789,7 @@ DB_DATA8_0b82a0:
 ; Technical Discoveries:
 ; - Battle system uses 4 types with different graphics pointers
 ; - Sprite table: 22 slots × 26 bytes each = 572 bytes
-; - OAM mirror at $0c02+ (hardware Object Attribute Memory copy)
+; - OAM mirror at !oam_sprite0_tile+ (hardware Object Attribute Memory copy)
 ; - Multi-table lookup system for background configuration
 ; - Hardware multiply used for enemy HP calculation ($211b/$211c/$2134)
 ; - Direct page optimization for sprite table access (PEA/PLD)
@@ -805,7 +805,7 @@ DB_DATA8_0b82a0:
 ; Hardware Registers Used:
 ; - $211b/$211c: Hardware multiply (SNES PPU math unit)
 ; - $2134: Hardware multiply result (16-bit)
-; - $0c02-$0c0f: OAM data mirror (copied to PPU during V-blank)
+; - !oam_sprite0_tile-$0c0f: OAM data mirror (copied to PPU during V-blank)
 ;
 ; Next Cycle: Lines 400-800
 ; - Continue battle effects code
@@ -1718,10 +1718,10 @@ DB_DATA8_0b8737:
 ; LoadEnemyStatsBankB: Battle OAM Clear Routine
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize OAM (Object Attribute Memory) buffers with default values
-; Clears: $0c40-$0dff (448 bytes) and $0e03-$0e1e (28 bytes)
+; Clears: !oam_sprite_window-$0dff (448 bytes) and $0e03-$0e1e (28 bytes)
 ;
 ; OAM Structure:
-;   $0c40-$0dff: Main OAM data (128 sprites × 4 bytes = 512 bytes, uses 448)
+;   !oam_sprite_window-$0dff: Main OAM data (128 sprites × 4 bytes = 512 bytes, uses 448)
 ;     Each sprite: [X] [Y] [Tile] [Attributes]
 ;   $0e03-$0e1e: Extended OAM data (sprite size/position bits)
 ;     Format: 2 bits per sprite (bit 0 = X hi, bit 1 = size)
@@ -1731,11 +1731,11 @@ BattleOAM_ClearBuffers:
 	phb ; Save data bank
 	rep #$30		; Set A/X/Y to 16-bit
 
-; Clear main OAM buffer ($0c40-$0dff)
+; Clear main OAM buffer (!oam_sprite_window-$0dff)
 	lda.w #$0001	; Fill value = $0001
-	sta.w $0c40	 ; Store to first position
+	sta.w !oam_sprite_window	 ; Store to first position
 	ldy.w #$0c41	; Dest = $0c41 (next byte)
-	ldx.w #$0c40	; Source = $0c40 (first byte)
+	ldx.w #!oam_sprite_window	; Source = !oam_sprite_window (first byte)
 	lda.w #$01be	; Size = 447 bytes (446+1)
 	mvn $00,$00	 ; Fill via mvn (copies $01 repeatedly)
 
@@ -2170,7 +2170,7 @@ BattleAnim_SkipTransfer:
 ;   - Lower nibble: Repeat count
 ;   - Upper nibble: Copy-from-offset count
 ; - WRAM graphics upload uses PPU $2180-$2183 registers directly
-; - OAM buffers: $0c40-$0dff (main) + $0e03-$0e1e (extended)
+; - OAM buffers: !oam_sprite_window-$0dff (main) + $0e03-$0e1e (extended)
 ; - mvn self-modifying code: Copies routines to $0918 for DP access
 ; - Animation frame counters stored in WRAM $7ec360 range
 ; - 53 unique enemy types with full configurations
@@ -2340,8 +2340,8 @@ BattleAnim_SetStateFlag:
 ; Uses: Direct page for fast register access
 
 ; Entry at $0b8f4b
-	db $da,$5a,$0b,$f4,$00,$0c,$2b ; phx / phy / php / pea $0c00 / pld
-; Relocate direct page to $0c00 (OAM buffer area)
+	db $da,$5a,$0b,$f4,$00,$0c,$2b ; phx / phy / php / pea !oam_sprite_buffer / pld
+; Relocate direct page to !oam_sprite_buffer (OAM buffer area)
 
 	lda.b #$00	  ; Clear A
 	sta.l $7ec360,x ; Reset animation frame counter
@@ -2376,10 +2376,10 @@ BattleAnim_SetStateFlag:
 ; Animation Handler 1 (Same State): Sprite Flip Animation
 ; -----------------------------------------------------------------------------
 ; Purpose: Animate sprite by toggling horizontal flip based on OAM data
-; Uses: OAM buffer $0c02 to determine flip direction
+; Uses: OAM buffer !oam_sprite0_tile to determine flip direction
 
 ; Entry at $0b8f9c
-	db $da,$0b,$f4,$00,$0c,$2b ; Save X, relocate DP to $0c00
+	db $da,$0b,$f4,$00,$0c,$2b ; Save X, relocate DP to !oam_sprite_buffer
 
 	lda.l $7ec360,x ; Load animation frame counter
 	clc ; Clear carry
@@ -2388,7 +2388,7 @@ BattleAnim_SetStateFlag:
 	asl a; Multiply by 2 again (×4 total)
 	tay ; Transfer to Y (OAM index)
 
-	lda.w $0c02,y   ; Load OAM sprite data byte
+	lda.w !oam_sprite0_tile,y   ; Load OAM sprite data byte
 	pha ; Save it
 
 	lda.l $7ec360,x ; Load frame counter again
@@ -2442,13 +2442,13 @@ BattleAnim_VerticalSpriteSetup:
 	lda.l $7ec480,x ; Load sprite base tile ID
 	sec ; Set carry
 	sbc.b #$0c	  ; Subtract 12 (start 12 tiles back)
-	sta.w $0c02,y   ; Store to sprite 0 tile
+	sta.w !oam_sprite0_tile,y   ; Store to sprite 0 tile
 	inc a; Next tile
-	sta.w $0c06,y   ; Store to sprite 1 tile
+	sta.w !oam_sprite1_tile,y   ; Store to sprite 1 tile
 	inc a; Next tile
-	sta.w $0c0a,y   ; Store to sprite 2 tile
+	sta.w !oam_sprite2_tile,y   ; Store to sprite 2 tile
 	inc a; Next tile
-	sta.w $0c0e,y   ; Store to sprite 3 tile
+	sta.w !oam_sprite3_tile,y   ; Store to sprite 3 tile
 	rts ; Return
 
 ; Handler 2 (Same State) at $0b9014:
@@ -2472,14 +2472,14 @@ BattleAnim_ExpandingSetup:
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate OAM positions
 
 ; Setup expanding sprite positions
-	lda.w $0c00,y   ; Load sprite 0 X position
+	lda.w !oam_sprite_buffer,y   ; Load sprite 0 X position
 	sec ; Set carry
 	sbc.b #$04	  ; Subtract 4 (move left)
-	sta.w $0c10,y   ; Store to sprite 1 X
+	sta.w !oam_sprite4_x,y   ; Store to sprite 1 X
 	adc.b #$14	  ; Add 20 (move right from center)
 	sta.w $0c14,y   ; Store to sprite 2 X
 
-	lda.w $0c01,y   ; Load sprite 0 Y position
+	lda.w !oam_sprite0_y,y   ; Load sprite 0 Y position
 	sta.w $0c15,y   ; Store to sprite 2 Y (same height)
 	sbc.b #$08	  ; Subtract 8 (move up)
 	sta.w $0c11,y   ; Store to sprite 1 Y
@@ -2517,33 +2517,33 @@ DB_DATA8_0b905f:	; Rotation frame handlers
 ; Frame 0: Tiles $b9, $d2
 BattleAnim_SpinFrame0:
 	lda.b #$b9	  ; Tile ID $b9
-	sta.w $0c12,y   ; Store to sprite slot
+	sta.w !oam_sprite4_tile,y   ; Store to sprite slot
 	lda.b #$d2	  ; Tile ID $d2
-	sta.w $0c16,y   ; Store to next sprite
+	sta.w !oam_sprite5_tile,y   ; Store to next sprite
 
 
 ; Frame 1: Tiles $b9, $b9 (same tile both)
 BattleAnim_SpinFrame1:
 	lda.b #$b9
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	lda.b #$b9
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 
 
 ; Frame 2: Tiles $ba, $b9
 BattleAnim_SpinFrame2:
 	lda.b #$ba
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	lda.b #$b9
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 
 
 ; Frame 3: Tiles $d2, $ba
 BattleAnim_SpinFrame3:
 	lda.b #$d2
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	lda.b #$ba
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 
 
 ; -----------------------------------------------------------------------------
@@ -2565,9 +2565,9 @@ BattleAnim_MultiSpriteSetup:
 	jsr.w BattleSprite_CalculateOAMPositions ; Setup OAM
 
 ; Position calculations for 8-sprite grid
-	lda.w $0c00,y   ; Load base X position
+	lda.w !oam_sprite_buffer,y   ; Load base X position
 	sbc.b #$0d	  ; Subtract 13 (left edge)
-	sta.w $0c10,y   ; Store sprite 1 X
+	sta.w !oam_sprite4_x,y   ; Store sprite 1 X
 	sta.w $0c14,y   ; Store sprite 2 X (same column)
 	clc ; Clear carry
 	adc.b #$08	  ; Add 8 (next column)
@@ -2582,7 +2582,7 @@ BattleAnim_MultiSpriteSetup:
 	sta.w $0c2c,y   ; Store sprite 8 X (same column)
 
 ; Y position calculations (2 rows)
-	lda.w $0c01,y   ; Load base Y position
+	lda.w !oam_sprite0_y,y   ; Load base Y position
 	sbc.b #$0d	  ; Subtract 13 (top row)
 	sta.w $0c11,y   ; Store row 1 sprites
 	sta.w $0c1d,y
@@ -2636,9 +2636,9 @@ DB_DATA8_0b9113:	; 4-frame tile pattern handlers
 ; Frame 0: Tiles $ab, $ac, $ad (sequential)
 BattleAnim_TileFrame0:
 	lda.b #$ab
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	inc a
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 	inc a
 	sta.w $0c1a,y
 
@@ -2646,8 +2646,8 @@ BattleAnim_TileFrame0:
 ; Frame 1: Mixed pattern $d2, $d2, $d2, $ae, $af
 BattleAnim_TileFrame1:
 	lda.b #$d2
-	sta.w $0c12,y
-	sta.w $0c16,y
+	sta.w !oam_sprite4_tile,y
+	sta.w !oam_sprite5_tile,y
 	sta.w $0c1a,y
 	lda.b #$ae
 	sta.w $0c1e,y
@@ -2703,16 +2703,16 @@ BattleAnim_AttackSetup:
 	lda.l $7ec480,x ; Load base tile
 	clc ; Clear carry
 	adc.b #$08	  ; Add 8 (forward offset)
-	sta.w $0c02,y   ; Store sprite 0
+	sta.w !oam_sprite0_tile,y   ; Store sprite 0
 	inc a; Next tile
-	sta.w $0c06,y   ; Store sprite 1
+	sta.w !oam_sprite1_tile,y   ; Store sprite 1
 	inc a
-	sta.w $0c0a,y   ; Store sprite 2
+	sta.w !oam_sprite2_tile,y   ; Store sprite 2
 	inc a
-	sta.w $0c0e,y   ; Store sprite 3
+	sta.w !oam_sprite3_tile,y   ; Store sprite 3
 
 ; Vertical positioning
-	lda.w $0c01,y   ; Load base Y
+	lda.w !oam_sprite0_y,y   ; Load base Y
 	sec ; Set carry
 	sbc.b #$08	  ; Subtract 8 (move up)
 	sta.w $0c11,y   ; Store sprites 1,2
@@ -2720,10 +2720,10 @@ BattleAnim_AttackSetup:
 	sta.w $0c15,y   ; Store sprite 3
 
 ; Horizontal positioning
-	lda.w $0c00,y   ; Load base X
+	lda.w !oam_sprite_buffer,y   ; Load base X
 	clc ; Clear carry
 	adc.b #$08	  ; Add 8
-	sta.w $0c10,y   ; Store sprite 1 X
+	sta.w !oam_sprite4_x,y   ; Store sprite 1 X
 	adc.b #$08	  ; Add 8
 	sta.w $0c14,y   ; Store sprite 2 X
 
@@ -2762,28 +2762,28 @@ DB_DATA8_0b91d0:	; Attack motion frames
 ; Motion frames set tile patterns for thrust animation
 BattleAnim_AttackNeutral:	; Frame 0: Both $d2 (neutral)
 	lda.b #$d2
-	sta.w $0c12,y
-	sta.w $0c16,y
+	sta.w !oam_sprite4_tile,y
+	sta.w !oam_sprite5_tile,y
 
 
 BattleAnim_AttackForward:	; Frame 1: $b4, $d2 (forward start)
 	lda.b #$b4
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	lda.b #$d2
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 
 
 BattleAnim_AttackMaxForward:	; Frame 2: Both $b4 (max forward)
 	lda.b #$b4
-	sta.w $0c12,y
-	sta.w $0c16,y
+	sta.w !oam_sprite4_tile,y
+	sta.w !oam_sprite5_tile,y
 
 
 BattleAnim_AttackRetreat:	; Frame 3: $d2, $b4 (retreat)
 	lda.b #$d2
-	sta.w $0c12,y
+	sta.w !oam_sprite4_tile,y
 	lda.b #$b4
-	sta.w $0c16,y
+	sta.w !oam_sprite5_tile,y
 
 
 ; -----------------------------------------------------------------------------
@@ -2805,17 +2805,17 @@ BattleAnim_WingFlapSetup:
 
 ; Setup wing tiles ($b7, $b8)
 	lda.b #$b7	  ; Wing tile 1
-	sta.w $0c12,y   ; Left wing top
+	sta.w !oam_sprite4_tile,y   ; Left wing top
 	sta.w $0c1a,y   ; Left wing bottom
 	inc a; $b8
-	sta.w $0c16,y   ; Right wing top
+	sta.w !oam_sprite5_tile,y   ; Right wing top
 	sta.w $0c1e,y   ; Right wing bottom
 
 ; Position wings horizontally
-	lda.w $0c00,y   ; Load base X
+	lda.w !oam_sprite_buffer,y   ; Load base X
 SEC_Label:
 	sbc.b #$08	  ; Move left
-	sta.w $0c10,y   ; Left wing X
+	sta.w !oam_sprite4_x,y   ; Left wing X
 	sta.w $0c14,y
 
 	adc.b #$17	  ; Move right 23 pixels
@@ -2823,7 +2823,7 @@ SEC_Label:
 	sta.w $0c1c,y
 
 ; Position wings vertically
-	lda.w $0c01,y   ; Load base Y
+	lda.w !oam_sprite0_y,y   ; Load base Y
 	sta.w $0c11,y   ; Top row Y
 	sta.w $0c19,y
 
@@ -2854,10 +2854,10 @@ TAY_Label_1:
 	beq BattleAnim_WingsOutward ; Branch if even
 
 ; Odd frames: Wings move inward
-	lda.w $0c10,y   ; Load left wing X
+	lda.w !oam_sprite4_x,y   ; Load left wing X
 	inc a; Move right 2 pixels
 	inc a
-	sta.w $0c10,y
+	sta.w !oam_sprite4_x,y
 	sta.w $0c14,y
 
 	lda.w $0c18,y   ; Load right wing X
@@ -2868,7 +2868,7 @@ TAY_Label_1:
 
 
 BattleAnim_WingsOutward:	; Even frames: Wings move outward
-	lda.w $0c10,y   ; Load left wing X
+	lda.w !oam_sprite4_x,y   ; Load left wing X
 ; [Continues beyond this section...]
 
 ; =============================================================================
@@ -2899,7 +2899,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; - Dual dispatch tables for state changes vs. continuations
 ; - Frame counter at $7ec360,X (WRAM animation timing)
 ; - Sprite states at $7ec400,X (WRAM sprite type/behavior)
-; - OAM buffer direct manipulation ($0c00-$0c2f range)
+; - OAM buffer direct manipulation (!oam_sprite_buffer-$0c2f range)
 ; - Direct page relocation for fast OAM access
 ; - Jump table dispatch via CallSpriteInitializer
 ; - bit masking for frame cycling (AND #$03 = 4 frames)
@@ -2951,16 +2951,16 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; - WRAM $7ec400: Sprite animation states
 ; - WRAM $7ec480: Sprite base tile indexes
 ; - WRAM $7ec260: Sprite slot assignments
-; - OAM $0c00-$0c2f: Output sprite buffer (32 sprites × 4 bytes)
+; - OAM !oam_sprite_buffer-$0c2f: Output sprite buffer (32 sprites × 4 bytes)
 ; - Bank $09: Graphics source data ($82c0+)
 ; - Bank $07: Additional graphics ($d824+, $d874+)
 ; ==============================================================================
 
 ; Continue sprite position adjustment (Y-coordinate pair 2)
-	lda.w $0c10,y   ;0B927F Position tile #3 Y-coordinate
+	lda.w !oam_sprite4_x,y   ;0B927F Position tile #3 Y-coordinate
 	dec a;0B9282 Adjust Y-1
 	dec a;0B9283 Adjust Y-2 (move up 2 pixels)
-	sta.w $0c10,y   ;0B9284 Store adjusted Y for tile #3
+	sta.w !oam_sprite4_x,y   ;0B9284 Store adjusted Y for tile #3
 	sta.w $0c14,y   ;0B9287 Store adjusted Y for tile #4
 	lda.w $0c18,y   ;0B928A Get tile #5 Y-coordinate
 	inc a;0B928D Adjust Y+1
@@ -3011,13 +3011,13 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	lda.l $7ec480,x ;0B92BC Get base tile index
 	clc ;0B92C0 Clear carry
 	adc.b #$08	  ;0B92C1 Offset tile+8
-	sta.w $0c02,y   ;0B92C3 OAM tile #0 index
+	sta.w !oam_sprite0_tile,y   ;0B92C3 OAM tile #0 index
 	inc a;0B92C6 Tile+9
-	sta.w $0c06,y   ;0B92C7 OAM tile #1 index
+	sta.w !oam_sprite1_tile,y   ;0B92C7 OAM tile #1 index
 	inc a;0B92CA Tile+10
-	sta.w $0c0a,y   ;0B92CB OAM tile #2 index
+	sta.w !oam_sprite2_tile,y   ;0B92CB OAM tile #2 index
 	inc a;0B92CE Tile+11
-	sta.w $0c0e,y   ;0B92CF OAM tile #3 index
+	sta.w !oam_sprite3_tile,y   ;0B92CF OAM tile #3 index
 	ply ;0B92D2 Restore Y register
 	plx ;0B92D3 Restore X register
 	rts ;0B92D4 Return
@@ -3093,7 +3093,7 @@ DB_Label_0B92D6:
 ; standard attributes (palette $d2 = 11010010 binary).
 ;
 ; Input:  X = Sprite slot index
-; Output: OAM $0c00+Y populated:
+; Output: OAM !oam_sprite_buffer+Y populated:
 ;         - Tiles: Sequential from $7ec480,X (+0, +1, +2, +3)
 ;         - Attributes: $d2 for all tiles (palette 6, priority 1, no flip)
 ;         - Y-coordinates: Duplicated in pairs
@@ -3109,22 +3109,22 @@ DB_Load_0B9304:
 	lda.l $7ec260,x ;0B9304 Get sprite slot number
 	asl a;0B9308 × 2
 	asl a;0B9309 × 4 (4 bytes per OAM entry)
-	tay ;0B930A Y = OAM offset ($0c00 + Y)
+	tay ;0B930A Y = OAM offset (!oam_sprite_buffer + Y)
 
 ; Setup sequential tile indexes
 	lda.l $7ec480,x ;0B930B Get base tile index
-	sta.w $0c02,y   ;0B930F OAM tile #0
+	sta.w !oam_sprite0_tile,y   ;0B930F OAM tile #0
 	inc a;0B9312 Base+1
-	sta.w $0c06,y   ;0B9313 OAM tile #1
+	sta.w !oam_sprite1_tile,y   ;0B9313 OAM tile #1
 	inc a;0B9316 Base+2
-	sta.w $0c0a,y   ;0B9317 OAM tile #2
+	sta.w !oam_sprite2_tile,y   ;0B9317 OAM tile #2
 	inc a;0B931A Base+3
-	sta.w $0c0e,y   ;0B931B OAM tile #3
+	sta.w !oam_sprite3_tile,y   ;0B931B OAM tile #3
 
 ; Setup tile attributes ($d2 = palette 6, priority 2)
 	lda.b #$d2	  ;0B931E Attribute byte
-	sta.w $0c12,y   ;0B9320 OAM tile #0 attributes
-	sta.w $0c16,y   ;0B9323 OAM tile #1 attributes
+	sta.w !oam_sprite4_tile,y   ;0B9320 OAM tile #0 attributes
+	sta.w !oam_sprite5_tile,y   ;0B9323 OAM tile #1 attributes
 	sta.w $0c1a,y   ;0B9326 OAM tile #2 attributes
 	sta.w $0c1e,y   ;0B9329 OAM tile #3 attributes
 	sta.w $0c22,y   ;0B932C OAM tile #4 attributes (extended)
@@ -3133,7 +3133,7 @@ DB_Load_0B9304:
 	sta.w $0c2e,y   ;0B9335 OAM tile #7 attributes (extended)
 
 ; Setup Y-coordinates (duplicate in pairs)
-	lda.w $0c03,y   ;0B9338 Get tile #0 Y-coordinate
+	lda.w !oam_sprite0_attrs,y   ;0B9338 Get tile #0 Y-coordinate
 	sta.w $0c07,y   ;0B933B Duplicate to tile #1 Y
 	sta.w $0c0b,y   ;0B933E Duplicate to tile #2 Y
 	sta.w $0c0f,y   ;0B9341 Duplicate to tile #3 Y
@@ -3577,7 +3577,7 @@ Battlefield_GfxPointers:
 ; Hardware Registers Used:
 ; - PPU $2100-$2133: Display control, layer config, color math
 ; - PPU $2180-$2183: WRAM access registers
-; - OAM $0c00-$0c2f: Output sprite buffer (32 sprites × 4 bytes)
+; - OAM !oam_sprite_buffer-$0c2f: Output sprite buffer (32 sprites × 4 bytes)
 ;
 ; BANK $0b DOCUMENTATION 100% COMPLETE! 🎉
 ; ==============================================================================
