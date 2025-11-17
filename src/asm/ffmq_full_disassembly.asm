@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; Final Fantasy Mystic Quest (SNES) - Complete Disassembly
 ; ==============================================================================
 ;
@@ -71,7 +71,7 @@
 	dw $0000        ; COP vector
 	dw $0000        ; BRK vector
 	dw $0000        ; ABORT vector
-	dw Label_008000  ; NMI vector
+	dw DB_Label_008000  ; NMI vector
 	dw $0000        ; RESET (unused in native mode)
 	dw $0000        ; IRQ vector
 
@@ -83,8 +83,8 @@
 	dw $0000        ; COP vector
 	dw $0000        ; Reserved
 	dw $0000        ; ABORT vector
-	dw Label_008000  ; NMI vector
-	dw Label_008000  ; RESET vector (boot entry point!)
+	dw DB_Label_008000  ; NMI vector
+	dw DB_Label_008000  ; RESET vector (boot entry point!)
 	dw $0000        ; IRQ/BRK vector
 
 ;===============================================================================
@@ -106,7 +106,7 @@
 
 	org $008000
 
-Label_008000:
+DB_Label_008000:
 ; ===========================================================================
 ; Boot Sequence - SNES Initialization
 ; ===========================================================================
@@ -147,9 +147,9 @@ Label_008000:
 	sta.L $7e3667           ; Clear save file state flag 1
 	dec a; A = $ff (-1)
 	sta.L $7e3668           ; Set save file state flag 2 to $ff
-	bra Label_008023         ; Skip to main initialization
+	bra DB_Label_008023         ; Skip to main initialization
 
-Label_008016:
+DB_Label_008016:
 ; ===========================================================================
 ; Secondary Boot Path (called from somewhere else)
 ; ===========================================================================
@@ -159,7 +159,7 @@ Label_008016:
 	sta.L $000600           ; Store to low RAM (hardware mirror area)
 	jsl.L Secondary_APU_Command_Entry_Point       ; Initialize subsystem variant
 
-Label_008023:
+DB_Label_008023:
 ; ===========================================================================
 ; Stack and Memory Setup
 ; ===========================================================================
@@ -180,12 +180,12 @@ Label_008023:
 
 	lda.W #$0040            ; A = $0040 (bit 6 = some button?)
 	and.w !system_flags_5             ; Mask with controller input at $00da
-	bne Label_00806E         ; If button pressed, skip to alternate path
+	bne DB_Label_00806E         ; If button pressed, skip to alternate path
 
 	jsl.L CodeScreenInitialization       ; Call routine in bank $0c
-	bra Label_00804D         ; Continue to main setup
+	bra DB_Label_00804D         ; Continue to main setup
 
-Label_00803A:
+DB_Label_00803A:
 ; ===========================================================================
 ; Another Entry Point (possibly soft reset?)
 ; ===========================================================================
@@ -199,7 +199,7 @@ Label_00803A:
 	ldx.W #$1fff            ; Reset stack pointer
 	txs
 
-Label_00804D:
+DB_Label_00804D:
 ; ===========================================================================
 ; DMA Setup for Initial Data Transfer
 ; ===========================================================================
@@ -227,7 +227,7 @@ Label_00804D:
 	lda.B #$01              ; Enable DMA channel 0
 	sta.W !SNES_MDMAEN       ; $420b: DMA enable register
 
-Label_00806E:
+DB_Label_00806E:
 ; ===========================================================================
 ; Main Game Initialization Continues
 ; ===========================================================================
@@ -255,28 +255,28 @@ Label_00806E:
 
 ; Check save file state
 	lda.L $7e3665           ; Load save state flag
-	bne Label_0080A8         ; If not zero, handle differently
+	bne DB_Label_0080A8         ; If not zero, handle differently
 
 ; Check if save data exists in SRAM
 	lda.L $700000           ; SRAM byte 1
 	ora.L $70038c           ; OR with SRAM byte 2
 	ora.L $700718           ; OR with SRAM byte 3
-	beq Label_0080AD         ; If all zero, no save exists
+	beq DB_Label_0080AD         ; If all zero, no save exists
 
 ; Save data exists - load it
 	jsl.L LoadSaveGame       ; Load save game
-	bra Load_0080B0         ; Continue
+	bra DB_Load_0080B0         ; Continue
 
-Label_0080A8:
+DB_Label_0080A8:
 ; Handle different save state
 	jsr.W CallRoutine       ; Call routine
 	bra SkipDifferentPath         ; Skip to different path
 
-Label_0080AD:
+DB_Label_0080AD:
 ; No save data - start new game
 	jsr.W NewGameInitialization       ; New game initialization
 
-Load_0080B0:
+DB_Load_0080B0:
 ; ===========================================================================
 ; Graphics Setup - Screen Initialization
 ; ===========================================================================

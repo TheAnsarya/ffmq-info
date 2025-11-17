@@ -400,14 +400,14 @@ Battle_SumEnemy3HP:
 	clc                                  ;0282DE|18      |      ;
 	adc.B $a2                            ;0282DF|65A2    |0004A2;
 	cmp.B $a0                            ;0282E1|C5A0    |0004A0;
-	bcs UNREACH_0282EE                   ;0282E3|B009    |0282EE;
+	bcs DB_UNREACH_0282EE                   ;0282E3|B009    |0282EE;
 	ldx.W #$d29d                         ;0282E5|A29DD2  |      ;
 	jsr.W Battle_DisplayMessage                    ;0282E8|203588  |028835;
 	lda.B #$ff                           ;0282EB|A9FF    |      ;
 	rts                                  ;0282ED|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0282EE:
+DB_UNREACH_0282EE:
 	db $a2,$ac,$d2,$20,$35,$88,$a9,$01,$85,$76,$60;0282EE|        |      ;
 ;      |        |      ;
 Battle_InitializeSlots:
@@ -885,7 +885,7 @@ Battle_ProcessWake:
 	lda.B $de                            ;0285E9|A5DE    |0004DE;
 	asl a;0285EB|0A      |      ;
 	tax                                  ;0285EC|AA      |      ;
-	jsr.W (UNREACH_02A1EB,x)             ;0285ED|FCEBA1  |02A1EB;
+	jsr.W (DB_UNREACH_02A1EB,x)             ;0285ED|FCEBA1  |02A1EB;
 	sep #$20                             ;0285F0|E220    |      ;
 	rep #$10                             ;0285F2|C210    |      ;
 	lda.B #$00                           ;0285F4|A900    |      ;
@@ -1047,7 +1047,7 @@ Battle_CalculateRegenHP:
 	clc                                  ;0286EE|18      |      ;
 	adc.W $04a0                          ;0286EF|6DA004  |0204A0;
 	tax                                  ;0286F2|AA      |      ;
-	lda.W DATA8_028715,x                 ;0286F3|BD1587  |028715;
+	lda.W DB_DATA8_028715,x                 ;0286F3|BD1587  |028715;
 	plx                                  ;0286F6|FA      |      ;
 	sta.W $04bf,x                        ;0286F7|9DBF04  |0204BF;
 	sta.W $0a05,x                        ;0286FA|9D050A  |020A05;
@@ -1068,7 +1068,7 @@ Battle_ApplyRegenHP:
 	rts                                  ;028714|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_028715:
+DB_DATA8_028715:
 	db $00,$00,$01,$01,$00,$00,$01,$02,$00,$01,$02,$03,$00,$01,$02,$03;028715|        |      ;
 ;      |        |      ;
 Battle_ProcessInput:
@@ -1400,12 +1400,12 @@ Battle_CalculateGPReward:
 	lda.B $54                            ;02895A|A554    |001254;
 	pha                                  ;02895C|48      |      ;
 	cmp.B #$42                           ;02895D|C942    |      ;
-	bcs UNREACH_028965                   ;02895F|B004    |028965;
+	bcs DB_UNREACH_028965                   ;02895F|B004    |028965;
 	lda.B #$03                           ;028961|A903    |      ;
 	bra Battle_MultiplyRewardByLevel                      ;028963|800A    |02896F;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_028965:
+DB_UNREACH_028965:
 	db $c9,$4a,$b0,$04,$a9,$06,$80,$02,$a9,$0a;028965|        |      ;
 ;      |        |      ;
 Battle_MultiplyRewardByLevel:
@@ -1851,7 +1851,7 @@ Battle_SetEnemyHP:
 	ldy.W #$0000                         ;028CD7|A00000  |      ;
 ;      |        |      ;
 Battle_SetEnemyLevel:
-	lda.W UNREACH_02CA6A,x               ;028CDA|BD6ACA  |02CA6A;
+	lda.W DB_UNREACH_02CA6A,x               ;028CDA|BD6ACA  |02CA6A;
 	pha                                  ;028CDD|48      |      ;
 	cmp.B #$ff                           ;028CDE|C9FF    |      ;
 	beq Battle_CalculateEnemyDefense                      ;028CE0|F002    |028CE4;
@@ -1869,7 +1869,7 @@ Battle_CalculateEnemyDefense:
 	tya                                  ;028CF5|98      |      ;
 	cmp.B #$03                           ;028CF6|C903    |      ;
 	bne Battle_SetEnemyLevel                      ;028CF8|D0E0    |028CDA;
-	lda.W UNREACH_02CA6A,x               ;028CFA|BD6ACA  |02CA6A;
+	lda.W DB_UNREACH_02CA6A,x               ;028CFA|BD6ACA  |02CA6A;
 	sta.B $af                            ;028CFD|85AF    |0004AF;
 	and.B #$30                           ;028CFF|2930    |      ;
 	sta.W $0a01                          ;028D01|8D010A  |020A01;
@@ -2351,11 +2351,11 @@ Battle_CommandWizardMagic:
 	jsr.W Battle_ProcessPetrifySpell                    ;029073|20DA99  |0299DA;
 	lda.B $3a                            ;029076|A53A    |00043A;
 	cmp.B #$4f                           ;029078|C94F    |      ;
-	beq UNREACH_02907D                   ;02907A|F001    |02907D;
+	beq DB_UNREACH_02907D                   ;02907A|F001    |02907D;
 	rts                                  ;02907C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02907D:
+DB_UNREACH_02907D:
 	db $46,$b7,$a9,$65,$8d,$a8,$00,$22,$83,$97,$00,$ad,$a9,$00,$85,$b9;02907D|        |0000B7;
 	db $22,$83,$97,$00,$ad,$a9,$00,$85,$b8,$a5,$b7,$c5,$b8,$b0,$01,$60;02908D|        |009783;
 	db $4c,$9b,$9c                       ;02909D|        |029C9B;
@@ -2494,12 +2494,12 @@ Battle_CommandItem:
 	db $0a,$c6,$b3,$22,$49,$d1,$02,$2b,$60;029200|        |      ;
 	lda.B $11                            ;029209|A511    |000411;
 	and.B #$08                           ;02920B|2908    |      ;
-	bne UNREACH_029215                   ;02920D|D006    |029215;
+	bne DB_UNREACH_029215                   ;02920D|D006    |029215;
 	jsr.W Battle_ApplyStatDebuff                    ;02920F|206499  |029964;
 	inc a;029212|1A      |      ;
 	beq Battle_UseItem                      ;029213|F058    |02926D;
 ;      |        |      ;
-UNREACH_029215:
+DB_UNREACH_029215:
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$a5,$17,$29,$80,$f0,$03,$4c;029215|        |000090;
 	db $7f,$97,$0b,$20,$2f,$8f,$a5,$10,$2b,$c5,$00,$f0,$02,$b0,$f0,$0b;029225|        |200B97;
 	db $20,$2f,$8f,$a5,$2e,$2b,$29,$04,$d0,$e5,$20,$d9,$97,$a5,$8b,$c9;029235|        |028F2F;
@@ -2533,12 +2533,12 @@ Battle_ValidateItem:
 	beq Battle_ItemValidated                      ;029295|F076    |02930D;
 	lda.B $11                            ;029297|A511    |000411;
 	and.B #$08                           ;029299|2908    |      ;
-	bne UNREACH_0292A3                   ;02929B|D006    |0292A3;
+	bne DB_UNREACH_0292A3                   ;02929B|D006    |0292A3;
 	jsr.W Battle_ApplyStatDebuff                    ;02929D|206499  |029964;
 	inc a;0292A0|1A      |      ;
 	beq Battle_ApplyItemEffect                      ;0292A1|F07A    |02931D;
 ;      |        |      ;
-UNREACH_0292A3:
+DB_UNREACH_0292A3:
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$20,$d9,$97,$a5,$3a,$c9,$16;0292A3|        |000090;
 	db $f0,$11,$46,$b7,$a5,$b7,$c5,$b8,$b0,$03,$4c,$85,$97,$20,$ca,$9c;0292B3|        |0292C6;
 	db $4c,$9b,$9c,$a5,$b7,$c5,$b8,$b0,$03,$4c,$85,$97,$0b,$20,$2f,$8f;0292C3|        |029C9B;
@@ -2583,14 +2583,14 @@ Battle_ItemEffectApplied:
 Battle_CommandDefend:
 	lda.B $11                            ;029345|A511    |000411;
 	and.B #$08                           ;029347|2908    |      ;
-	bne UNREACH_029354                   ;029349|D009    |029354;
+	bne DB_UNREACH_029354                   ;029349|D009    |029354;
 	jsr.W Battle_ApplyStatDebuff                    ;02934B|206499  |029964;
 	inc a;02934E|1A      |      ;
-	bne UNREACH_029354                   ;02934F|D003    |029354;
+	bne DB_UNREACH_029354                   ;02934F|D003    |029354;
 	jmp.W Battle_DefendStateSet                    ;029351|4CA693  |0293A6;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029354:
+DB_UNREACH_029354:
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$20,$d9,$97,$a5,$b7,$c5,$b8;029354|        |000090;
 	db $b0,$03,$4c,$85,$97,$20,$c4,$99,$20,$8b,$9a,$a5,$8d,$c9,$02,$90;029364|        |029369;
 	db $03,$20,$39,$9b,$a6,$77,$d0,$14,$0b,$20,$2f,$8f,$a5,$2e,$2b,$29;029374|        |000020;
@@ -2637,7 +2637,7 @@ Battle_AttemptEscape:
 	cmp.B #$0f                           ;0293CF|C90F    |      ;
 	beq Battle_EscapeSuccessful                      ;0293D1|F00D    |0293E0;
 	cmp.B #$10                           ;0293D3|C910    |      ;
-	beq UNREACH_0293E5                   ;0293D5|F00E    |0293E5;
+	beq DB_UNREACH_0293E5                   ;0293D5|F00E    |0293E5;
 	cmp.B #$11                           ;0293D7|C911    |      ;
 	beq Battle_EscapeFail                      ;0293D9|F00F    |0293EA;
 	jsr.W Battle_ProcessConfusionSpell                    ;0293DB|20DA9A  |029ADA;
@@ -2649,7 +2649,7 @@ Battle_EscapeSuccessful:
 	bra Battle_ProcessEscapeAttempt                      ;0293E3|8008    |0293ED;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0293E5:
+DB_UNREACH_0293E5:
 	db $20,$da,$9a,$80,$03               ;0293E5|        |029ADA;
 ;      |        |      ;
 Battle_EscapeFail:
@@ -2855,12 +2855,12 @@ Battle_ApplyDamageToTarget:
 	lda.B $10                            ;029568|A510    |001010;
 	pld                                  ;02956A|2B      |      ;
 	cmp.B $00                            ;02956B|C500    |000400;
-	beq UNREACH_029572                   ;02956D|F003    |029572;
-	bcc UNREACH_029572                   ;02956F|9001    |029572;
+	beq DB_UNREACH_029572                   ;02956D|F003    |029572;
+	bcc DB_UNREACH_029572                   ;02956F|9001    |029572;
 	rts                                  ;029571|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029572:
+DB_UNREACH_029572:
 	db $a4,$77,$84,$a0,$20,$8c,$95,$0b,$20,$22,$8f,$20,$c7,$95,$2b,$20;029572|        |000077;
 	db $de,$95,$20,$c8,$a0,$a6,$a0,$86,$77,$60,$08,$8c,$98,$00,$a9,$65;029582|        |002095;
 	db $8d,$a8,$00,$22,$83,$97,$00,$ad,$a9,$00,$8d,$9c,$00,$9c,$9d,$00;029592|        |0000A8;
@@ -3179,7 +3179,7 @@ Battle_StatusCured:
 	lda.B $de                            ;0297EF|A5DE    |0004DE;
 	asl a;0297F1|0A      |      ;
 	tax                                  ;0297F2|AA      |      ;
-	jmp.W (UNREACH_02992E,x)             ;0297F3|7C2E99  |02992E;
+	jmp.W (DB_UNREACH_02992E,x)             ;0297F3|7C2E99  |02992E;
 ;      |        |      ;
 	db $a5,$28,$85,$b7,$a9,$05,$4c,$95,$98;0297F6|        |000028;
 	lda.B $12                            ;0297FF|A512    |000412;
@@ -3370,7 +3370,7 @@ Battle_ProcessDebuffSpell:
 	rts                                  ;02992D|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02992E:
+DB_UNREACH_02992E:
 	db $95,$98,$f6,$97                   ;02992E|        |000098;
 	db $ff,$97,$12,$98,$20,$98,$2e,$98,$36,$98;029932|        |      ;
 	db $44,$98                           ;02993C|        |      ;
@@ -3782,11 +3782,11 @@ DATA8_029ba0:
 Battle_ApplyDrain:
 	lda.B $db                            ;029BB0|A5DB    |0004DB;
 	cmp.B #$08                           ;029BB2|C908    |      ;
-	beq UNREACH_029BB7                   ;029BB4|F001    |029BB7;
+	beq DB_UNREACH_029BB7                   ;029BB4|F001    |029BB7;
 	rts                                  ;029BB6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029BB7:
+DB_UNREACH_029BB7:
 	db $a5,$38,$c9,$20,$f0,$01,$60,$a2,$00,$00,$86,$77,$60;029BB7|        |000038;
 ;      |        |      ;
 Battle_TransferDrainedHP:
@@ -3843,11 +3843,11 @@ Battle_ReflectComplete:
 	jsr.W Battle_ShakeUp                    ;029C15|20129E  |029E12;
 	and.B #$50                           ;029C18|2950    |      ;
 	cmp.B #$50                           ;029C1A|C950    |      ;
-	beq UNREACH_029C1F                   ;029C1C|F001    |029C1F;
+	beq DB_UNREACH_029C1F                   ;029C1C|F001    |029C1F;
 	rts                                  ;029C1E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029C1F:
+DB_UNREACH_029C1F:
 	db $c2,$30,$46,$77,$e2,$20,$c2,$10,$20,$e1,$9b,$a2,$7b,$d3,$20,$3d;029C1F|        |      ;
 	db $88,$80,$63                       ;029C2F|        |      ;
 ;      |        |      ;
@@ -3877,13 +3877,13 @@ Battle_LoopAllTargets:
 Battle_ApplyToNextTarget:
 	lda.B $db                            ;029C59|A5DB    |0004DB;
 	and.B #$20                           ;029C5B|2920    |      ;
-	beq UNREACH_029C67                   ;029C5D|F008    |029C67;
+	beq DB_UNREACH_029C67                   ;029C5D|F008    |029C67;
 	ldx.W #$d372                         ;029C5F|A272D3  |      ;
 	jsr.W Battle_MessageLoop                    ;029C62|203D88  |02883D;
 	bra Battle_AllTargetsProcessed                      ;029C65|802E    |029C95;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029C67:
+DB_UNREACH_029C67:
 	db $a5,$db,$29,$10,$f0,$08,$a2,$77,$d3,$20,$3d,$88,$80,$20,$a5,$8d;029C67|        |0000DB;
 	db $c9,$02,$b0,$1d,$a5,$db,$29,$06,$f0,$08,$a2,$86,$d3,$20,$3d,$88;029C77|        |      ;
 	db $80,$0c,$a5,$db,$29,$01,$f0,$09,$a2,$8c,$d3,$20,$3d,$88;029C87|        |029C95;
@@ -4045,7 +4045,7 @@ Battle_FlashComplete:
 	bne Battle_ProcessShake                      ;029DB1|D036    |029DE9;
 	lda.B $8d                            ;029DB3|A58D    |00048D;
 	cmp.B #$02                           ;029DB5|C902    |      ;
-	bcs UNREACH_029DC8                   ;029DB7|B00F    |029DC8;
+	bcs DB_UNREACH_029DC8                   ;029DB7|B00F    |029DC8;
 	lda.B $dc                            ;029DB9|A5DC    |0004DC;
 	phd                                  ;029DBB|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;029DBC|202F8F  |028F2F;
@@ -4056,7 +4056,7 @@ Battle_FlashComplete:
 	rts                                  ;029DC7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029DC8:
+DB_UNREACH_029DC8:
 	db $0b,$20,$2f,$8f,$a9,$80,$85,$21,$2b,$a9,$00,$eb,$a5,$8d,$3a,$3a;029DC8|        |      ;
 	db $aa,$a9,$ff,$9d,$02,$0a,$a9,$00,$8d,$05,$05,$a2,$00,$00,$86,$77;029DD8|        |      ;
 	db $60                               ;029DE8|        |      ;
@@ -4170,10 +4170,10 @@ Battle_ApplyFadeStep:
 Battle_FadeComplete:
 	lda.B $38                            ;029E95|A538    |000438;
 	cmp.B #$30                           ;029E97|C930    |      ;
-	beq UNREACH_029EE8                   ;029E99|F04D    |029EE8;
+	beq DB_UNREACH_029EE8                   ;029E99|F04D    |029EE8;
 	lda.B $3a                            ;029E9B|A53A    |00043A;
 	cmp.B #$1d                           ;029E9D|C91D    |      ;
-	beq UNREACH_029EE8                   ;029E9F|F047    |029EE8;
+	beq DB_UNREACH_029EE8                   ;029E9F|F047    |029EE8;
 	ldx.W #$d2ea                         ;029EA1|A2EAD2  |      ;
 	jsr.W Battle_DisplayMessage                    ;029EA4|203588  |028835;
 	lda.B #$00                           ;029EA7|A900    |      ;
@@ -4217,7 +4217,7 @@ Battle_ProcessSound:
 	jmp.W Battle_DisplayMessage                    ;029EE5|4C3588  |028835;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_029EE8:
+DB_UNREACH_029EE8:
 	db $0b,$20,$2f,$8f,$a5,$21,$29,$c0,$d0,$0f,$a2,$03,$00,$b5,$4c,$95;029EE8|        |      ;
 	db $26,$18,$75,$2a,$95,$22,$ca,$10,$f4,$2b,$a2,$39,$d5,$4c,$35,$88;029EF8|        |000018;
 ;      |        |      ;
@@ -4377,11 +4377,11 @@ Battle_ProcessAccuracyCheck:
 	lda.B $2e                            ;02A00C|A52E    |0011AE;
 	pld                                  ;02A00E|2B      |      ;
 	and.B #$04                           ;02A00F|2904    |      ;
-	bne UNREACH_02A014                   ;02A011|D001    |02A014;
+	bne DB_UNREACH_02A014                   ;02A011|D001    |02A014;
 	rts                                  ;02A013|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A014:
+DB_UNREACH_02A014:
 	db $20,$c4,$97,$0b,$20,$2f,$8f,$a5,$2e,$2b,$29,$04,$f0,$47,$a5,$75;02A014|        |0297C4;
 	db $8d,$a0,$04,$c9,$4e,$f0,$04,$c9,$4f,$d0,$3a,$a9,$00,$eb,$a5,$8d;02A024|        |0004A0;
 	db $3a,$3a,$aa,$0b,$20,$2f,$8f,$a5,$62,$eb,$a5,$2e,$2b,$29,$04,$f0;02A034|        |      ;
@@ -4506,7 +4506,7 @@ Battle_ExecuteCounter:
 	sec                                  ;02A19A|38      |      ;
 	sbc.B #$22                           ;02A19B|E922    |      ;
 	tax                                  ;02A19D|AA      |      ;
-	lda.W UNREACH_02A1CC,x               ;02A19E|BDCCA1  |02A1CC;
+	lda.W DB_UNREACH_02A1CC,x               ;02A19E|BDCCA1  |02A1CC;
 	sta.B $e3                            ;02A1A1|85E3    |0004E3;
 	rts                                  ;02A1A3|60      |      ;
 ;      |        |      ;
@@ -4525,16 +4525,16 @@ Battle_CounterComplete:
 	sec                                  ;02A1B0|38      |      ;
 	sbc.B #$10                           ;02A1B1|E910    |      ;
 	tax                                  ;02A1B3|AA      |      ;
-	lda.W UNREACH_02A1BA,x               ;02A1B4|BDBAA1  |02A1BA;
+	lda.W DB_UNREACH_02A1BA,x               ;02A1B4|BDBAA1  |02A1BA;
 	sta.B $e2                            ;02A1B7|85E2    |0004E2;
 	rts                                  ;02A1B9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A1BA:
+DB_UNREACH_02A1BA:
 	db $3d,$28,$29,$27,$2a,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d,$3d;02A1BA|        |002928;
 	db $3d,$3d                           ;02A1CA|        |00163D;
 ;      |        |      ;
-UNREACH_02A1CC:
+DB_UNREACH_02A1CC:
 	db $16                               ;02A1CC|        |000023;
 	db $23,$24,$25,$26,$13               ;02A1CD|        |      ;
 	db $11,$12                           ;02A1D2|        |000012;
@@ -4547,7 +4547,7 @@ UNREACH_02A1CC:
 	db $16,$16                           ;02A1E4|        |      ;
 	db $16,$16,$16,$16,$60               ;02A1E6|        |000016;
 ;      |        |      ;
-UNREACH_02A1EB:
+DB_UNREACH_02A1EB:
 	db $a8,$8f,$ae,$8f                   ;02A1EB|        |      ;
 	db $d4,$8f,$d4,$8f,$d4,$8f,$2a,$90,$a0,$90;02A1EF|        |      ;
 	db $e2,$90                           ;02A1F9|        |      ;
@@ -4647,7 +4647,7 @@ Battle_ApplyDOT:
 	rep #$10                             ;02A2BE|C210    |      ;
 	lda.B $d0                            ;02A2C0|A5D0    |0004D0;
 	dec a;02A2C2|3A      |      ;
-	beq UNREACH_02A32E                   ;02A2C3|F069    |02A32E;
+	beq DB_UNREACH_02A32E                   ;02A2C3|F069    |02A32E;
 	rts                                  ;02A2C5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -4716,7 +4716,7 @@ Battle_CalculatePercentHP:
 	jmp.W Battle_SpeedModifierApplied                    ;02A32B|4C28A5  |02A528;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A32E:
+DB_UNREACH_02A32E:
 	db $e2,$20,$c2,$10,$a9,$65,$8d,$a8,$00,$22,$83,$97,$00,$ad,$a0,$10;02A32E|        |      ;
 	db $29,$0f,$3a,$aa,$bd,$6b,$a3,$cd,$a9,$00,$90,$01,$60,$ad,$2f,$10;02A33E|        |      ;
 	db $29,$02,$f0,$0b,$a9,$11,$8d,$d0,$10,$a9,$30,$0c,$20,$10,$60,$ad;02A34E|        |      ;
@@ -4983,11 +4983,11 @@ Battle_DefenseModifierApplied:
 	rep #$10                             ;02A503|C210    |      ;
 	lda.W $10b8                          ;02A505|ADB810  |0210B8;
 	and.B #$10                           ;02A508|2910    |      ;
-	beq UNREACH_02A511                   ;02A50A|F005    |02A511;
+	beq DB_UNREACH_02A511                   ;02A50A|F005    |02A511;
 	lda.w !char2_current_mp                          ;02A50C|AD9810  |021098;
 	bne Battle_ApplySpeedModifier                      ;02A50F|D005    |02A516;
 ;      |        |      ;
-UNREACH_02A511:
+DB_UNREACH_02A511:
 	db $64,$c5,$4c,$b4,$a2               ;02A511|        |0000C5;
 ;      |        |      ;
 Battle_ApplySpeedModifier:
@@ -5415,7 +5415,7 @@ Battle_BlockSuccess:
 	adc.B $a2                            ;02A7C9|65A2    |0004A2;
 	tax                                  ;02A7CB|AA      |      ;
 	pla                                  ;02A7CC|68      |      ;
-	lda.W UNREACH_02A82E,x               ;02A7CD|BD2EA8  |02A82E;
+	lda.W DB_UNREACH_02A82E,x               ;02A7CD|BD2EA8  |02A82E;
 	bne Battle_BlockFailed                      ;02A7D0|D003    |02A7D5;
 	db $4c,$5e,$a8                       ;02A7D2|        |02A85E;
 ;      |        |      ;
@@ -5471,14 +5471,14 @@ Battle_ParryFailed:
 	lda.B $2e                            ;02A823|A52E    |0011AE;
 	pld                                  ;02A825|2B      |      ;
 	and.B #$04                           ;02A826|2904    |      ;
-	bne UNREACH_02A82B                   ;02A828|D001    |02A82B;
+	bne DB_UNREACH_02A82B                   ;02A828|D001    |02A82B;
 	rts                                  ;02A82A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A82B:
+DB_UNREACH_02A82B:
 	db $4c,$81,$a8                       ;02A82B|        |02A881;
 ;      |        |      ;
-UNREACH_02A82E:
+DB_UNREACH_02A82E:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;02A82E|        |      ;
 	db $1a                               ;02A83A|        |      ;
 	db $00,$15,$00,$00,$00,$00,$00,$00,$00,$00,$00,$15,$00,$00,$00,$00;02A83B|        |      ;
@@ -5496,7 +5496,7 @@ Battle_DisplayParry:
 	bne Battle_ProcessStatusResistance                      ;02A866|D019    |02A881;
 	lda.B $c3                            ;02A868|A5C3    |0004C3;
 	and.B #$80                           ;02A86A|2980    |      ;
-	bne UNREACH_02A88F                   ;02A86C|D021    |02A88F;
+	bne DB_UNREACH_02A88F                   ;02A86C|D021    |02A88F;
 ;      |        |      ;
 Battle_ParryComplete:
 	lda.B #$65                           ;02A86E|A965    |      ;
@@ -5517,7 +5517,7 @@ Battle_ProcessStatusResistance:
 	jmp.W Battle_ImmunityComplete                    ;02A88C|4C50A9  |02A950;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A88F:
+DB_UNREACH_02A88F:
 	db $a2,$07,$00,$bd,$c4,$10,$29,$80,$f0,$03,$4c,$c6,$a8,$ca,$10,$f3;02A88F|        |      ;
 ;      |        |      ;
 Battle_CalculateStatusResist:
@@ -5613,11 +5613,11 @@ Battle_CheckImmunityFlags:
 	rep #$10                             ;02A924|C210    |      ;
 	xba                                  ;02A926|EB      |      ;
 	and.B #$04                           ;02A927|2904    |      ;
-	bne UNREACH_02A92C                   ;02A929|D001    |02A92C;
+	bne DB_UNREACH_02A92C                   ;02A929|D001    |02A92C;
 	rts                                  ;02A92B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02A92C:
+DB_UNREACH_02A92C:
 	db $4c,$81,$a8                       ;02A92C|        |02A881;
 ;      |        |      ;
 Battle_ImmuneToEffect:
@@ -5636,7 +5636,7 @@ Battle_NotImmune:
 	bne Battle_DisplayImmune                      ;02A940|D005    |02A947;
 	xba                                  ;02A942|EB      |      ;
 	and.B #$04                           ;02A943|2904    |      ;
-	bne UNREACH_02A92C                   ;02A945|D0E5    |02A92C;
+	bne DB_UNREACH_02A92C                   ;02A945|D0E5    |02A92C;
 ;      |        |      ;
 Battle_DisplayImmune:
 	inc.B $8d                            ;02A947|E68D    |00048D;
@@ -6659,7 +6659,7 @@ DATA8_02ae40:
 	db $19,$19,$16,$8a,$0a,$08,$00,$00   ;02CA52|        |      ;
 	db $14,$0f,$0f,$8a,$0a,$0a,$0a,$0a,$13,$0f,$0f,$0f,$89,$09,$09,$09;02CA5A|        |00000F;
 ;      |        |      ;
-UNREACH_02CA6A:
+DB_UNREACH_02CA6A:
 	db $00,$00,$ff,$11                   ;02CA6A|        |      ;
 	db $00,$00,$00,$10,$00,$00,$06,$00   ;02CA6E|        |      ;
 	db $06,$06,$ff,$11                   ;02CA76|        |000006;
@@ -7102,7 +7102,7 @@ Battle_TurnOrderComplete:
 	sep #$30                             ;02D224|E230    |      ;
 	lda.B $02                            ;02D226|A502    |000A02;
 	cmp.B #$50                           ;02D228|C950    |      ;
-	beq UNREACH_02D269                   ;02D22A|F03D    |02D269;
+	beq DB_UNREACH_02D269                   ;02D22A|F03D    |02D269;
 	stz.B $ec                            ;02D22C|64EC    |000AEC;
 	ldy.B #$00                           ;02D22E|A000    |      ;
 ;      |        |      ;
@@ -7122,7 +7122,7 @@ Battle_GetNextTurn:
 	lda.B #$18                           ;02D24C|A918    |      ;
 	xba                                  ;02D24E|EB      |      ;
 	lda.B #$0c                           ;02D24F|A90C    |      ;
-	jsl.L Label_0B92D6                    ;02D251|22D6920B|0B92D6;
+	jsl.L DB_Label_0B92D6                    ;02D251|22D6920B|0B92D6;
 	sep #$20                             ;02D255|E220    |      ;
 	rep #$10                             ;02D257|C210    |      ;
 	jsr.W Battle_ApplyShell                    ;02D259|2018DA  |02DA18;
@@ -7142,7 +7142,7 @@ Battle_ProcessATBGauge:
 	rtl                                  ;02D268|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02D269:
+DB_UNREACH_02D269:
 	db $20,$60,$ea,$a9,$20,$9f,$80,$c3,$7e,$a9,$00,$9f,$60,$c3,$7e,$a9;02D269|        |02EA60;
 	db $c5,$9f,$40,$c2,$7e,$a0,$00,$20,$60,$ea,$b9,$e2,$d2,$9f,$40,$c4;02D279|        |00009F;
 	db $7e,$c8,$b9,$e2,$d2,$9f,$60,$c4,$7e,$c8,$a9,$00,$9f,$80,$c4,$7e;02D289|        |00B9C8;
@@ -7832,7 +7832,7 @@ Battle_DoomCountdown:
 	lda.B #$05                           ;02D7C0|A905    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02D7C2|221E9700|00971E;
 	ldx.w !RDMPYL                          ;02D7C6|AE1642  |024216;
-	lda.L DATA8_098462,x                 ;02D7C9|BF628409|098462;
+	lda.L DB_DATA8_098462,x                 ;02D7C9|BF628409|098462;
 	sta.B $15                            ;02D7CD|8515    |000A15;
 	plp                                  ;02D7CF|28      |      ;
 	plx                                  ;02D7D0|FA      |      ;
@@ -7862,18 +7862,18 @@ Battle_DoomTriggerDeath:
 	lda.B #$05                           ;02D81C|A905    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02D81E|221E9700|00971E;
 	ldx.w !RDMPYL                          ;02D822|AE1642  |024216;
-	lda.L DATA8_098460,x                 ;02D825|BF608409|098460;
+	lda.L DB_DATA8_098460,x                 ;02D825|BF608409|098460;
 	sta.B $69                            ;02D829|8569    |000A69;
-	lda.L DATA8_098461,x                 ;02D82B|BF618409|098461;
+	lda.L DB_DATA8_098461,x                 ;02D82B|BF618409|098461;
 	sta.B $6a                            ;02D82F|856A    |000A6A;
-	lda.L DATA8_098462,x                 ;02D831|BF628409|098462;
+	lda.L DB_DATA8_098462,x                 ;02D831|BF628409|098462;
 	sta.B $6b                            ;02D835|856B    |000A6B;
 	phb                                  ;02D837|8B      |      ;
-	lda.L DATA8_098464,x                 ;02D838|BF648409|098464;
+	lda.L DB_DATA8_098464,x                 ;02D838|BF648409|098464;
 	cmp.B #$ff                           ;02D83C|C9FF    |      ;
-	beq UNREACH_02D89B                   ;02D83E|F05B    |02D89B;
+	beq DB_UNREACH_02D89B                   ;02D83E|F05B    |02D89B;
 	pha                                  ;02D840|48      |      ;
-	lda.L DATA8_098463,x                 ;02D841|BF638409|098463;
+	lda.L DB_DATA8_098463,x                 ;02D841|BF638409|098463;
 	pha                                  ;02D845|48      |      ;
 	rep #$30                             ;02D846|C230    |      ;
 	lda.B $83                            ;02D848|A583    |000A83;
@@ -7928,7 +7928,7 @@ Battle_DoomTriggerDeath:
 	rts                                  ;02D89A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02D89B:
+DB_UNREACH_02D89B:
 	db $e2,$30,$a6,$83,$b5,$07,$c9,$03,$d0,$01,$3a,$18,$69,$29,$48,$a9;02D89B|        |      ;
 	db $28,$48,$80,$97                   ;02D8AB|        |      ;
 ;      |        |      ;
@@ -8349,12 +8349,12 @@ Battle_RegenComplete:
 	sep #$20                             ;02DBB0|E220    |      ;
 	rep #$10                             ;02DBB2|C210    |      ;
 	lda.B $9c                            ;02DBB4|A59C    |000A9C;
-	beq UNREACH_02DBBD                   ;02DBB6|F005    |02DBBD;
+	beq DB_UNREACH_02DBBD                   ;02DBB6|F005    |02DBBD;
 	jsr.W Battle_ApplySap                    ;02DBB8|20DDDC  |02DCDD;
 	bra Battle_ProcessSap                      ;02DBBB|8003    |02DBC0;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02DBBD:
+DB_UNREACH_02DBBD:
 	db $20,$30,$dd                       ;02DBBD|        |02DD30;
 ;      |        |      ;
 Battle_ProcessSap:
@@ -8443,7 +8443,7 @@ Battle_ProcessSap:
 	lda.w !char2_active_flag                          ;02DC69|ADA010  |0210A0;
 	and.B #$0f                           ;02DC6C|290F    |      ;
 	tay                                  ;02DC6E|A8      |      ;
-	lda.W UNREACH_02DCD4,y               ;02DC6F|B9D4DC  |02DCD4;
+	lda.W DB_UNREACH_02DCD4,y               ;02DC6F|B9D4DC  |02DCD4;
 	pha                                  ;02DC72|48      |      ;
 	phd                                  ;02DC73|0B      |      ;
 	pea.W $0c00                          ;02DC74|F4000C  |020C00;
@@ -8497,7 +8497,7 @@ Battle_ProcessSap:
 ;      |        |      ;
 	db $0c,$10,$02,$02,$12,$10,$02,$02,$0f,$10,$02,$02,$ff,$ff,$02,$02;02DCC4|        |      ;
 ;      |        |      ;
-UNREACH_02DCD4:
+DB_UNREACH_02DCD4:
 	db $1c                               ;02DCD4|        |004C34;
 	db $34,$4c,$64,$7c,$34,$4c           ;02DCD5|        |      ;
 	db $64,$7c                           ;02DCDB|        |00007C;
@@ -8587,7 +8587,7 @@ Battle_ProcessSlip:
 	phy                                  ;02DF3F|5A      |      ;
 	php                                  ;02DF40|08      |      ;
 	tax                                  ;02DF41|AA      |      ;
-	lda.W UNREACH_02DF5B,x               ;02DF42|BD5BDF  |02DF5B;
+	lda.W DB_UNREACH_02DF5B,x               ;02DF42|BD5BDF  |02DF5B;
 	sta.W $0aee                          ;02DF45|8DEE0A  |020AEE;
 	pea.W DATA8_02df53                   ;02DF48|F453DF  |02DF53;
 	jsl.L CallSpriteInitializer                    ;02DF4B|22BE9700|0097BE;
@@ -8601,7 +8601,7 @@ DATA8_02df53:
 	db $7f,$df,$80,$df,$81,$df           ;02DF53|        |      ;
 	db $80,$df                           ;02DF59|        |02DF3A;
 ;      |        |      ;
-UNREACH_02DF5B:
+DB_UNREACH_02DF5B:
 	db $03                               ;02DF5B|        |000000;
 	db $00,$00,$01,$00,$00,$00,$00       ;02DF5C|        |      ;
 	db $00,$00,$00,$00                   ;02DF63|        |      ;
@@ -9546,11 +9546,11 @@ Battle_ProcessPhysicalBarrier:
 	sep #$20                             ;02E746|E220    |      ;
 	lda.W DATA8_02e781                   ;02E748|AD81E7  |02E781;
 	cmp.B $b4                            ;02E74B|C5B4    |000AB4;
-	beq UNREACH_02E777                   ;02E74D|F028    |02E777;
+	beq DB_UNREACH_02E777                   ;02E74D|F028    |02E777;
 	cmp.B $b5                            ;02E74F|C5B5    |000AB5;
-	beq UNREACH_02E777                   ;02E751|F024    |02E777;
+	beq DB_UNREACH_02E777                   ;02E751|F024    |02E777;
 	cmp.B $b6                            ;02E753|C5B6    |000AB6;
-	beq UNREACH_02E777                   ;02E755|F020    |02E777;
+	beq DB_UNREACH_02E777                   ;02E755|F020    |02E777;
 	lda.B $b4                            ;02E757|A5B4    |000AB4;
 	cmp.B #$24                           ;02E759|C924    |      ;
 	bne Battle_ApplyPhysicalBarrier                      ;02E75B|D004    |02E761;
@@ -9573,7 +9573,7 @@ Battle_PhysicalBarrierComplete:
 	rts                                  ;02E776|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02E777:
+DB_UNREACH_02E777:
 	db $85,$b4,$a9,$ff,$85,$b5,$85,$b6,$80,$f4;02E777|        |0000B4;
 ;      |        |      ;
 DATA8_02e781:
@@ -10061,7 +10061,7 @@ Battle_ApplyVanish:
 Battle_VanishEvadePhysical:
 	jsr.W Battle_ProcessSafeguard                    ;02EA7F|209FEA  |02EA9F;
 	cmp.B #$80                           ;02EA82|C980    |      ;
-	bpl UNREACH_02EA9C                   ;02EA84|1016    |02EA9C;
+	bpl DB_UNREACH_02EA9C                   ;02EA84|1016    |02EA9C;
 	pha                                  ;02EA86|48      |      ;
 ;      |        |      ;
 Battle_VanishComplete:
@@ -10080,7 +10080,7 @@ Battle_VanishComplete:
 	rts                                  ;02EA9B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02EA9C:
+DB_UNREACH_02EA9C:
 	db $a9,$ff,$60                       ;02EA9C|        |      ;
 ;      |        |      ;
 Battle_ProcessSafeguard:
@@ -10100,7 +10100,7 @@ Battle_ApplySafeguard:
 	pla                                  ;02EAB1|68      |      ;
 	inc a;02EAB2|1A      |      ;
 	cmp.B #$80                           ;02EAB3|C980    |      ;
-	bpl UNREACH_02EAC6                   ;02EAB5|100F    |02EAC6;
+	bpl DB_UNREACH_02EAC6                   ;02EAB5|100F    |02EAC6;
 	dey                                  ;02EAB7|88      |      ;
 	bne Battle_ApplySafeguard                      ;02EAB8|D0E8    |02EAA2;
 	sec                                  ;02EABA|38      |      ;
@@ -10117,7 +10117,7 @@ Battle_SafeguardImmuneStatus:
 	bra Battle_ApplySafeguard                      ;02EAC4|80DC    |02EAA2;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02EAC6:
+DB_UNREACH_02EAC6:
 	db $a9,$ff,$80,$f3                   ;02EAC6|        |      ;
 ;      |        |      ;
 Battle_SafeguardComplete:
@@ -10517,7 +10517,7 @@ Battle_ProcessFuryEffect:
 	beq Battle_FuryDamageMultiplier                      ;02ED3D|F02C    |02ED6B;
 	bmi Battle_ApplyLimitBreak                      ;02ED3F|3046    |02ED87;
 	cmp.W #$7ffe                         ;02ED41|C9FE7F  |      ;
-	beq UNREACH_02ED90                   ;02ED44|F04A    |02ED90;
+	beq DB_UNREACH_02ED90                   ;02ED44|F04A    |02ED90;
 ;      |        |      ;
 Battle_ApplyFury:
 	jsr.W Battle_OverdriveExecute                    ;02ED46|201FEE  |02EE1F;
@@ -10567,7 +10567,7 @@ Battle_ApplyLimitBreak:
 	bra Battle_ApplyFury                      ;02ED8E|80B6    |02ED46;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02ED90:
+DB_UNREACH_02ED90:
 	db $a9,$00,$00,$ce,$dd,$0a,$80,$ae   ;02ED90|        |      ;
 ;      |        |      ;
 Battle_LimitBreakPower:
@@ -11311,7 +11311,7 @@ DATA8_02f2f7:
 	tay                                  ;02F327|A8      |      ;
 	lda.L $7ec400,x                      ;02F328|BF00C47E|7EC400;
 	cmp.B #$05                           ;02F32C|C905    |      ;
-	bpl UNREACH_02F33B                   ;02F32E|100B    |02F33B;
+	bpl DB_UNREACH_02F33B                   ;02F32E|100B    |02F33B;
 	pea.W DATA8_02f33d                   ;02F330|F43DF3  |02F33D;
 	jsl.L CallSpriteInitializer                    ;02F333|22BE9700|0097BE;
 	plp                                  ;02F337|28      |      ;
@@ -11320,7 +11320,7 @@ DATA8_02f2f7:
 	rts                                  ;02F33A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F33B:
+DB_UNREACH_02F33B:
 	db $80,$fe                           ;02F33B|        |02F33B;
 ;      |        |      ;
 DATA8_02f33d:
@@ -11461,7 +11461,7 @@ Battle_AnimTileSwap:
 	asl a;02F428|0A      |      ;
 	asl a;02F429|0A      |      ;
 	tax                                  ;02F42A|AA      |      ;
-	lda.W UNREACH_02F46B,y               ;02F42B|B96BF4  |02F46B;
+	lda.W DB_UNREACH_02F46B,y               ;02F42B|B96BF4  |02F46B;
 	cmp.B #$80                           ;02F42E|C980    |      ;
 	beq Battle_AnimReset                      ;02F430|F028    |02F45A;
 	pha                                  ;02F432|48      |      ;
@@ -11497,7 +11497,7 @@ Battle_AnimReset:
 	bra Battle_AnimComplete                      ;02F469|80EE    |02F459;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F46B:
+DB_UNREACH_02F46B:
 	db $00                               ;02F46B|        |      ;
 	db $08,$00,$00,$f8,$00,$00,$04,$00,$fc,$00,$02,$00,$fe,$00,$01,$ff;02F46C|        |      ;
 	db $00,$00,$00,$00,$80               ;02F47C|        |      ;
@@ -11575,7 +11575,7 @@ Battle_HiddenBattlerUpdate:
 	sta.W $0c03,y                        ;02F4EE|99030C  |020C03;
 	lda.L $7ec240,x                      ;02F4F1|BF40C27E|7EC240;
 	bit.B #$20                           ;02F4F5|8920    |      ;
-	bne UNREACH_02F510                   ;02F4F7|D017    |02F510;
+	bne DB_UNREACH_02F510                   ;02F4F7|D017    |02F510;
 	lda.W $0af0                          ;02F4F9|ADF00A  |020AF0;
 	beq Battle_SpriteOffsetCalc                      ;02F4FC|F006    |02F504;
 	cmp.B #$01                           ;02F4FE|C901    |      ;
@@ -11592,7 +11592,7 @@ Battle_SpriteOffsetCalc:
 	rts                                  ;02F50F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02F510:
+DB_UNREACH_02F510:
 	db $bf,$e0,$c2,$7e,$0a,$1f,$e0,$c2,$7e,$29,$f7,$80,$e7,$bf,$e0,$c2;02F510|        |7EC2E0;
 	db $7e,$0a,$0a,$1f,$e0,$c2,$7e,$29,$33,$0a,$80,$d8;02F520|        |000A0A;
 ;      |        |      ;
@@ -12083,7 +12083,7 @@ DATA8_02f9f9:
 	bne Battle_CharGfxLoad                      ;02FA1E|D00F    |02FA2F;
 	lda.L $7ec360,x                      ;02FA20|BF60C37E|7EC360;
 	cmp.B #$11                           ;02FA24|C911    |      ;
-	bpl UNREACH_02FA30                   ;02FA26|1008    |02FA30;
+	bpl DB_UNREACH_02FA30                   ;02FA26|1008    |02FA30;
 	pea.W DATA8_02f9f9                   ;02FA28|F4F9F9  |02F9F9;
 	jsl.L CallSpriteInitializer                    ;02FA2B|22BE9700|0097BE;
 ;      |        |      ;
@@ -12091,7 +12091,7 @@ Battle_CharGfxLoad:
 	rts                                  ;02FA2F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_02FA30:
+DB_UNREACH_02FA30:
 	db $00,$00                           ;02FA30|        |      ;
 	php                                  ;02FA32|08      |      ;
 	phd                                  ;02FA33|0B      |      ;
@@ -12103,7 +12103,7 @@ UNREACH_02FA30:
 	ldy.B #$04                           ;02FA40|A004    |      ;
 	jsr.W Battle_VanishEvadePhysical                    ;02FA42|207FEA  |02EA7F;
 	cmp.B #$ff                           ;02FA45|C9FF    |      ;
-	beq UNREACH_02FA30                   ;02FA47|F0E7    |02FA30;
+	beq DB_UNREACH_02FA30                   ;02FA47|F0E7    |02FA30;
 	sta.L $7ec260,x                      ;02FA49|9F60C27E|7EC260;
 	rep #$30                             ;02FA4D|C230    |      ;
 	and.W #$00ff                         ;02FA4F|29FF00  |      ;
@@ -12273,7 +12273,7 @@ Battle_CharLoadComplete:
 	lda.L $7ec320,x                      ;02FB55|BF20C37E|7EC320;
 	clc                                  ;02FB59|18      |      ;
 	adc.B #$08                           ;02FB5A|6908    |      ;
-	jsl.L Label_0B92D6                    ;02FB5C|22D6920B|0B92D6;
+	jsl.L DB_Label_0B92D6                    ;02FB5C|22D6920B|0B92D6;
 	rts                                  ;02FB60|60      |      ;
 ;      |        |      ;
 	db $85,$fb,$b7,$fb,$2b,$fc,$f1,$fb,$2b,$fc,$b7,$fb,$2b,$fc,$f1,$fb;02FB61|        |0000FB;

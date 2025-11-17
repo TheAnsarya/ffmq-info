@@ -1064,7 +1064,7 @@ Field_HandleInput:
 	pla                                  ;018A41|68      |      ;
 	bit.B #$02                           ;018A42|8902    |      ;
 	bne Field_InputCheck                      ;018A44|D005    |018A4B;
-	jsl.L Label_079030                    ;018A46|22309007|079030;
+	jsl.L DB_Label_079030                    ;018A46|22309007|079030;
 	rts                                  ;018A4A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -13721,7 +13721,7 @@ Field_WakeFromRest:
 ;      |        |      ;
 	ldy.w !player_map_x                          ;01F0F6|AC890E  |010E89;
 	jsr.W Field_CheckEntityBridge                    ;01F0F9|2026F3  |01F326;
-	bcs UNREACH_01F119                   ;01F0FC|B01B    |01F119;
+	bcs DB_UNREACH_01F119                   ;01F0FC|B01B    |01F119;
 ;      |        |      ;
 Field_ProcessSavePoint:
 	lda.B #$05                           ;01F0FE|A905    |      ;
@@ -13733,7 +13733,7 @@ Field_ProcessSavePoint:
 ;      |        |      ;
 	ldy.w !player_map_x                          ;01F109|AC890E  |010E89;
 	jsr.W Field_CheckEntityBridge                    ;01F10C|2026F3  |01F326;
-	bcs UNREACH_01F119                   ;01F10F|B008    |01F119;
+	bcs DB_UNREACH_01F119                   ;01F10F|B008    |01F119;
 ;      |        |      ;
 Field_DisplaySaveMenu:
 	lda.B #$10                           ;01F111|A910    |      ;
@@ -13742,7 +13742,7 @@ Field_DisplaySaveMenu:
 	lda.w !world_map_flag                          ;01F114|AD5B1A  |011A5B;
 	beq Field_ProcessSavePoint                      ;01F117|F0E5    |01F0FE;
 ;      |        |      ;
-UNREACH_01F119:
+DB_UNREACH_01F119:
 	db $a9,$00,$60                       ;01F119|        |      ;
 	lda.w !world_map_flag                          ;01F11C|AD5B1A  |011A5B;
 	beq Field_DisplaySaveMenu                      ;01F11F|F0F0    |01F111;
@@ -13758,7 +13758,7 @@ Field_ExecuteSaveGame:
 	rts                                  ;01F134|60      |      ;
 ;      |        |      ;
 	lda.w !world_map_flag                          ;01F135|AD5B1A  |011A5B;
-	bne UNREACH_01F16F                   ;01F138|D035    |01F16F;
+	bne DB_UNREACH_01F16F                   ;01F138|D035    |01F16F;
 	lda.W DATA8_01f42d,x                 ;01F13A|BD2DF4  |01F42D;
 	tay                                  ;01F13D|A8      |      ;
 	lda.w !context_param                          ;01F13E|AD880E  |010E88;
@@ -13794,7 +13794,7 @@ Field_CompleteSaveGame:
 	rts                                  ;01F16E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01F16F:
+DB_UNREACH_01F16F:
 	db $a9,$02,$8d,$28,$19,$bd,$2d,$f4,$8d,$d7,$19,$20,$b7,$f3,$b0,$ed;01F16F|        |      ;
 	db $20,$12,$f2,$ad,$d5,$19,$8d,$d3,$19,$ae,$cf,$19,$8e,$cb,$19,$a9;01F17F|        |01F212;
 	db $02,$60,$ee,$b0,$19,$a2,$02,$70,$8e,$ee,$19,$a9,$00,$60;01F18F|        |      ;

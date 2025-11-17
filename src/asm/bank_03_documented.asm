@@ -1531,7 +1531,7 @@
 ; and unreachable data blocks from lines 1200-2200 (1000 source lines)
 ;
 ; KEY SYSTEMS DOCUMENTED:
-; - UNREACH_03D5E5: Unreachable pointer table (orphaned development data)
+; - DB_UNREACH_03D5E5: Unreachable pointer table (orphaned development data)
 ; - Massive Compressed Text Dictionary ($03d6dd-$03eacb, 3KB+ compressed dialogue)
 ; - Multi-Layer Text Compression (Dictionary + RLE + Control Codes)
 ; - Recursive Dictionary References (entries can reference other entries)
@@ -1648,11 +1648,11 @@
 ; $0a = Choice prompt marker
 
 ; ------------------------------------------------------------
-; UNREACH_03D5E5 - Unreachable Data Block
+; DB_UNREACH_03D5E5 - Unreachable Data Block
 ; Orphaned Jump Table (Development Artifact / Cut Content)
 ; ------------------------------------------------------------
 
-UNREACH_03D5E5:
+DB_UNREACH_03D5E5:
 ; Pointer Table (never executed by game code)
 ; Likely leftover from development or cut features
 ; Analysis: No code paths lead to $03d5e5-$03d67b

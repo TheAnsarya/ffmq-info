@@ -1,4 +1,4 @@
-﻿	SNES_INIDISP = $002100               ;      |        |      ;
+	SNES_INIDISP = $002100               ;      |        |      ;
 	SNES_OBJSEL = $002101                ;      |        |      ;
 	SNES_OAMADDL = $002102               ;      |        |      ;
 	SNES_OAMADDH = $002103               ;      |        |      ;
@@ -194,7 +194,7 @@
 	LOOSE_OP_008B84 = $008b84            ;      |        |      ;
 	LOOSE_OP_008B95 = $008b95            ;      |        |      ;
 	LOOSE_OP_00BCF3 = $00bcf3            ;      |        |      ;
-	LOOSE_OP_00CAB5 = $00cab5            ;      |        |      ;
+	DB_LOOSE_OP_00CAB5 = $00cab5            ;      |        |      ;
 	PTR16_00FFFF = $00ffff               ;      |        |      ;
 
 ; ===============================================================================

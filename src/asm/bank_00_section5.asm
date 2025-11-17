@@ -1,4 +1,4 @@
-﻿; ===========================================================================
+; ===========================================================================
 ; Continued Bank $00 Disassembly - Section 5
 ; Lines 2400-3200 (Menu/UI/Math routines)
 ; ===========================================================================
@@ -150,12 +150,12 @@ Menu_CommandCleanup:
 Menu_TransitionOpen:
 ; Open menu transition
 	jsr.W				   Menu_TransitionSetup ; Common transition setup
-	jmp.W				   Label_00803A ; Jump to menu open handler
+	jmp.W				   DB_Label_00803A ; Jump to menu open handler
 
 Menu_TransitionClose:
 ; Close menu transition
 	jsr.W				   Menu_TransitionSetup ; Common transition setup
-	jmp.W				   Label_008016 ; Jump to menu close handler
+	jmp.W				   DB_Label_008016 ; Jump to menu close handler
 
 Menu_TransitionSetup:
 ; Common transition setup
@@ -263,15 +263,15 @@ Input_CheckDelayCounter:
 ; Check if input locked
 	lda.W				   #$0080	; Bit 7 = input lock
 	and.W				   $00e2	 ; Check state flags
-	bne					 UNREACH_0093C9 ; If locked, skip
+	bne					 DB_UNREACH_0093C9 ; If locked, skip
 
 	jsr.W				   Input_ReadControllerState ; Read controller state
-	bne					 UNREACH_0093C9 ; If buttons pressed, skip text processing
+	bne					 DB_UNREACH_0093C9 ; If buttons pressed, skip text processing
 
 ; Check text scroll state
 	lda.W				   #$0002	; Bit 1 = text scrolling
 	and.W				   $00db	 ; Check menu flags
-	bne					 UNREACH_009385 ; If scrolling, handle differently
+	bne					 DB_UNREACH_009385 ; If scrolling, handle differently
 
 ; Start text scroll
 	lda.W				   #$0002	; Bit 1
@@ -285,7 +285,7 @@ Input_CheckDelayCounter:
 	lsr					 a
 	bra					 ProcessNibble ; Process nibble
 
-UNREACH_009385:
+DB_UNREACH_009385:
 ; Continue text scroll (get low nibble)
 	db											 $a9,$02,$00,$1c,$db,$00,$a7,$53,$e6,$53 ; Clear scroll, get low nibble
 
@@ -313,7 +313,7 @@ Text_LoadCharacter:
 	sta.B				   $90	   ; Store character (DP $0090)
 	rts							   ; Return
 
-UNREACH_0093C9:
+DB_UNREACH_0093C9:
 	db											 $4c,$4b,$95 ; JMP to input handler
 
 ; ===========================================================================
@@ -422,7 +422,7 @@ Math_DivideLoop:
 	rol.B				   $a2	   ; Rotate into remainder
 
 	lda.B				   $a2	   ; Get remainder
-	bcs					 UNREACH_009710 ; If carry set, definitely >= divisor
+	bcs					 DB_UNREACH_009710 ; If carry set, definitely >= divisor
 
 ; Check if remainder >= divisor
 SEC_Label:
@@ -430,7 +430,7 @@ SEC_Label:
 	bcs					 Math_DivisionSucceeded ; If no borrow, division succeeded
 	bra					 Math_SkipQuotientBit ; Skip setting quotient bit
 
-UNREACH_009710:
+DB_UNREACH_009710:
 	db											 $e5,$9c	 ; SBC.B $9c (subtract divisor)
 
 Math_DivisionSucceeded:

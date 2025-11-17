@@ -27,9 +27,9 @@ Main_InitSequence:
 	jsr.W Init_SNES                    ;008029|20F081  |0081F0;
 	lda.W #$0040                         ;00802C|A94000  |      ;
 	and.w !system_flags_5                          ;00802F|2DDA00  |0000DA;
-	bne Label_00806E                      ;008032|D03A    |00806E;
+	bne DB_Label_00806E                      ;008032|D03A    |00806E;
 	jsl.L CodeScreenInitialization                    ;008034|2280800C|0C8080;
-	bra Label_00804D                      ;008038|8013    |00804D;
+	bra DB_Label_00804D                      ;008038|8013    |00804D;
 ;      |        |      ;
 ;      |        |      ;
 Init_FinalSetup:
@@ -1934,7 +1934,7 @@ Frame_NoOverflow:
 ;      |        |      ;
 ;      |        |      ;
 Frame_StandardUpdate:
-	jsr.W Store_008BFD                    ;008999|20FD8B  |008BFD;
+	jsr.W DB_Store_008BFD                    ;008999|20FD8B  |008BFD;
 	lda.W #$0010                         ;00899C|A91000  |      ;
 	and.w !system_flags_5                          ;00899F|2DDA00  |0200DA;
 	bne Frame_CheckInputMask             ;0089A2|D008    |0089AC;
@@ -3247,7 +3247,7 @@ Cursor_CalcPosition:
 ;   5. Check game mode flag (battle vs field):
 ;      
 ;      BATTLE MODE ($D8 bit 1 set):
-;        a) Load Y offset from DATA8_049800 table
+;        a) Load Y offset from DB_DATA8_049800 table
 ;        b) Add $0A to Y offset
 ;        c) Extract column and row from grid position
 ;        d) Calculate sprite tile indices
@@ -3349,7 +3349,7 @@ Cursor_CalcPosition:
 ;   Creates flashing effect for cursor attention/emphasis
 ;
 ; DATA TABLE REFERENCE:
-;   DATA8_049800 (bank $04, offset $9800):
+;   DB_DATA8_049800 (bank $04, offset $9800):
 ;     Y offset lookup table for cursor grid positions
 ;     Each grid position maps to Y pixel offset
 ;     Used to calculate vertical sprite position
@@ -3424,18 +3424,18 @@ Cursor_CalcPosition:
 ;   - Cursor_CalcTileIndex ($008D8A): Grid to tilemap index
 ;   - VBlank_OAMTransfer: Transfers OAM to hardware
 ;   - Menu_UpdateCursor: Main cursor update logic
-;   - DATA8_049800: Y offset lookup table (bank $04)
+;   - DB_DATA8_049800: Y offset lookup table (bank $04)
 ;===============================================================================
 Cursor_UpdateSprite:
 	php	; Save processor status (preserve 8/16-bit modes)
 	sep #$30	; Set 8-bit A/X/Y for OAM operations
 	ldx.w !ram_1031	; X = cursor grid position from $1031
 	cpx.B #$ff	; Check if cursor disabled ($FF = hidden)
-	beq UNREACH_008C81	; If disabled, return immediately (cursor not visible)
+	beq DB_UNREACH_008C81	; If disabled, return immediately (cursor not visible)
 	lda.B #$02	; Test system_flags_4 bit 1 (battle mode flag)
 	and.w !system_flags_4	; Check if in battle mode
 	beq Cursor_UpdateSprite_Field	; If clear, use field mode cursor → branch
-	lda.L DATA8_049800,x	; A = Y offset from table (grid pos → Y pixel)
+	lda.L DB_DATA8_049800,x	; A = Y offset from table (grid pos → Y pixel)
 	adc.B #$0a	; Add $0A to Y offset (vertical positioning adjustment)
 	xba	; Swap A bytes: save Y offset to high byte temporarily
 	txa	; A = cursor grid position (reload from X)
@@ -3465,7 +3465,7 @@ Cursor_DeadCode_PhpRts:
 	db $28,$60	; Dead code: php, rts (leftover from refactoring, unreachable due to BRA above)
 ;      |        |      ;
 Cursor_UpdateSprite_Field:
-	lda.L DATA8_049800,x	; A = Y offset from table (field mode lookup)
+	lda.L DB_DATA8_049800,x	; A = Y offset from table (field mode lookup)
 	asl a	; Y offset × 2
 	asl a	; Y offset × 4 (scale for tile calculation)
 	sta.w !tile_offset_1	; Store to $F4 (tile offset for field cursor)
@@ -3526,7 +3526,7 @@ Cursor_UpdateSprite_DigitLoop:
 	adc.B #$8a	; A + $8A: convert remainder to ones digit tile index
 	sta.W $0002,x	; Store ones digit tile to OAM (+2 offset, right sprite)
 	cpy.W #$0000	; Check if tens = 0 (single digit number)
-	beq UNREACH_008D06	; If zero tens, special handling → branch
+	beq DB_UNREACH_008D06	; If zero tens, special handling → branch
 	tya	; A = tens count (0-9)
 	adc.B #$7f	; A + $7F: convert to tens digit tile index
 	sta.W $0000,x	; Store tens digit tile to OAM (left sprite)
@@ -3577,7 +3577,7 @@ Cursor_UpdateSprite_Done:
 ;      BATTLE MODE ($D8 bit 1 set):
 ;        a) Load second cursor position from $10B1
 ;        b) If $FF (disabled), return immediately
-;        c) Load Y offset from DATA8_049800 table
+;        c) Load Y offset from DB_DATA8_049800 table
 ;        d) Add $0A to Y offset (vertical positioning)
 ;        e) Extract column and row from grid position
 ;        f) Calculate sprite tile indices (same formula as Cursor_UpdateSprite)
@@ -3696,7 +3696,7 @@ Cursor_UpdateSprite_Done:
 ;   - Cursor_UpdateSprite ($008C3D): First cursor update (more features)
 ;   - Cursor_CalcTileIndex ($008D8A): Grid to tilemap index conversion
 ;   - Cursor_CalcPosition ($008C1B): Grid to pixel coordinate
-;   - DATA8_049800: Y offset lookup table (bank $04)
+;   - DB_DATA8_049800: Y offset lookup table (bank $04)
 ;===============================================================================
 Menu2_UpdateCursor:
 	php	; Save processor status (preserve 8/16-bit modes)
@@ -3707,7 +3707,7 @@ Menu2_UpdateCursor:
 	ldx.w !char1_cursor_pos	; X = second cursor grid position from $10B1
 	cpx.B #$ff	; Check if cursor disabled ($FF = hidden)
 	beq Menu2_UpdateCursor_Return	; If disabled, return immediately (no update)
-	lda.L DATA8_049800,x	; A = Y offset from table (grid pos → Y pixel)
+	lda.L DB_DATA8_049800,x	; A = Y offset from table (grid pos → Y pixel)
 	adc.B #$0a	; Add $0A to Y offset (vertical positioning adjustment)
 	xba	; Swap A bytes: save Y offset to high byte temporarily
 	txa	; A = second cursor grid position (reload from X)
@@ -3737,7 +3737,7 @@ Menu2_UpdateCursor_Return:
 ;      |        |      ;
 Menu2_UpdateCursor_Field:
 	ldx.w !char1_cursor_pos	; X = second cursor grid position from $10B1
-	lda.L DATA8_049800,x	; A = Y offset from table (field mode lookup)
+	lda.L DB_DATA8_049800,x	; A = Y offset from table (field mode lookup)
 	asl a	; Y offset × 2
 	asl a	; Y offset × 4 (scale for tile calculation)
 	sta.w !tile_offset_2	; Store to $F7 (second tile offset for field cursor)
@@ -3798,7 +3798,7 @@ Menu2_UpdateCursor_Field:
 ;     - Formula: VRAM_addr = (X - $8000) / tile_width + base
 ;
 ; DISABLED CURSOR PATH ($FF):
-;   UNREACH_008D93: db $A2,$FF,$FF,$60
+;   DB_UNREACH_008D93: db $A2,$FF,$FF,$60
 ;     Disassembles to: LDX #$FFFF | RTS
 ;   
 ;   Returns X = $FFFF to indicate no valid tilemap address
@@ -3869,7 +3869,7 @@ Menu2_UpdateCursor_Field:
 ;===============================================================================
 Cursor_CalcTileIndex:
 	cmp.B #$ff	; Check if cursor disabled ($FF = hidden)
-	beq UNREACH_008D93	; If disabled, return X=$FFFF (unreachable in practice)
+	beq DB_UNREACH_008D93	; If disabled, return X=$FFFF (unreachable in practice)
 	jsr.W Cursor_CalcPosition	; Call grid → pixel converter (A → X coordinate in A)
 	tax	; X = tilemap address (transfer result from A to X)
 	rts	; Return with X = tilemap address for field cursor
@@ -4639,21 +4639,21 @@ Battle_LoadPaletteLoop:
 ;===============================================================================
 Palette_Write8Colors:
 	sta.B !SNES_CGADD-$2100               ;008FB4|8521    |002121; Set CGRAM write address (palette slot)
-	lda.W DATA8_078000,x                 ;008FB6|BD0080  |078000; Read color 0 low byte (gggrrrrr)
+	lda.W DB_DATA8_078000,x                 ;008FB6|BD0080  |078000; Read color 0 low byte (gggrrrrr)
 	sta.B !SNES_CGDATA-$2100              ;008FB9|8522    |002122; Write to CGRAM, address auto-increments
-	lda.W DATA8_078001,x                 ;008FBB|BD0180  |078001; Read color 0 high byte (0bbbbbgg)
+	lda.W DB_DATA8_078001,x                 ;008FBB|BD0180  |078001; Read color 0 high byte (0bbbbbgg)
 	sta.B !SNES_CGDATA-$2100              ;008FBE|8522    |002122; Write to CGRAM
-	lda.W DATA8_078002,x                 ;008FC0|BD0280  |078002; Read color 1 low byte
+	lda.W DB_DATA8_078002,x                 ;008FC0|BD0280  |078002; Read color 1 low byte
 	sta.B !SNES_CGDATA-$2100              ;008FC3|8522    |002122; Write to CGRAM
-	lda.W DATA8_078003,x                 ;008FC5|BD0380  |078003; Read color 1 high byte
+	lda.W DB_DATA8_078003,x                 ;008FC5|BD0380  |078003; Read color 1 high byte
 	sta.B !SNES_CGDATA-$2100              ;008FC8|8522    |002122; Write to CGRAM
-	lda.W DATA8_078004,x                 ;008FCA|BD0480  |078004; Read color 2 low byte
+	lda.W DB_DATA8_078004,x                 ;008FCA|BD0480  |078004; Read color 2 low byte
 	sta.B !SNES_CGDATA-$2100              ;008FCD|8522    |002122; Write to CGRAM
-	lda.W DATA8_078005,x                 ;008FCF|BD0580  |078005; Read color 2 high byte
+	lda.W DB_DATA8_078005,x                 ;008FCF|BD0580  |078005; Read color 2 high byte
 	sta.B !SNES_CGDATA-$2100              ;008FD2|8522    |002122; Write to CGRAM
-	lda.W DATA8_078006,x                 ;008FD4|BD0680  |078006; Read color 3 low byte
+	lda.W DB_DATA8_078006,x                 ;008FD4|BD0680  |078006; Read color 3 low byte
 	sta.B !SNES_CGDATA-$2100              ;008FD7|8522    |002122; Write to CGRAM
-	lda.W DATA8_078007,x                 ;008FD9|BD0780  |078007; Read color 3 high byte
+	lda.W DB_DATA8_078007,x                 ;008FD9|BD0780  |078007; Read color 3 high byte
 	sta.B !SNES_CGDATA-$2100              ;008FDC|8522    |002122; Write to CGRAM (4 colors = 8 bytes complete)
 	rts                                  ;008FDE|60      |      ; Return to caller (only 4 colors written, not 8!)
 ;      |        |      ;
@@ -5327,7 +5327,7 @@ Input_HandleCancel:
 ;      |        |      ;
 Input_HandleMenu:
 	jsr.W NMI_EnableAndProcess                    ;0092F6|20FC92  |0092FC;
-	jmp.W Label_008016                    ;0092F9|4C1680  |008016;
+	jmp.W DB_Label_008016                    ;0092F9|4C1680  |008016;
 ;      |        |      ;
 ;      |        |      ;
 NMI_EnableAndProcess:
@@ -5395,12 +5395,12 @@ Timer_ProcessFrame:
 Timer_UpdateCounter:
 	lda.W #$0080                         ;009362|A98000  |      ;
 	and.w !system_flags_9                          ;009365|2DE200  |0200E2;
-	bne UNREACH_0093C9                   ;009368|D05F    |0093C9;
+	bne DB_UNREACH_0093C9                   ;009368|D05F    |0093C9;
 	jsr.W Input_CheckAnyPressed                    ;00936A|20FB95  |0095FB;
-	bne UNREACH_0093C9                   ;00936D|D05A    |0093C9;
+	bne DB_UNREACH_0093C9                   ;00936D|D05A    |0093C9;
 	lda.W #$0002                         ;00936F|A90200  |      ;
 	and.w !system_flags_6                          ;009372|2DDB00  |0200DB;
-	bne UNREACH_009385                   ;009375|D00E    |009385;
+	bne DB_UNREACH_009385                   ;009375|D00E    |009385;
 	lda.W #$0002                         ;009377|A90200  |      ;
 	tsb.w !system_flags_6                          ;00937A|0CDB00  |0200DB;
 	lda.B [$53]                          ;00937D|A753    |000053;
@@ -6332,7 +6332,7 @@ Math_Multiply16x16_AddShift:
 ;      
 ;      b) TEST IF DIVISOR FITS:
 ;         - LDA $A2: Load current remainder accumulator
-;         - BCS UNREACH_009710: If carry set (accumulator ≥ $10000), handle overflow
+;         - BCS DB_UNREACH_009710: If carry set (accumulator ≥ $10000), handle overflow
 ;         - SEC: Set carry for subtraction
 ;         - SBC $9C: Subtract divisor from accumulator
 ;         - BCS Math_Divide32by16_Store: If carry set (no borrow), divisor fits
@@ -6418,7 +6418,7 @@ Math_Multiply16x16_AddShift:
 ;   
 ;   Each iteration shifts one dividend bit into remainder accumulator
 ;
-; UNREACH_009710 CODE:
+; DB_UNREACH_009710 CODE:
 ;
 ;   db $e5,$9c (SBC $9C instruction)
 ;   
@@ -6625,7 +6625,7 @@ Math_Divide32by16_Loop:
 	rol.B $a6                            ;009701|26A6    |0000A6; rotate working dividend high left (carry → bit 0)
 	rol.B $a2                            ;009703|26A2    |0000A2; rotate remainder accumulator left (dividend bit → remainder)
 	lda.B $a2                            ;009705|A5A2    |0000A2; load current remainder accumulator value
-	bcs UNREACH_009710                   ;009707|B007    |009710; if carry set (remainder ≥ $10000): handle overflow (unreachable)
+	bcs DB_UNREACH_009710                   ;009707|B007    |009710; if carry set (remainder ≥ $10000): handle overflow (unreachable)
 	sec                                  ;009709|38      |      ; set carry for subtraction
 	sbc.B $9c                            ;00970A|E59C    |00009C; subtract divisor from remainder (A = remainder - divisor)
 	bcs Math_Divide32by16_Store          ;00970C|B004    |009712; if carry set (no borrow): divisor fits, store result
@@ -9627,7 +9627,7 @@ DMA_SetFontPointer:
 	lda.B $20                            ;009B92|A520    |000020;
 	asl a;009B94|0A      |      ;
 	tax                                  ;009B95|AA      |      ;
-	lda.L UNREACH_03D5E5,x               ;009B96|BFE5D503|03D5E5;
+	lda.L DB_UNREACH_03D5E5,x               ;009B96|BFE5D503|03D5E5;
 	sta.B $17                            ;009B9A|8517    |000017;
 	rts                                  ;009B9C|60      |      ;
 ;      |        |      ;
@@ -11194,7 +11194,7 @@ Dialog_WaitFrames:
 Dialog_LoadCharacterPointer:
 	lda.W Dialog_CharacterTable_IDs,x    ;00A2BB|BDDDA2  |00A2DD;	Load character ID from table
 	cmp.B #$ff                           ;00A2BE|C9FF    |      ;	Check for terminator ($FF)
-	beq UNREACH_00A2D4                   ;00A2C0|F012    |00A2D4;	If $FF: end of table (error)
+	beq DB_UNREACH_00A2D4                   ;00A2C0|F012    |00A2D4;	If $FF: end of table (error)
 	cmp.B $01,s                          ;00A2C2|C301    |000001;	Compare with target character ID (on stack)
 	beq Dialog_LoadCharacterPointer_Found ;00A2C4|F005    |00A2CB;	If match: found character entry
 	inx                                  ;00A2C6|E8      |      ;	X += 3 (skip to next entry: 1 ID byte + 2 pointer bytes)
@@ -13646,7 +13646,7 @@ Sprite_CalculatePosition_Ten:
 	sep #$30                             ;00B46E|E230    |      ;
 	clc                                  ;00B470|18      |      ;
 	ldx.B $5e                            ;00B471|A65E    |00005E;
-	adc.L DATA8_049800,x                 ;00B473|7F009804|049800;
+	adc.L DB_DATA8_049800,x                 ;00B473|7F009804|049800;
 	xba                                  ;00B477|EB      |      ;
 	txa                                  ;00B478|8A      |      ;
 	and.B #$38                           ;00B479|2938    |      ;
@@ -13990,7 +13990,7 @@ Dialog_Complete:
 	sta.B $62                            ;00B6BD|8562    |000062;
 	sep #$30                             ;00B6BF|E230    |      ;
 	ldx.B $9e                            ;00B6C1|A69E    |00009E;
-	lda.L DATA8_049800,x                 ;00B6C3|BF009804|049800;
+	lda.L DB_DATA8_049800,x                 ;00B6C3|BF009804|049800;
 	asl a;00B6C7|0A      |      ;
 	asl a;00B6C8|0A      |      ;
 ;      |        |      ;
@@ -14228,7 +14228,7 @@ VBlank_CheckPolling_Second:
 	lda.B #$01                           ;00B8E0|A901    |      ;
 	sta.W !SNES_NMITIMEN                  ;00B8E2|8D0042  |004200;
 	phd                                  ;00B8E5|0B      |      ;
-	jsr.W Label_008BA0                    ;00B8E6|20A08B  |008BA0;
+	jsr.W DB_Label_008BA0                    ;00B8E6|20A08B  |008BA0;
 	phy                                  ;00B8E9|5A      |      ;
 	jsr.W Sub_008B88                    ;00B8EA|20888B  |008B88;
 	sep #$20                             ;00B8ED|E220    |      ;
@@ -20823,7 +20823,7 @@ Graphics_TileDrawLoop:
 ;      |        |      ;
 Graphics_ProcessTileRow:
 	stz.B $01                            ;00DEB9|6401    |001F97;
-	lda.L DATA8_078030,x                 ;00DEBB|BF308007|078030;
+	lda.L DB_DATA8_078030,x                 ;00DEBB|BF308007|078030;
 	eor.W #$00ff                         ;00DEBF|49FF00  |      ;
 	and.B $09                            ;00DEC2|2509    |001F9F;
 	jmp.W ($00cc)                        ;00DEC4|6CCC00  |0000CC;
@@ -22824,7 +22824,7 @@ Camera_DirectionOffsetTable:  ; Camera scroll offsets indexed by direction (5 ×
 Native_COP:
 	dw PTR16_00FFFF                      ;00FFE4|        |00FFFF;
 	dw $011b                             ;00FFE6|        |00011B;
-	dw Label_008000                       ;00FFE8|        |008000;
+	dw DB_Label_008000                       ;00FFE8|        |008000;
 	dw $0113                             ;00FFEA|        |000113;
 	dw PTR16_00FFFF                      ;00FFEC|        |00FFFF;
 	dw $0117                             ;00FFEE|        |000117;
@@ -22834,7 +22834,7 @@ Native_COP:
 	dw PTR16_00FFFF                      ;00FFF6|        |00FFFF;
 	dw PTR16_00FFFF                      ;00FFF8|        |00FFFF;
 	dw PTR16_00FFFF                      ;00FFFA|        |00FFFF;
-	dw Label_008000                       ;00FFFC|        |008000;
+	dw DB_Label_008000                       ;00FFFC|        |008000;
 ;      |        |      ;
 Emulation_RESET:
 	dw PTR16_00FFFF                      ;00FFFE|        |00FFFF;

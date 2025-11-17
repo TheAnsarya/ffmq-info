@@ -128,7 +128,7 @@ lorom:
 	DATA8_03ba35 = $03ba35   ; Bank $03 data
 	DATA8_03bb81 = $03bb81   ; Bank $03 data
 	DATA8_03a37c = $03a37c   ; Bank $03 character data
-	UNREACH_03D5E5 = $03d5e5 ; Bank $03 unreachable code
+	DB_UNREACH_03D5E5 = $03d5e5 ; Bank $03 unreachable code
 	AddressC8000OriginalCode = $0c8000    ; Bank $0c routine
 	AddressC8080OriginalCode = $0c8080    ; Bank $0c routine
 	BankOC_Init = $0c8000    ; Bank $0c Init
@@ -139,21 +139,21 @@ lorom:
 	BankSpriteInitialization = $018a52    ; Bank $01 sprite initialization
 	BankScriptInitializationRoutine = $01b24c    ; Bank $01 script initialization routine
 	Jump_To_Bank01 = $018000 ; Bank $01 jump target
-	DATA8_049800 = $049800   ; Bank $04 data
+	DB_DATA8_049800 = $049800   ; Bank $04 data
 	Load_Save_Game = $0e8000 ; Bank $0e save game
 	Some_System_Call = $0f8000    ; Bank $0f system
 	Some_Init_Function_1 = $0f8100    ; Bank $0f init
 	Some_Init_Function_3 = $0f8200    ; Bank $0f init
 
 ; Bank $07 data
-	DATA8_078000 = $078000
-	DATA8_078001 = $078001
-	DATA8_078002 = $078002
-	DATA8_078003 = $078003
-	DATA8_078004 = $078004
-	DATA8_078005 = $078005
-	DATA8_078006 = $078006
-	DATA8_078007 = $078007
+	DB_DATA8_078000 = $078000
+	DB_DATA8_078001 = $078001
+	DB_DATA8_078002 = $078002
+	DB_DATA8_078003 = $078003
+	DB_DATA8_078004 = $078004
+	DB_DATA8_078005 = $078005
+	DB_DATA8_078006 = $078006
+	DB_DATA8_078007 = $078007
 	DATA8_07800a = $07800a
 	DATA8_07800c = $07800c
 	DATA8_07d7f4 = $07d7f4   ; Palette color data base
@@ -562,7 +562,7 @@ Boot_FinalInit:
 ; ---------------------------------------------------------------------------
 ; Load Initial Data Table
 ; ---------------------------------------------------------------------------
-; $81ed points to initialization data (see DATA8_0081ED below)
+; $81ed points to initialization data (see DB_DATA8_0081ed below)
 ; CodeLikelyLoadsProcessesThisData likely loads/processes this data table
 ; ---------------------------------------------------------------------------
 
@@ -793,7 +793,7 @@ Load_SaveSlotData:
 ; Slot number is incremented and used as index into data table.
 ;
 ; Data Table Structure (8 bytes per slot):
-;   See DATA8_0081D5-0081ED below
+;   See DB_DATA8_0081d5-0081ED below
 ; ===========================================================================
 
 	inc a; A = slot number + 1 (1, 2, or 3)
@@ -812,25 +812,25 @@ Load_SaveSlotData:
 ; ---------------------------------------------------------------------------
 ; Load Data from Slot Table
 ; ---------------------------------------------------------------------------
-; Uses X as offset into DATA8_0081D5 table
+; Uses X as offset into DB_DATA8_0081d5 table
 ; Loads 8 bytes of configuration data for this save slot
 ; ---------------------------------------------------------------------------
 
 	stz.b $19	   ; [$19] = $00 (clear direct page variable)
 
-	lda.w DATA8_0081d5,x ; A = table[X+0] (byte 0)
+	lda.w DB_DATA8_0081d5,x ; A = table[X+0] (byte 0)
 	sta.w !env_context_value	 ; Store to !env_context_value
 
-	ldy.w DATA8_0081d6,x ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
+	ldy.w DB_DATA8_0081d6,x ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
 	sty.w !env_coord_x	 ; Store to !env_coord_x-!env_coord_y
 
-	lda.w DATA8_0081d8,x ; A = table[X+3] (byte 3)
+	lda.w DB_DATA8_0081d8,x ; A = table[X+3] (byte 3)
 	sta.w $0e92	 ; Store to $0e92
 
-	ldy.w DATA8_0081db,x ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
+	ldy.w DB_DATA8_0081db,x ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
 	sty.b $53	   ; Store to $53-$54
 
-	ldy.w DATA8_0081d9,x ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
+	ldy.w DB_DATA8_0081d9,x ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
 	tyx ; X = Y (transfer loaded value to X)
 
 	rep #$30		; 16-bit A, X, Y
@@ -868,19 +868,19 @@ Load_SaveSlotData:
 ; Structure unclear without further analysis
 ;-------------------------------------------------------------------------------
 
-DATA8_0081d5:
+DB_DATA8_0081d5:
 	db $2d		 ; Slot 0, byte 0
 
-DATA8_0081d6:
+DB_DATA8_0081d6:
 	dw $1f26	   ; Slot 0, bytes 1-2 (little-endian)
 
-DATA8_0081d8:
+DB_DATA8_0081d8:
 	db $05		 ; Slot 0, byte 3
 
-DATA8_0081d9:
+DB_DATA8_0081d9:
 	dw $aa0c	   ; Slot 0, bytes 4-5
 
-DATA8_0081db:
+DB_DATA8_0081db:
 	dw $a82e	   ; Slot 0, bytes 6-7
 
 ; Slot 1 data (8 bytes)
@@ -889,7 +889,7 @@ DATA8_0081db:
 ; Slot 2 data (8 bytes)
 	db $14, $33, $28, $05, $2c, $aa, $6a, $a9
 
-DATA8_0081ed:
+DB_DATA8_0081ed:
 ; Referenced by OriginalCode (at $008113)
 ; Initialization data table
 	db $ec, $a6, $03
@@ -981,11 +981,11 @@ Load_InitDataTable:
 ; INITIALIZATION DATA TABLES
 ;-------------------------------------------------------------------------------
 
-DATA8_00822a:
+DB_DATA8_00822a:
 ; No save file table
 	db $2d, $a6, $03
 
-DATA8_00822d:
+DB_DATA8_00822d:
 ; Has save file table
 	db $2b, $a6, $03
 
@@ -1052,7 +1052,7 @@ Init_Hardware:
 ;-------------------------------------------------------------------------------
 ; DMA Configuration Data Table
 ;-------------------------------------------------------------------------------
-; Referenced by DMA setup routine at Label_00804D
+; Referenced by DMA setup routine at DB_Label_00804D
 ; Format: 9 bytes total
 ;   - Byte 0: Initial value ($00)
 ;   - Bytes 1-9: Three identical 3-byte DMA channel configurations
@@ -1062,7 +1062,7 @@ Init_Hardware:
 ;   - Byte 2 ($fd): DMA source bank or transfer parameters
 ;-------------------------------------------------------------------------------
 
-DATA8_008252:
+DB_DATA8_008252:
 	db $00
 	db $db, $80, $fd, $db, $80, $fd, $db, $80, $fd
 
@@ -1262,7 +1262,7 @@ Init_VBlankDMA:
 ; INITIALIZATION DATA TABLE
 ;-------------------------------------------------------------------------------
 
-DATA8_008334:
+DB_DATA8_008334:
 ; Referenced at $0082a2
 	db $fc, $a6, $03
 
@@ -2391,19 +2391,19 @@ Init_SaveGameDefaults:
 	stz.b $19	   ; Clear some variable
 
 ; Load data from table based on save state
-	lda.w Save_State_Table,x
+	lda.w DB_Save_State_Table,x
 	sta.w !env_context_value
 
-	ldy.w Save_State_Table+1,x
+	ldy.w DB_Save_State_Table+1,x
 	sty.w !env_coord_x
 
-	lda.w Save_State_Table+3,x
+	lda.w DB_Save_State_Table+3,x
 	sta.w $0e92
 
-	ldy.w Save_State_Table+6,x
+	ldy.w DB_Save_State_Table+6,x
 	sty.b $53
 
-	ldy.w Save_State_Table+4,x
+	ldy.w DB_Save_State_Table+4,x
 TYX_Label:
 
 	rep #$30		; 16-bit mode
@@ -2424,7 +2424,7 @@ TYX_Label:
 ; Save State Data Table
 ;-------------------------------------------------------------------------------
 
-Save_State_Table:
+DB_Save_State_Table:
 	db $2d		 ; Entry 0
 	dw $1f26
 	db $05
@@ -2569,7 +2569,7 @@ Init_Hardware_1:
 ;-------------------------------------------------------------------------------
 
 	org $008252
-DMA_Init_Data:
+DB_DMA_Init_Data:
 	db $00		 ; First byte
 	db $db, $80, $fd ; More init values
 	db $db, $80, $fd
@@ -3031,13 +3031,13 @@ DMA_PaletteToCGRAM:
 ;===============================================================================
 
 ; Data table referenced by DataTableReferencedCode
-DATA8_008960:
+DB_DATA8_008960:
 	db $3c		 ; Tile $3c
 
-DATA8_008961:
+DB_DATA8_008961:
 	db $3d		 ; Tile $3d
 
-DATA8_008962:
+DB_DATA8_008962:
 	db $3e,$45,$3a,$3b ; Tiles: $3e, $45, $3a, $3b
 
 ;===============================================================================
@@ -3131,7 +3131,7 @@ GameLoop_NormalUpdate:
 ; Handles incremental tilemap updates and controller input.
 ; ===========================================================================
 
-	jsr.w Store_008BFD ; Update tilemap changes (scrolling, etc.)
+	jsr.w DB_Store_008BFD ; Update tilemap changes (scrolling, etc.)
 
 ; ---------------------------------------------------------------------------
 ; Check Menu Mode Flag ($00da bit 4)
@@ -3821,7 +3821,7 @@ Input_CheckAllowed_Exit:
 	rts ; Return (Z flag indicates input state)
 
 ; Padding/unused byte
-Unused_008B68:
+DB_Unused_008B68:
 	rts ; Return
 
 ;===============================================================================
@@ -4121,7 +4121,7 @@ Tilemap_RefreshLayer0:
 
 	ldx.w !location_identifier	 ; X = character Y position
 	cpx.b #$ff	  ; Check if invalid position
-	beq UNREACH_008C81 ; If $ff → Exit (invalid)
+	beq DB_UNREACH_008C81 ; If $ff → Exit (invalid)
 
 ; ---------------------------------------------------------------------------
 ; Check Battle Mode Flag
@@ -4137,7 +4137,7 @@ Tilemap_RefreshLayer0:
 ; Uses special tilemap data from bank $04
 ; ---------------------------------------------------------------------------
 
-	lda.l DATA8_049800,x ; A = [$049800+X] (base tile value)
+	lda.l DB_DATA8_049800,x ; A = [$049800+X] (base tile value)
 	adc.b #$0a	  ; A = A + $0a (offset for battle tiles)
 	xba ; Swap A high/low bytes (save in high byte)
 
@@ -4175,7 +4175,7 @@ Tilemap_RefreshLayer0:
 ;-------------------------------------------------------------------------------
 ; UNREACHABLE CODE ANALYSIS
 ; ------------------------------------------------------------------------------
-; Label: UNREACH_008C81
+; Label: DB_UNREACH_008C81
 ; Category: 🔴 Truly Unreachable (Dead Code)
 ; Purpose: Function epilogue (PLP + RTS)
 ; Reachability: No known call sites or branches to this address
@@ -4184,7 +4184,7 @@ Tilemap_RefreshLayer0:
 ; Notes: May be leftover from development or removed function
 ; ------------------------------------------------------------------------------
 
-UNREACH_008C81:
+DB_UNREACH_008C81:
 	plp ;008C81|28      |      ; Pull processor status
 	rts ;008C82|60      |      ; Return from subroutine
 
@@ -4197,7 +4197,7 @@ Tilemap_RefreshLayer0_Field:
 ; Normal field/map mode cursor update
 ; ===========================================================================
 
-	lda.l DATA8_049800,x ; A = [$049800+X] (base tile)
+	lda.l DB_DATA8_049800,x ; A = [$049800+X] (base tile)
 	asl a; A = A × 2
 	asl a; A = A × 4 (tile offset)
 	sta.w !tile_offset_1	 ; [$00f4] = tile offset
@@ -4314,7 +4314,7 @@ Display_DecimalDigit_Loop:
 
 ; Check if tens digit is zero
 	cpy.w #$0000	; Is tens digit zero?
-	beq UNREACH_008D06 ; If zero → Show blank tens digit
+	beq DB_UNREACH_008D06 ; If zero → Show blank tens digit
 
 ; Display tens digit
 	tya ; A = tens digit value
@@ -4324,7 +4324,7 @@ Display_DecimalDigit_Loop:
 
 ;-------------------------------------------------------------------------------
 
-UNREACH_008D06:
+DB_UNREACH_008D06:
 ; Show blank tile for tens digit
 	db $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f
 ; lda #$45, sta [$00,X], XBA, sta [$01,X], bra $0f
@@ -4394,7 +4394,7 @@ Tilemap_RefreshLayer1:
 	beq Tilemap_RefreshLayer1_Exit ; If $ff → Exit
 
 ; Calculate tile data
-	lda.l DATA8_049800,x ; A = base tile value
+	lda.l DB_DATA8_049800,x ; A = base tile value
 	adc.b #$0a	  ; A = A + $0a (battle offset)
 	xba ; Save in high byte
 
@@ -4436,7 +4436,7 @@ Tilemap_RefreshLayer1_Field:
 ; ===========================================================================
 
 	ldx.w !char1_cursor_pos	 ; X = cursor position
-	lda.l DATA8_049800,x ; A = base tile
+	lda.l DB_DATA8_049800,x ; A = base tile
 	asl a; A × 2
 	asl a; A × 4
 	sta.w !tile_offset_2	 ; Save tile offset
@@ -4483,7 +4483,7 @@ Tilemap_CalcRowAddress:
 ; Reachability: Reachable via conditional branch (beq above)
 ; Analysis: When position is $ff (invalid), returns $ffff as error marker
 ;   - Used by map coordinate helpers to signal invalid tile positions
-; Technical: Originally labeled UNREACH_008D93
+; Technical: Originally labeled DB_UNREACH_008D93
 ;-------------------------------------------------------------------------------
 Map_InvalidPositionReturn:
 	ldx.w #$ffff	; X = invalid address marker
@@ -4974,27 +4974,27 @@ Palette_Load8Colors:
 ;
 ; Parameters:
 ;   A = CGRAM starting address
-;   X = Source offset in DATA8_078000
+;   X = Source offset in DB_DATA8_078000
 ;   Data bank = $07
 ;   Direct Page = $2100
 ; ===========================================================================
 
 	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
-	lda.w DATA8_078000,x ; Get color byte 0
+	lda.w DB_DATA8_078000,x ; Get color byte 0
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078001,x ; Get color byte 1
+	lda.w DB_DATA8_078001,x ; Get color byte 1
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078002,x ; Get color byte 2
+	lda.w DB_DATA8_078002,x ; Get color byte 2
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078003,x ; Get color byte 3
+	lda.w DB_DATA8_078003,x ; Get color byte 3
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078004,x ; Get color byte 4
+	lda.w DB_DATA8_078004,x ; Get color byte 4
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078005,x ; Get color byte 5
+	lda.w DB_DATA8_078005,x ; Get color byte 5
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078006,x ; Get color byte 6
+	lda.w DB_DATA8_078006,x ; Get color byte 6
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w DATA8_078007,x ; Get color byte 7
+	lda.w DB_DATA8_078007,x ; Get color byte 7
 	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	rts ; Return
 
@@ -5666,13 +5666,13 @@ Animation_Done:
 ; Purpose: Setup graphics environment and jump to field mode code
 ; Technical Details:
 ;   - Calls CallsCodePrepareGraphicsState to prepare graphics state
-;   - Jumps to Label_00803A for field mode initialization
+;   - Jumps to DB_Label_00803A for field mode initialization
 ; Side Effects: Modifies $00d6, NMITIMEN register, $00d2, $00db
 ; ===========================================================================
 
 Graphics_SetupFieldMode:
 	jsr.w CallsCodePrepareGraphicsState ; Setup graphics state
-	jmp.w Label_00803A ; Jump to field mode init
+	jmp.w DB_Label_00803A ; Jump to field mode init
 
 ; ===========================================================================
 ; Graphics Mode Setup - Jump to Battle Mode Initialization
@@ -5680,13 +5680,13 @@ Graphics_SetupFieldMode:
 ; Purpose: Setup graphics environment and jump to battle mode code
 ; Technical Details:
 ;   - Calls CallsCodePrepareGraphicsState to prepare graphics state
-;   - Jumps to Label_008016 for battle mode initialization
+;   - Jumps to DB_Label_008016 for battle mode initialization
 ; Side Effects: Modifies $00d6, NMITIMEN register, $00d2, $00db
 ; ===========================================================================
 
 Graphics_SetupBattleMode:
 	jsr.w Graphics_PrepareTransition ; Setup graphics state
-	jmp.w Label_008016 ; Jump to battle mode init
+	jmp.w DB_Label_008016 ; Jump to battle mode init
 
 ; ===========================================================================
 ; Graphics State Setup Routine
@@ -6120,11 +6120,11 @@ Bit_PositionToMask:
 	phx ; Save X
 	asl a; Multiply by 2 for word table
 	tax ; X = index
-	lda.l DATA8_0097fb,x ; Load bit mask from table
+	lda.l DB_DATA8_0097fb,x ; Load bit mask from table
 	plx ; Restore X
 	rts ; Return
 
-DATA8_0097fb:
+DB_DATA8_0097fb:
 	dw $0001, $0002, $0004, $0008, $0010, $0020, $0040, $0080
 	dw $0100, $0200, $0400, $0800, $1000, $2000, $4000, $8000
 
@@ -6322,7 +6322,7 @@ Memory_FillLong:
 ; Technical Details:
 ;   - Handles blocks of 64 bytes ($40) at a time
 ;   - Uses Memory_Fill64 for 64-byte blocks
-;   - Uses jump table (DATA8_009A1E) for partial blocks
+;   - Uses jump table (DB_DATA8_009a1e) for partial blocks
 ;   - Remainder handled by indexed jump
 ; ===========================================================================
 
@@ -6354,7 +6354,7 @@ Fill_Block_Loop:
 Handle_Remainder:
 	tax ; X = remainder count (doubled for jump table)
 	pla ; Restore X from stack
-	jmp.w (DATA8_009a1e,x) ; Jump to handler for exact count
+	jmp.w (DB_DATA8_009a1e,x) ; Jump to handler for exact count
 
 ; ---------------------------------------------------------------------------
 ; Fill 64 Bytes With Value
@@ -6422,7 +6422,7 @@ Memory_Fill2Words:
 ;   - Allows exact fill counts without conditional logic
 ; ===========================================================================
 
-DATA8_009a1e:
+DB_DATA8_009a1e:
 	dw $9a1d	   ; 0 bytes (just return)
 	dw $9a1a, $9a17, $9a14, $9a11 ; 2, 4, 6, 8 bytes
 	dw $9a0e, $9a0b, $9a08, $9a05, $9a02 ; 10-18 bytes
@@ -6581,7 +6581,7 @@ Graphics_SetupPointer:
 	lda.b $20	   ; Load parameter
 	asl a; Multiply by 2
 	tax ; X = index
-	lda.l UNREACH_03D5E5,x ; Load pointer from table
+	lda.l DB_UNREACH_03D5E5,x ; Load pointer from table
 	sta.b $17	   ; Store graphics pointer
 	rts ; Return
 
@@ -6631,7 +6631,7 @@ Graphics_Setup4:
 ; ------------------------------------------------------------------------------
 ; UNREACHABLE CODE ANALYSIS
 ; ------------------------------------------------------------------------------
-; Label: UNREACH_00A2D4
+; Label: DB_UNREACH_00A2D4
 ; Category: 🔴 Truly Unreachable (Dead Code)
 ; Purpose: Initialize variables $9e and $a0 to $ffff, then pull and return
 ; Reachability: No known call sites or branches to this address
@@ -6644,17 +6644,17 @@ Graphics_Setup4:
 ; Verified: NOT reachable in normal gameplay
 ; Notes: May be debug initialization or removed initialization routine
 ; ------------------------------------------------------------------------------
-UNREACH_00A2D4:
+DB_UNREACH_00A2D4:
 	ldx.w #$ffff                         ;00A2D4|A2FFFF  |      ; Load X with $ffff
 	stx.b $9e                            ;00A2D7|869E    |00009E; Store to $9e
 	stx.b $a0                            ;00A2D9|86A0    |0000A0; Store to $a0
 	pla ;00A2DB|FA      |      ; Pull accumulator
 	rts ;00A2DC|60      |      ; Return
 
-DATA8_00a2dd:
+DB_DATA8_00a2dd:
 	db $10
 
-DATA8_00a2de:
+DB_DATA8_00a2de:
 	db $19,$00,$12,$32,$00,$dd,$0a,$00
 	db $ff
 
@@ -6772,7 +6772,7 @@ Graphics_DispatchTable:
 	and.w #$00ff
 	asl a
 TAX_Label:
-	jmp.w (DATA8_009e6e,x)
+	jmp.w (DB_DATA8_009e6e,x)
 
 Graphics_CallSystem:
 	lda.w #$0080
@@ -7097,7 +7097,7 @@ Color_BlueOK:
 ; Color Palette Data
 ; ---------------------------------------------------------------------------
 
-DATA8_009c87:
+DB_DATA8_009c87:
 ; Color Palette Data Table
 DATA8_009c87_colors:
 	dw $0d00, $0d01, $0d01, $0d01 ; Color entries
@@ -7341,7 +7341,7 @@ Graphics_DispatchCommand:
 ; Jump table dispatch ($00-$2f)
 	asl a; Multiply by 2 (word index)
 	tax ; X = table offset
-	jsr.w (DATA8_009e0e,x) ; Call handler via table
+	jsr.w (DB_DATA8_009e0e,x) ; Call handler via table
 	rep #$30		; 16-bit A/X/Y
 	rts ; Return
 
@@ -7384,7 +7384,7 @@ Graphics_IndexedDataFound:
 ; Commands $00-$2f dispatch here
 ; ===========================================================================
 
-DATA8_009e0e:
+DB_DATA8_009e0e:
 ; Jump table entries
 DATA8_009e0e_handlers:
 	dw CommandHandler ; $00: Command handler
@@ -7440,7 +7440,7 @@ DATA8_009e0e_handlers:
 ; Secondary Jump Table (for specific graphics operations)
 ; ---------------------------------------------------------------------------
 
-DATA8_009e6e:
+DB_DATA8_009e6e:
 	dw ImportedSegmentCodeCode ; $00
 	dw Sub_00A3AB ; $01
 	dw Sub_00A51E ; $02
@@ -7942,10 +7942,10 @@ Palette_SearchTable_Entry:
 
 Cmd_PaletteLookup_Search:
 ; Search palette table for matching index
-	lda.w DATA8_00a2dd,x ; Load table entry
+	lda.w DB_DATA8_00a2dd,x ; Load table entry
 	cmp.b #$ff	  ; Check for end marker
 	bne +		   ; Not end, continue
-	jmp UNREACH_00A2D4 ; End of table (not found)
+	jmp DB_UNREACH_00A2D4 ; End of table (not found)
 	+	cmp.b $01,s                 ; Compare with search index
 	beq Cmd_PaletteLookup_Found ; Found match
 	inx ; Next entry
@@ -7955,12 +7955,12 @@ Cmd_PaletteLookup_Search:
 
 Cmd_PaletteLookup_Found:
 	rep #$30		; 16-bit A/X/Y
-	lda.w DATA8_00a2de,x ; Load palette pointer
+	lda.w DB_DATA8_00a2de,x ; Load palette pointer
 	sta.b $9e	   ; Store to $9e
 	plx ; Clean stack
 	rts ; Return
 
-; UNREACH_00A2D4: (duplicate label removed - see line ~6390 for actual occurrence)
+; DB_UNREACH_00A2D4: (duplicate label removed - see line ~6390 for actual occurrence)
 ; End of table - index not found
 ; (likely error condition)
 
@@ -9552,7 +9552,7 @@ Window_DrawTiles:
 	sta.b $64	   ; Save tile
 
 Window_DrawTileLoop:
-	jsr.w (DATA8_009a1e,x) ; Call indexed routine
+	jsr.w (DB_DATA8_009a1e,x) ; Call indexed routine
 	tya ; Get pointer
 	adc.w #$0040	; Next row
 TAY_Label_4:
@@ -9613,7 +9613,7 @@ PLB_Label_1:
 	lda.b $64
 	and.w #$fff8	; Mask to 8-byte boundary
 	adc.w #$0008	; Adjust
-	jsr.w (DATA8_009a1e,x) ; Call indexed routine
+	jsr.w (DB_DATA8_009a1e,x) ; Call indexed routine
 	sbc.w #$0007	; Adjust back
 TAX_Label_9:
 	lda.b $64
@@ -9651,7 +9651,7 @@ TXA_Label_1:
 	asl a; × 2
 TAX_Label_11:
 	lda.b $64
-	jsr.w (DATA8_009a1e,x) ; Final draw
+	jsr.w (DB_DATA8_009a1e,x) ; Final draw
 	plb ; Restore bank
 
 
@@ -11114,7 +11114,7 @@ Sprite_CalcTileAddress_Do:
 	sep #$30		; 8-bit A/X/Y
 	clc ; Clear carry
 	ldx.b $5e	   ; Load character index
-	adc.l DATA8_049800,x ; Add character position offset
+	adc.l DB_DATA8_049800,x ; Add character position offset
 	xba ; Swap A/B (position in high byte)
 	txa ; A = character index
 	and.b #$38	  ; Mask bits 3-5
@@ -11627,7 +11627,7 @@ Sprite_DisplayCharacter:
 	sta.b $62	   ; Store sprite mode
 	sep #$30		; 8-bit A/X/Y
 	ldx.b $9e	   ; X = character index
-	lda.l DATA8_049800,x ; Load position offset
+	lda.l DB_DATA8_049800,x ; Load position offset
 	asl a; × 2
 	asl a; × 4
 
@@ -12004,7 +12004,7 @@ IRQ_JitterFix2_Skip:
 ;       NMI mode set
 ;       $d8 bit 5 set
 ;       Interrupt vector updated to CodeIrqHandlerJitterFixFirst
-; Calls: Label_008BA0, CallsLabelCodeScreenSetupRoutines (screen setup routines)
+; Calls: DB_Label_008BA0, CallsLabelCodeScreenSetupRoutines (screen setup routines)
 ; Notes: Uses different screen setup sequence than InterruptVectorUpdatedCode
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn2:
@@ -12013,7 +12013,7 @@ IRQ_ScreenOn2:
 	lda.b #$01	  ; NMI only mode
 	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	phd ; Save direct page
-	jsr.w Label_008BA0 ; Screen setup routine 1
+	jsr.w DB_Label_008BA0 ; Screen setup routine 1
 	phy ; Save Y
 	jsr.w CallsLabelCodeScreenSetupRoutines ; Screen setup routine 2
 	sep #$20		; 8-bit accumulator
@@ -12824,10 +12824,10 @@ Menu_Handler:
 ; Reachability: DEAD CODE - No branches or calls to this address
 ; Analysis: jsr.w Sprite_SetMode2C (error sound)
 ;           Likely removed error handler or debug code
-; Technical: Originally labeled UNREACH_00BDCA
+; Technical: Originally labeled DB_UNREACH_00BDCA
 ; Status: Preserved for historical reference
 ;-------------------------------------------------------------------------------
-UNREACH_00BDCA:
+DB_UNREACH_00BDCA:
 	jsr.w Sprite_SetMode2C               ;00BDCA|2012B9  |00B912
 
 Menu_Handler_Loop:
@@ -12844,7 +12844,7 @@ Menu_Handler_Loop:
 Menu_Handler_Done:
 
 
-LOOSE_OP_00BDE5:
+DB_LOOSE_OP_00BDE5:
 	pla ; Pull return address
 	sta.b $03	   ; Store in $03
 	pla ; Pull high byte
@@ -13054,10 +13054,10 @@ Menu_OptionSelection_Cancel:
 ; Reachability: DEAD CODE - No branches or calls to this address
 ; Analysis: lda #$0001, trb $00d8, rts
 ;           Clears bit 0 in $00d8 and returns
-; Technical: Originally labeled UNREACH_00BEBB
+; Technical: Originally labeled DB_UNREACH_00BEBB
 ; Status: Preserved for historical reference
 ;-------------------------------------------------------------------------------
-UNREACH_00BEBB:
+DB_UNREACH_00BEBB:
 	db $a9,$01,$00,$1c,$d8,$00,$60
 
 SystemData_Config8:
@@ -13066,7 +13066,7 @@ SystemData_Config8:
 SystemData_Config9:
 	db $f2,$82,$03
 
-LOOSE_OP_00BECE:
+DB_LOOSE_OP_00BECE:
 	db $9c,$10,$01,$9c,$12,$01,$60 ; stz $0110; stz $0112; rts
 
 ;-------------------------------------------------------------------------------
@@ -13076,10 +13076,10 @@ LOOSE_OP_00BECE:
 ; Reachability: DEAD CODE - No branches or calls to this address
 ; Analysis: PHA, jsl AddressC8000OriginalCode (more code follows)
 ;           Pushes accumulator and calls Bank $0c code
-; Technical: Originally labeled UNREACH_00BED5
+; Technical: Originally labeled DB_UNREACH_00BED5
 ; Status: Preserved for historical reference
 ;-------------------------------------------------------------------------------
-UNREACH_00BED5:
+DB_UNREACH_00BED5:
 	db $48,$22,$00,$80,$0c
 
 Menu_OptionSelection_UpdateDisplay:
@@ -13096,10 +13096,10 @@ Menu_OptionSelection_UpdateDisplay:
 ; Reachability: DEAD CODE - No branches or calls to this address
 ; Analysis: lda #$ccb0, jsl AnalysisLdaCcb0JslCodeMenu (menu polling)
 ;           Complex multi-byte sequence (25 bytes total)
-; Technical: Originally labeled UNREACH_00BEE5
+; Technical: Originally labeled DB_UNREACH_00BEE5
 ; Status: Preserved for historical reference
 ;-------------------------------------------------------------------------------
-UNREACH_00BEE5:
+DB_UNREACH_00BEE5:
 	db $a9,$b0,$cc,$22,$30,$b9,$00,$f0,$f1,$89,$80,$00,$f0,$03,$4c,$cc
 	db $be,$20,$12,$b9,$a9,$ff,$00,$85,$01,$60
 
@@ -13138,10 +13138,10 @@ Menu_MultiOption_Loop:
 ; Reachability: DEAD CODE - No branches or calls to this address
 ; Analysis: jsr Anim_SetMode10, lda #$ffff, sta $01, stz $8e, rts
 ;           Sets animation mode, loads $ffff, stores to $01, clears $8e
-; Technical: Originally labeled UNREACH_00BF1B
+; Technical: Originally labeled DB_UNREACH_00BF1B
 ; Status: Preserved for historical reference
 ;-------------------------------------------------------------------------------
-UNREACH_00BF1B:
+DB_UNREACH_00BF1B:
 	db $20,$1c,$b9,$a9,$ff,$ff,$85,$01,$9c,$8e,$00,$60
 
 SystemData_Config10:
@@ -13608,9 +13608,9 @@ Menu_BattleSettings:
 ; Purpose: Play error sound for invalid battle setting operations
 ; Reachability: Dead code (no references found)
 ; Analysis: Orphaned error sound handler
-; Technical: Originally labeled UNREACH_00C1EB
+; Technical: Originally labeled DB_UNREACH_00C1EB
 ;-------------------------------------------------------------------------------
-UNREACH_00C1EB:
+DB_UNREACH_00C1EB:
 	jsr.w Sprite_SetMode2C               ;00C1EB|2012B9  |00B912; Play error sound
 
 Menu_BattleSettings_InputLoop:
@@ -13732,11 +13732,11 @@ Menu_BattleSettings_Speed_Store:
 Menu_BattleSettings_UpdateDisplay:
 	sty.b $03	   ; Store menu mode
 	sta.b $01	   ; Store current value
-	lda.w DATA8_00c339,x ; Load color byte 1
+	lda.w DB_DATA8_00c339,x ; Load color byte 1
 	sta.l $7f56d7   ; Store to WRAM
-	lda.w DATA8_00c33a,x ; Load color byte 2
+	lda.w DB_DATA8_00c33a,x ; Load color byte 2
 	sta.l $7f56d9   ; Store to WRAM
-	lda.w DATA8_00c33b,x ; Load color byte 3
+	lda.w DB_DATA8_00c33b,x ; Load color byte 3
 	sta.l $7f56db   ; Store to WRAM
 
 Menu_BattleSettings_Refresh:
@@ -13822,11 +13822,11 @@ Menu_BattleSettings_SetBlue_Store:
 
 SystemData_Config14:
 	db $1f		 ; Blue data
-DATA8_00c339:
+DB_DATA8_00c339:
 	db $1f		 ; Blue data
-DATA8_00c33a:
+DB_DATA8_00c33a:
 	db $20		 ; Green data
-DATA8_00c33b:
+DB_DATA8_00c33b:
 	db $78,$3f,$20,$58,$5f,$20,$38,$7f,$38,$00
 
 SystemData_Config15:
@@ -14828,7 +14828,7 @@ LoadData_Success:
 	rts ;00CA62|60      |      ;
 
 SaveData_MainHandler:
-	pea.w LOOSE_OP_00CAB5 ;00CA63|F4B5CA  |00CAB5;
+	pea.w DB_LOOSE_OP_00CAB5 ;00CA63|F4B5CA  |00CAB5;
 	php ;00CA66|08      |      ;
 	rep #$30		;00CA67|C230    |      ;
 	phb ;00CA69|8B      |      ;
@@ -14872,7 +14872,7 @@ LoadData_Complete:
 	sta.b $8e	   ;00CAB1|858E    |00008E;
 	jmp.w Sub_00981B ;00CAB3|4C1B98  |00981B;
 
-LOOSE_OP_00CAB5:
+DB_LOOSE_OP_00CAB5:
 	lda.b $64	   ;00CAB6|A564    |000064;
 	rts ;00CAB8|60      |      ;
 
@@ -15082,9 +15082,9 @@ Screen_ColorAdjustTable:
 ; ==============================================================================
 
 ; Final stub definitions for any remaining external routines
-ExternalRoutine_00CF3F:
+DB_ExternalRoutine_00CF3F:
 	= $cf3f
-ExternalRoutine_00CF62:
+DB_ExternalRoutine_00CF62:
 	= $cf62
 
 ; ==============================================================================

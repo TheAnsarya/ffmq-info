@@ -1,8 +1,8 @@
-﻿;==============================================================================
+;==============================================================================
 ; Final Fantasy Mystic Quest - Input/Controller Handler Analysis
 ;==============================================================================
 ; Analyzes how the game reads and processes controller input
-; Location: Primarily bank_00.asm Label_008BA0+
+; Location: Primarily bank_00.asm DB_Label_008BA0+
 ;==============================================================================
 
 ;------------------------------------------------------------------------------
@@ -59,7 +59,7 @@
 ;   - Reset to 25 ($19) on auto-repeat
 
 ;------------------------------------------------------------------------------
-; Main Input Reading Routine (Label_008BA0)
+; Main Input Reading Routine (DB_Label_008BA0)
 ;------------------------------------------------------------------------------
 ; Called every frame to read controller and update input state
 ;
@@ -75,7 +75,7 @@
 ; 9. Store raw state in $0092
 ; 10. Clear injected input
 
-Label_008BA0:	; Main input reading entry point
+DB_Label_008BA0:	; Main input reading entry point
 	rep #$30                        ; 16-bit A/X/Y
 	lda #$0000
 	tcd                             ; Set direct page to $0000
@@ -145,7 +145,7 @@ Label_008BA0:	; Main input reading entry point
 	rts
 
 ;------------------------------------------------------------------------------
-; Input Processing Routine (Store_008BFD)
+; Input Processing Routine (DB_Store_008BFD)
 ;------------------------------------------------------------------------------
 ; Processes input with auto-repeat timing
 ; Called after reading hardware to generate final input for game logic
@@ -157,7 +157,7 @@ Label_008BA0:	; Main input reading entry point
 ;
 ; Output: $07 = processed input for this frame
 
-Store_008BFD:	; Process input with timing
+DB_Store_008BFD:	; Process input with timing
 	stz $07                         ; Clear output
 
 ; Check for new button press
@@ -364,5 +364,5 @@ Store_008BFD:	; Process input with timing
 ; Confidence: HIGH
 ; - Hardware register reading: VERIFIED (SNES_CNTRL1L usage confirmed)
 ; - State variables: VERIFIED ($92, $94, $96 usage documented)
-; - Auto-repeat logic: VERIFIED (timer behavior at Store_008BFD)
+; - Auto-repeat logic: VERIFIED (timer behavior at DB_Store_008BFD)
 ; - Flag system: VERIFIED (multiple context checks observed)

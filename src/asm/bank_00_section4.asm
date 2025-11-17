@@ -1,4 +1,4 @@
-﻿; ===========================================================================
+; ===========================================================================
 ; Continued Bank $00 Disassembly - Section 4
 ; Lines 1600-2400 (Graphics and VRAM routines)
 ; ===========================================================================
@@ -13,7 +13,7 @@
 
 Sprite_UpdateCharacterSingleBuffer:
 ; Get character tile from map data
-	lda.L				   DATA8_049800,x ; Load tile number from map data
+	lda.L				   DB_DATA8_049800,x ; Load tile number from map data
 	asl					 a; Multiply by 4 (4 bytes per tile)
 	asl					 a
 	sta.W				   $00f4	 ; Store tile offset
@@ -101,7 +101,7 @@ Sprite_ConvertDigit:
 
 ; Handle tens digit
 	cpy.W				   #$0000	; Check if any tens
-	beq					 UNREACH_008D06 ; If zero, skip tens display
+	beq					 DB_UNREACH_008D06 ; If zero, skip tens display
 
 	tya							   ; Get tens count
 	adc.B				   #$7f	  ; Add tile offset for tens
@@ -111,7 +111,7 @@ Sprite_ConvertDigit:
 ; ------------------------------------------------------------------------------
 ; UNREACHABLE CODE ANALYSIS
 ; ------------------------------------------------------------------------------
-; Label: UNREACH_008D06
+; Label: DB_UNREACH_008D06
 ; Category: 🔴 Truly Unreachable (Dead Code)
 ; Purpose: Writes $45 to consecutive memory locations indexed by X
 ; Reachability: No known call sites or branches to this address
@@ -122,7 +122,7 @@ Sprite_ConvertDigit:
 ; Verified: NOT reachable in normal gameplay
 ; Notes: May be debug initialization or removed feature
 ; ------------------------------------------------------------------------------
-UNREACH_008D06:
+DB_UNREACH_008D06:
 ; No tens digit (position < 10)
 	lda.B #$45                           ;008D06|A945    |      ; Load immediate $45
 	sta.W $0000,X                        ;008D08|9D0000  |000000; Store to $0000 indexed by X
@@ -173,7 +173,7 @@ Sprite_UpdateCharacterDualBuffer:
 	beq					 Sprite_UpdateDone ; If invalid, exit
 
 ; Get character tile and calculate buffer address
-	lda.L				   DATA8_049800,x ; Get tile number from map
+	lda.L				   DB_DATA8_049800,x ; Get tile number from map
 	adc.B				   #$0a	  ; Add animation offset
 	xba							   ; Swap to high byte
 
@@ -211,7 +211,7 @@ Sprite_UpdateDone:
 Sprite_UpdateSingleBufferAlt:
 ; Single buffer mode path
 	ldx.W				   $10b1	 ; Get character position
-	lda.L				   DATA8_049800,x ; Get tile number
+	lda.L				   DB_DATA8_049800,x ; Get tile number
 	asl					 a; Multiply by 4
 	asl					 a
 	sta.W				   $00f7	 ; Store tile offset
@@ -237,7 +237,7 @@ Sprite_UpdateSingleBufferAlt:
 
 Map_PositionToVRAMAddress:
 	cmp.B				   #$ff	  ; Check if invalid position
-	beq					 UNREACH_008D93 ; If invalid, return $ffff
+	beq					 DB_UNREACH_008D93 ; If invalid, return $ffff
 
 	jsr.W				   Map_TilePositionToVRAM ; Calculate VRAM address
 	tax							   ; Transfer to X
@@ -246,7 +246,7 @@ Map_PositionToVRAMAddress:
 ; ------------------------------------------------------------------------------
 ; UNREACHABLE CODE ANALYSIS
 ; ------------------------------------------------------------------------------
-; Label: UNREACH_008D93
+; Label: DB_UNREACH_008D93
 ; Category: 🟡 Conditionally Reachable (Error Handler)
 ; Purpose: Error return - sets X to $FFFF and returns
 ; Reachability: REACHABLE via conditional branch at line 239 (beq)
@@ -258,7 +258,7 @@ Map_PositionToVRAMAddress:
 ; Notes: Should be renamed to something like Map_InvalidPositionReturn
 ;        This is NOT truly unreachable - it's an error path
 ; ------------------------------------------------------------------------------
-UNREACH_008D93:
+DB_UNREACH_008D93:
 	ldx.W #$ffff                         ;008D93|A2FFFF  |      ; Load X with $FFFF (error marker)
 	rts                                  ;008D96|60      |      ; Return from subroutine
 

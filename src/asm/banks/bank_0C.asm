@@ -1773,7 +1773,7 @@ WorldInput_ApplyMovement:
 ;      |        |      ;
 WorldInput_UpdateCamera:
 	tax                                  ;0C900A|AA      |      ;
-	lda.L DATA8_078031,x                 ;0C900B|BF318007|078031;
+	lda.L DB_DATA8_078031,x                 ;0C900B|BF318007|078031;
 	and.W #$00ff                         ;0C900F|29FF00  |      ;
 	sta.W !SNES_VMDATAL                          ;0C9012|8D1821  |0C2118;
 	txa                                  ;0C9015|8A      |      ;

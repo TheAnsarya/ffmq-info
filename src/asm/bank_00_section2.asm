@@ -1,4 +1,4 @@
-﻿; ===========================================================================
+; ===========================================================================
 ; Graphics Transfer - Battle Mode
 ; ===========================================================================
 ; Purpose: Upload battle graphics to VRAM during battle transitions
@@ -170,7 +170,7 @@ Skip_High_Increment:
 	bra					 Frame_Update_Done ; Skip normal update
 
 Normal_Frame_Update:
-	jsr.W				   Store_008BFD ; Normal frame processing
+	jsr.W				   DB_Store_008BFD ; Normal frame processing
 
 ; Check if input processing allowed
 	lda.W				   #$0010	; Check bit 4

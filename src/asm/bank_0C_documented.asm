@@ -1085,7 +1085,7 @@ Display_WaitVBlankAndUpdate:
 	sta.w !vfx_anim_frames,X   ;0C8616	; Store new frame number
 	tax ;0C8619	; Use frame as index
 	sep #$20		;0C861A	; 8-bit accumulator
-	lda.w DATA8_0C8659,X ;0C861C	; Load tile number from table
+	lda.w DB_DATA8_0C8659,X ;0C861C	; Load tile number from table
 	sta.w $0002,Y   ;0C861F	; Update sprite tile
 	cmp.b #$44	  ;0C8622	; Tile = $44?
 	php ;0C8624	; Save comparison result
@@ -1122,7 +1122,7 @@ Display_WaitVBlankAndUpdate:
 ; Animation Frame Table (14 frames of sprite tile numbers)
 ; ==============================================================================
 
-DATA8_0C8659:
+DB_DATA8_0C8659:
 	db $00,$04,$04,$00,$00,$08,$08,$08,$0c,$40,$40,$44,$44,$00,$00,$00 ; Sprite animation sequence
 
 ; [Additional sprite configuration data continues...]
@@ -1283,7 +1283,7 @@ Display_Mode7TilemapSetup:
 ; Controls Mode 7 scroll offsets per scanline for perspective effect.
 ; ==============================================================================
 
-DATA8_0C886B:
+DB_DATA8_0C886B:
 	db $ff,$10,$00,$d1,$0e,$01,$00 ;0C886B	; HDMA: 255 lines, value=$0010, then $01d1
 
 ; ==============================================================================
@@ -1305,7 +1305,7 @@ Display_AnimatedVerticalScroll:
 	jsl.l CWaitTimingRoutine ;0C887A	; Wait for VBLANK
 	sta.b !SNES_BG1VOFS-$2100 ;0C887E	; Set BG1 vertical scroll ($210e)
 	stz.b !SNES_BG1VOFS-$2100 ;0C8880	; High byte = 0
-	lda.w DATA8_0C88B0,X ;0C8882	; Load animation tile pattern
+	lda.w DB_DATA8_0C88B0,X ;0C8882	; Load animation tile pattern
 	inx ;0C8885	; Next table entry
 	phx ;0C8886	; Save index
 	jsr.w DrawTilePatternGrid ;0C8887	; Draw tile pattern (3×3 grid)
@@ -1345,7 +1345,7 @@ Display_AnimatedVerticalScroll:
 ; Values correspond to VRAM tile addresses for 3×3 pattern drawing.
 ; ==============================================================================
 
-DATA8_0C88B0:
+DB_DATA8_0C88B0:
 	db $11,$15,$15,$11,$11,$19,$19,$19,$1d,$51,$51,$55,$55,$11 ;0C88B0
 
 ; ==============================================================================
@@ -1877,7 +1877,7 @@ Display_SpriteCoordinateDMA:
 ; Format: Signed 16-bit fixed-point (8.8 format)
 ; ==============================================================================
 
-DATA16_0C8B66:	; Sine/cosine table 1 (48 entries)
+DB_DATA16_0C8B66:	; Sine/cosine table 1 (48 entries)
 	db $dd,$00,$80,$00,$80,$00,$dd,$00,$00,$00 ;0C8B66	; Angles 0-9
 	db $00		 ;0C8B70
 	db $01,$80,$ff,$dd,$00,$23,$ff,$80,$00,$00,$ff,$00,$00,$23,$ff,$80 ;0C8B71	; Angles 10-25
@@ -1885,7 +1885,7 @@ DATA16_0C8B66:	; Sine/cosine table 1 (48 entries)
 	db $ff		 ;0C8B91
 	db $00		 ;0C8B92
 
-DATA8_0C8B93:	; Animation speed table (30 bytes)
+DB_DATA8_0C8B93:	; Animation speed table (30 bytes)
 	db $01,$00,$00,$01,$02,$03,$04,$05,$06,$07,$08,$0a,$0c,$0e,$10,$12 ;0C8B93
 	db $14,$16,$18,$1c,$20,$24,$28,$2c,$30,$00 ;0C8BA3
 
@@ -2025,7 +2025,7 @@ Display_TitleScreenInit:
 ; Defines sprite positions and attributes for title screen logo/effects.
 ; ==============================================================================
 
-DATA8_0C8C5E:
+DB_DATA8_0C8C5E:
 	db $28,$27,$10,$01,$38,$27,$12,$01,$48,$27,$14,$01,$58,$27,$16,$01 ;0C8C5E
 	db $68,$27,$18,$01,$80,$27,$10,$01,$90,$27,$16,$01,$a0,$27,$14,$01 ;0C8C6E
 	db $b0,$27,$1a,$01,$c0,$27,$16,$01,$d0,$27,$1c,$01,$e0,$27,$1e,$01 ;0C8C7E
@@ -2043,7 +2043,7 @@ DATA8_0C8C5E:
 ; Additional sprite/effect configuration for title animation.
 ; ==============================================================================
 
-DATA8_0C8CDE:
+DB_DATA8_0C8CDE:
 	db $90,$b7,$a0,$30,$a0,$b7,$a2,$30,$b8,$b7,$a4,$30 ;0C8CDE
 	db $c8,$b7,$a6,$30,$30,$c3,$a8,$30,$40,$c3,$aa,$30,$50,$c3,$ac,$30 ;0C8CEA
 	db $60,$c3,$ae,$30,$78,$c3,$e6,$30,$90,$c3,$e8,$30,$a0,$c3,$ea,$30 ;0C8CFA
@@ -2057,7 +2057,7 @@ DATA8_0C8CDE:
 ; Offset = 0 marks end of table.
 ; ==============================================================================
 
-DATA8_0C8D1E:
+DB_DATA8_0C8D1E:
 	db $01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$03,$01 ;0C8D1E
 	db $ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff ;0C8D2E
 	db $02,$01,$ff,$69,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02,$01,$ff,$02 ;0C8D3E
@@ -2306,7 +2306,7 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 	sep #$20		;0C8FB4|E220    |      ; 8-bit accumulator
 	lda.b #$08	  ;0C8FB6|A908    |      ; 8 rows per tile (8x8 pixels)
 
-Label_0C8FB8:
+DB_Label_0C8FB8:
 ; Process one row of the tile (8 pixels)
 	pha ;0C8FB8|48      |      ; Save row counter
 
@@ -2320,7 +2320,7 @@ Label_0C8FB8:
 	sty.b $62	   ;0C8FC1|8462    |000062; Store in DP $62-$63
 	ldy.w #$0008	;0C8FC3|A00800  |      ; 8 pixels per row
 
-Label_0C8FC6:
+DB_Label_0C8FC6:
 ; Deinterleave 4 bitplanes into 4-bit pixel value
 ; Each pixel needs bits from all 4 planes
 ; Shift order: BP3, BP2, BP1, BP0 (MSB to LSB)
@@ -2335,14 +2335,14 @@ Label_0C8FC6:
 	and.b #$0f	  ;0C8FD2|290F    |      ; Mask to 4 bits (palette index 0-15)
 	sta.l !SNES_VMDATAH ;0C8FD4|8F192100|002119; Write to VRAM high byte ($2119)
 	dey ;0C8FD8|88      |      ; Decrement pixel counter
-	bne Label_0C8FC6 ;0C8FD9|D0EB    |0C8FC6; Loop for all 8 pixels
+	bne DB_Label_0C8FC6 ;0C8FD9|D0EB    |0C8FC6; Loop for all 8 pixels
 
 ; Move to next row
 	inx ;0C8FDB|E8      |      ; X += 2 (next row in planar format)
 	inx ;0C8FDC|E8      |      ; (2 bytes per row per plane pair)
 	pla ;0C8FDD|68      |      ; Restore row counter
 	dec A		   ;0C8FDE|3A      |      ; Decrement row count
-	bne Label_0C8FB8 ;0C8FDF|D0D7    |0C8FB8; Loop for all 8 rows
+	bne DB_Label_0C8FB8 ;0C8FDF|D0D7    |0C8FB8; Loop for all 8 rows
 
 ; Tile complete, X now points +$10 from start
 	rep #$30		;0C8FE1|C230    |      ; 16-bit mode
@@ -2379,7 +2379,7 @@ RGB555_Color_To_Tile_Pattern_Converter_Batch:
 ;   3. Combine: (Green << 4) | Red to form 9-bit index (0-511)
 ;   4. Use index to lookup tile pattern from Bank $07:8031
 ;   5. Write 8 rows of tile data + 8 zeros (4bpp format padding)
-; Lookup Table: DATA8_078031 contains pre-generated tile patterns
+; Lookup Table: DB_DATA8_078031 contains pre-generated tile patterns
 ; VRAM Format: Each tile row writes to $2118 (VMDATAL), auto-increment
 ; ------------------------------------------------------------------------------
 RGB555_Color_To_Tile_Pattern_Converter_Single:
@@ -2407,16 +2407,16 @@ RGB555_Color_To_Tile_Pattern_Converter_Single:
 
 	ldy.w #$0008	;0C9007|A00800  |      ; 8 rows per tile
 
-Label_0C900A:
+DB_Label_0C900A:
 ; Lookup tile pattern for each row
 	tax ;0C900A|AA      |      ; Use color index as X
-	lda.l DATA8_078031,X ;0C900B|BF318007|078031; Load pattern byte from Bank $07
+	lda.l DB_DATA8_078031,X ;0C900B|BF318007|078031; Load pattern byte from Bank $07
 	and.w #$00ff	;0C900F|29FF00  |      ; Mask to byte
 	sta.w !VMDATAL	 ;0C9012|8D1821  |0C2118; Write to VRAM low byte ($2118)
 	txa ;0C9015|8A      |      ; Restore index
 	adc.w #$0040	;0C9016|694000  |      ; +$40 for next row in table
 	dey ;0C9019|88      |      ; Decrement row counter
-	bne Label_0C900A ;0C901A|D0EE    |0C900A; Loop for 8 rows
+	bne DB_Label_0C900A ;0C901A|D0EE    |0C900A; Loop for 8 rows
 
 ; Write 8 zero bytes (padding for 4bpp high bitplanes)
 	stz.w !VMDATAL	 ;0C901C|9C1821  |0C2118; Zero byte 1
@@ -2464,13 +2464,13 @@ Complex_Graphics_Buffer_Initialization:
 	pea.w $007f	 ;0C904F|F47F00  |0C007F; Push $7f00
 	plb ;0C9052|AB      |      ; Pull into DB ($7f)
 
-Label_0C9053:
+DB_Label_0C9053:
 ; Process 128 tiles
 	pha ;0C9053|48      |      ; Save iteration counter
 	jsr.w Tile_Processing_Routine_4bpp_Decompression_To_Buffer ;0C9054|209990  |0C9099; Process one tile (decompression)
 	pla ;0C9057|68      |      ; Restore counter
 	dec A		   ;0C9058|3A      |      ; Decrement
-	bne Label_0C9053 ;0C9059|D0F8    |0C9053; Loop for all 128 tiles
+	bne DB_Label_0C9053 ;0C9059|D0F8    |0C9053; Loop for all 128 tiles
 
 ; Setup DMA transfer for processed buffer
 	plb ;0C905B|AB      |      ; Restore data bank
@@ -2530,7 +2530,7 @@ Tile_Processing_Routine_4bpp_Decompression_To_Buffer:
 	sep #$20		;0C9099|E220    |      ; 8-bit accumulator
 	lda.b #$08	  ;0C909B|A908    |      ; 8 rows per tile
 
-Label_0C909D:
+DB_Label_0C909D:
 	pha ;0C909D|48      |      ; Save row counter
 	ldy.w !ram_1031_long,X   ;0C909E|BC1000  |7F0010; Load BP2+BP3 word
 	sty.b $64	   ;0C90A1|8464    |000064; Store at $64-$65
@@ -2538,8 +2538,8 @@ Label_0C909D:
 	sty.b $62	   ;0C90A6|8462    |000062; Store at $62-$63
 	ldy.w #$0008	;0C90A8|A00800  |      ; 8 pixels per row
 
-Label_0C90AB:
-; Deinterleave bitplanes (same as Label_0C8FC6)
+DB_Label_0C90AB:
+; Deinterleave bitplanes (same as DB_Label_0C8FC6)
 	asl.b $65	   ;0C90AB|0665    |000065; Shift BP3
 	rol A		   ;0C90AD|2A      |      ; Rotate into A
 	asl.b $64	   ;0C90AE|0664    |000064; Shift BP2
@@ -2551,24 +2551,24 @@ Label_0C90AB:
 	and.b #$0f	  ;0C90B7|290F    |      ; Mask to 4 bits (color 0-15)
 
 ; Transparency handling
-	beq Store_0C90BD ;0C90B9|F002    |0C90BD; If zero, skip (transparent)
+	beq DB_Store_0C90BD ;0C90B9|F002    |0C90BD; If zero, skip (transparent)
 	ora.b #$10	  ;0C90BB|0910    |      ; Set bit 4 (non-transparent marker)
 
-Store_0C90BD:
+DB_Store_0C90BD:
 ; Write to buffer
 	sta.b [$5f]	 ;0C90BD|875F    |00005F; Write to [$5f] (buffer pointer)
 	rep #$30		;0C90BF|C230    |      ; 16-bit mode
 	inc.b $5f	   ;0C90C1|E65F    |00005F; Increment buffer pointer
 	sep #$20		;0C90C3|E220    |      ; 8-bit mode
 	dey ;0C90C5|88      |      ; Decrement pixel counter
-	bne Label_0C90AB ;0C90C6|D0E3    |0C90AB; Loop for 8 pixels
+	bne DB_Label_0C90AB ;0C90C6|D0E3    |0C90AB; Loop for 8 pixels
 
 ; Next row
 	inx ;0C90C8|E8      |      ; X += 2
 	inx ;0C90C9|E8      |      ;
 	pla ;0C90CA|68      |      ; Restore row counter
 	dec A		   ;0C90CB|3A      |      ; Decrement
-	bne Label_0C909D ;0C90CC|D0CF    |0C909D; Loop for 8 rows
+	bne DB_Label_0C909D ;0C90CC|D0CF    |0C909D; Loop for 8 rows
 
 ; Tile complete, advance source pointer
 	rep #$30		;0C90CE|C230    |      ; 16-bit mode
@@ -2695,16 +2695,16 @@ Sprite_Graphics_Loading_Compositing_System:
 	jsl.l CallTilemapFillRoutine ;0C916A|22949900|009994; Clear memory routine
 
 ; Composite sprite layers (8 layers)
-	jsr.w Load_0C91AF ;0C916E|20AF91  |0C91AF; Layer 1: Base sprites
-	jsr.w Load_0C9197 ;0C9171|209791  |0C9197; Layer 2: Overlay 1
+	jsr.w DB_Load_0C91AF ;0C916E|20AF91  |0C91AF; Layer 1: Base sprites
+	jsr.w DB_Load_0C9197 ;0C9171|209791  |0C9197; Layer 2: Overlay 1
 	jsr.w Buffer_SpacingPadding ;0C9174|204792  |0C9247; Spacing/padding
-	jsr.w Load_0C91B7 ;0C9177|20B791  |0C91B7; Layer 3: Accessories
-	jsr.w Load_0C919F ;0C917A|209F91  |0C919F; Layer 4: Overlay 2
+	jsr.w DB_Load_0C91B7 ;0C9177|20B791  |0C91B7; Layer 3: Accessories
+	jsr.w DB_Load_0C919F ;0C917A|209F91  |0C919F; Layer 4: Overlay 2
 	jsr.w Bit_RotationTransformation_Processor ;0C917D|209E92  |0C929E; Unknown processing
-	jsr.w Load_0C91BF ;0C9180|20BF91  |0C91BF; Layer 5: Effects
+	jsr.w DB_Load_0C91BF ;0C9180|20BF91  |0C91BF; Layer 5: Effects
 	jsr.w Buffer_SpacingPadding ;0C9183|204792  |0C9247; Spacing/padding
-	jsr.w Load_0C91C7 ;0C9186|20C791  |0C91C7; Layer 6: Highlights
-	jsr.w Load_0C91A7 ;0C9189|20A791  |0C91A7; Layer 7: Shadows
+	jsr.w DB_Load_0C91C7 ;0C9186|20C791  |0C91C7; Layer 6: Highlights
+	jsr.w DB_Load_0C91A7 ;0C9189|20A791  |0C91A7; Layer 7: Shadows
 	jsr.w Buffer_SpacingPadding ;0C918C|204792  |0C9247; Spacing/padding
 
 ; Final upload
@@ -2719,43 +2719,43 @@ Sprite_Graphics_Loading_Compositing_System:
 ; Then branches to Sprite_Data_Processing_Loop_Bytecode_Interpreter for actual processing
 ; ------------------------------------------------------------------------------
 
-Load_0C9197:
+DB_Load_0C9197:
 ; Layer 2: VRAM $2080, source $0c:93CA
 	ldy.w #$2080	;0C9197|A08020  |      ; VRAM dest
 	ldx.w #$93ca	;0C919A|A2CA93  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C919D|802E    |0C91CD; Process
 
-Load_0C919F:
+DB_Load_0C919F:
 ; Layer 4: VRAM $2480, source $0c:93EB
 	ldy.w #$2480	;0C919F|A08024  |      ; VRAM dest
 	ldx.w #$93eb	;0C91A2|A2EB93  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91A5|8026    |0C91CD; Process
 
-Load_0C91A7:
+DB_Load_0C91A7:
 ; Layer 7: VRAM $20c0, source $0c:9410
 	ldy.w #$20c0	;0C91A7|A0C020  |      ; VRAM dest
 	ldx.w #$9410	;0C91AA|A21094  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91AD|801E    |0C91CD; Process
 
-Load_0C91AF:
+DB_Load_0C91AF:
 ; Layer 1: VRAM $2000, source $0c:9346
 	ldy.w #$2000	;0C91AF|A00020  |      ; VRAM dest
 	ldx.w #$9346	;0C91B2|A24693  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91B5|8016    |0C91CD; Process
 
-Load_0C91B7:
+DB_Load_0C91B7:
 ; Layer 3: VRAM $2b80, source $0c:9392
 	ldy.w #$2b80	;0C91B7|A0802B  |      ; VRAM dest
 	ldx.w #$9392	;0C91BA|A29293  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91BD|800E    |0C91CD; Process
 
-Load_0C91BF:
+DB_Load_0C91BF:
 ; Layer 5: VRAM $2ba0, source $0c:9392
 	ldy.w #$2ba0	;0C91BF|A0A02B  |      ; VRAM dest
 	ldx.w #$9392	;0C91C2|A29293  |      ; Source pointer
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91C5|8006    |0C91CD; Process
 
-Load_0C91C7:
+DB_Load_0C91C7:
 ; Layer 6: VRAM $2040, source $0c:9396
 	ldy.w #$2040	;0C91C7|A04020  |      ; VRAM dest
 	ldx.w #$9396	;0C91CA|A29693  |      ; Source pointer
@@ -2779,7 +2779,7 @@ Sprite_Data_Processing_Loop_Bytecode_Interpreter:
 	lda.w $0000,X   ;0C91CF|BD0000  |0C0000; Load command byte
 	and.w #$00ff	;0C91D2|29FF00  |      ; Mask to byte
 	cmp.w #$0080	;0C91D5|C98000  |      ; Check if < $80
-	bcs Label_0C91E8 ;0C91D8|B00E    |0C91E8; Branch if >= $80 (offset cmd)
+	bcs DB_Label_0C91E8 ;0C91D8|B00E    |0C91E8; Branch if >= $80 (offset cmd)
 
 ; Tile index command ($00-$7f)
 	asl A		   ;0C91DA|0A      |      ; Multiply by 32:
@@ -2794,10 +2794,10 @@ Sprite_Data_Processing_Loop_Bytecode_Interpreter:
 	inx ;0C91E5|E8      |      ; Next command
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91E6|80E5    |0C91CD; Loop
 
-Label_0C91E8:
+DB_Label_0C91E8:
 ; Check for end marker
 	cmp.w #$00ff	;0C91E8|C9FF00  |      ; End of commands?
-	beq Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE ;0C91EB|F011    |0C91FE; Yes, exit
+	beq DB_Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE ;0C91EB|F011    |0C91FE; Yes, exit
 
 ; Offset command ($80-$fe)
 	and.w #$007f	;0C91ED|297F00  |      ; Mask offset value (0-127)
@@ -2813,7 +2813,7 @@ Label_0C91E8:
 	inx ;0C91FB|E8      |      ; Next command
 	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91FC|80CF    |0C91CD; Loop
 
-Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE:
+DB_Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE:
 	rts ;0C91FE|60      |      ; End of command stream
 
 ; ==============================================================================
@@ -2835,7 +2835,7 @@ Tile_Compositing_With_Transparency_8x8_Tile_3_Plane:
 	plb ;0C9208|AB      |      ; Pull to DB (high byte)
 	plb ;0C9209|AB      |      ; Pull to DB (low byte) = $7f
 
-Load_0C920A:
+DB_Load_0C920A:
 ; Load source tile row (3 bytes: BP0, BP1, BP2)
 ; Calculate transparency mask: OR all 3 bitplanes
 	lda.w $0000,X   ;0C920A|BD0000  |7F0000; Load BP0
@@ -2867,7 +2867,7 @@ Load_0C920A:
 	iny ;0C9238|C8      |      ; Y += 2
 	iny ;0C9239|C8      |      ;
 	dec.b $62	   ;0C923A|C662    |000062; Decrement row counter
-	bne Load_0C920A ;0C923C|D0CC    |0C920A; Loop for 8 rows
+	bne DB_Load_0C920A ;0C923C|D0CC    |0C920A; Loop for 8 rows
 
 ; Tile complete, advance to next tile
 	rep #$30		;0C923E|C230    |      ; 16-bit mode
@@ -2903,12 +2903,12 @@ Buffer_SpacingPadding:
 	sta.b $62	   ;0C9250|8562    |000062; Save spacing counter
 	ldx.w #$0000	;0C9252|A20000  |      ; Start at offset 0
 
-Label_0C9255:
+DB_Label_0C9255:
 ; Double spacing application
 	jsr.w Pixel_Row_SwappingRotation ;0C9255|206092  |0C9260; Apply spacing transform
 	jsr.w Pixel_Row_SwappingRotation ;0C9258|206092  |0C9260; Apply again (2x)
 	dec.b $62	   ;0C925B|C662    |000062; Decrement spacing counter
-	bne Label_0C9255 ;0C925D|D0F6    |0C9255; Loop for 30 iterations
+	bne DB_Label_0C9255 ;0C925D|D0F6    |0C9255; Loop for 30 iterations
 	rts ;0C925F|60      |      ; Return
 
 ; ==============================================================================
@@ -2974,28 +2974,28 @@ Bit_RotationTransformation_Processor:
 	ldy.w #$001e	;0C92A3|A01E00  |      ; 30 rows to process
 	ldx.w #$0000	;0C92A6|A20000  |      ; Start at offset 0
 
-Label_0C92A9:
+DB_Label_0C92A9:
 	phy ;0C92A9|5A      |      ; Save row counter
 	ldy.w #$0010	;0C92AA|A01000  |      ; 16 bytes per row
 
-Label_0C92AD:
+DB_Label_0C92AD:
 ; Process each byte in row
 	jsr.w Bit_Rotation_Algorithm_8_Bit_Left_Rotation ;0C92AD|20C292  |0C92C2; Apply bit rotation
 	dey ;0C92B0|88      |      ; Decrement byte counter
-	bne Label_0C92AD ;0C92B1|D0FA    |0C92AD; Loop for 16 bytes
+	bne DB_Label_0C92AD ;0C92B1|D0FA    |0C92AD; Loop for 16 bytes
 
 ; Process additional 8 bytes (24 bytes total per row)
 	ldy.w #$0008	;0C92B3|A00800  |      ; 8 more bytes
 
-Label_0C92B6:
+DB_Label_0C92B6:
 	jsr.w Bit_Rotation_Algorithm_8_Bit_Left_Rotation ;0C92B6|20C292  |0C92C2; Apply bit rotation
 	inx ;0C92B9|E8      |      ; Advance pointer
 	dey ;0C92BA|88      |      ; Decrement counter
-	bne Label_0C92B6 ;0C92BB|D0F9    |0C92B6; Loop for 8 bytes
+	bne DB_Label_0C92B6 ;0C92BB|D0F9    |0C92B6; Loop for 8 bytes
 
 	ply ;0C92BD|7A      |      ; Restore row counter
 	dey ;0C92BE|88      |      ; Decrement row counter
-	bne Label_0C92A9 ;0C92BF|D0E8    |0C92A9; Loop for 30 rows
+	bne DB_Label_0C92A9 ;0C92BF|D0E8    |0C92A9; Loop for 30 rows
 	rts ;0C92C1|60      |      ; Return
 
 ; ==============================================================================
@@ -3049,7 +3049,7 @@ PaletteColor_Data_Transformation:
 	sta.b $62	   ;0C92EF|8562    |000062; Save counter
 	lda.w #$0000	;0C92F1|A90000  |      ; Start offset = 0
 
-Label_0C92F4:
+DB_Label_0C92F4:
 ; Calculate source/dest offsets
 	adc.w #$0018	;0C92F4|691800  |      ; +$18 (24 bytes)
 	tax ;0C92F7|AA      |      ; X = source offset
@@ -3059,7 +3059,7 @@ Label_0C92F4:
 	lda.w #$0008	;0C92FD|A90800  |      ; 8 bytes to copy
 	sta.b $64	   ;0C9300|8564    |000064; Save byte counter
 
-Label_0C9302:
+DB_Label_0C9302:
 ; Copy bytes in reverse order
 	dex ;0C9302|CA      |      ; Decrement source
 	dey ;0C9303|88      |      ; Decrement dest twice
@@ -3068,11 +3068,11 @@ Label_0C9302:
 	and.w #$00ff	;0C9308|29FF00  |      ; Mask to byte
 	sta.w $0000,Y   ;0C930B|990000  |7F0000; Store at dest
 	dec.b $64	   ;0C930E|C664    |000064; Decrement byte counter
-	bne Label_0C9302 ;0C9310|D0F0    |0C9302; Loop for 8 bytes
+	bne DB_Label_0C9302 ;0C9310|D0F0    |0C9302; Loop for 8 bytes
 
 	pla ;0C9312|68      |      ; Restore accumulator
 	dec.b $62	   ;0C9313|C662    |000062; Decrement iteration counter
-	bne Label_0C92F4 ;0C9315|D0DD    |0C92F4; Loop for 30 iterations
+	bne DB_Label_0C92F4 ;0C9315|D0DD    |0C92F4; Loop for 30 iterations
 	rts ;0C9317|60      |      ; Return
 
 ; ==============================================================================
@@ -3113,7 +3113,7 @@ Graphics_Buffer_Initialization_Multi_Bank_Copy:
 Block_Copy_Loop_MVN_Based:
 	sta.b $62	   ;0C9334|8562    |000062; Save iteration counter
 
-Load_0C9336:
+DB_Load_0C9336:
 	lda.w #$0017	;0C9336|A91700  |      ; 23 bytes to copy ($17 + 1)
 	mvn $7f,$04	 ;0C9339|547F04  |      ; Block move: $04:X → $7f:Y
 ; mvn auto-increments X, Y and decrements A until A=$ffff
@@ -3123,7 +3123,7 @@ Load_0C9336:
 	adc.w #$0008	;0C933D|690800  |      ; Add 8 (spacing between blocks)
 	tay ;0C9340|A8      |      ; Update Y
 	dec.b $62	   ;0C9341|C662    |000062; Decrement iteration counter
-	bne Load_0C9336 ;0C9343|D0F1    |0C9336; Loop until done
+	bne DB_Load_0C9336 ;0C9343|D0F1    |0C9336; Loop until done
 	rts ;0C9345|60      |      ; Return
 
 ; ==============================================================================
@@ -3176,7 +3176,7 @@ Load_0C9336:
 ; Animation control data
 	db $e2		 ;0C9420|        |      ; sep #$20 instruction
 
-Label_0C9421:
+DB_Label_0C9421:
 ; Graphics initialization sequence
 	sep #$20		;0C9421|E220    |      ; 8-bit accumulator
 	rep #$10		;0C9423|C210    |      ; 16-bit index
@@ -3255,7 +3255,7 @@ Label_0C9421:
 ; ==============================================================================
 ; CODE: Animation Sequencer
 ; ==============================================================================
-Load_0CA37F:
+DB_Load_0CA37F:
 ; Setup animation playback
 	ldx.w #$a3c0	;0CA37F|A2C0A3  |      ; Animation table pointer
 	stx.b $58	   ;0CA382|8658    |000058; Store at $58-$59
@@ -3297,7 +3297,7 @@ Load_0CA37F:
 	dw $a532, $a540, $a54e, $a55c ;0CA3C4-0CA3CB; 4 animation sequences
 
 ; Individual sequence entry points
-Load_0CA3C5:
+DB_Load_0CA3C5:
 	ldy.w #$6100	;0CA3C5|A00061  |      ; Sequence 1 offset
 	ldx.w #$a532	;0CA3C8|A232A5  |      ; Pointer
 	jsr.w ExecuteSequence ;0CA3CB|2058A4  |0CA458; Execute sequence
@@ -3305,7 +3305,7 @@ Load_0CA3C5:
 	stx.b $58	   ;0CA3D1|8658    |000058; Store
 	rtl ;0CA3D3|6B      |      ; Return long
 
-Load_0CA3D5:
+DB_Load_0CA3D5:
 	ldy.w #$6200	;0CA3D5|A00062  |      ; Sequence 2 offset
 	ldx.w #$a540	;0CA3D8|A240A5  |      ; Pointer
 	jsr.w ExecuteSequence ;0CA3DB|2058A4  |0CA458; Execute
@@ -3313,7 +3313,7 @@ Load_0CA3D5:
 	stx.b $58	   ;0CA3E1|8658    |000058; Store
 	rtl ;0CA3E3|6B      |      ; Return long
 
-Load_0CA3E5:
+DB_Load_0CA3E5:
 	ldy.w #$6300	;0CA3E5|A00063  |      ; Sequence 3 offset
 	ldx.w #$a54e	;0CA3E8|A24EA5  |      ; Pointer
 	jsr.w ExecuteSequence ;0CA3EB|2058A4  |0CA458; Execute
@@ -3321,7 +3321,7 @@ Load_0CA3E5:
 	stx.b $58	   ;0CA3F1|8658    |000058; Store
 	rtl ;0CA3F3|6B      |      ; Return long
 
-Load_0CA3F5:
+DB_Load_0CA3F5:
 	ldy.w #$6400	;0CA3F5|A00064  |      ; Sequence 4 offset
 	ldx.w #$a55c	;0CA3F8|A25CA5  |      ; Pointer
 	jsr.w ExecuteSequence ;0CA3FB|2058A4  |0CA458; Execute
@@ -3330,13 +3330,13 @@ Load_0CA3F5:
 	rtl ;0CA403|6B      |      ; Return long
 
 ; ==============================================================================
-; Complex_VRAM_Graphics_Upload_Sequence: Complex VRAM Graphics Upload Sequence
+; DB_Complex_VRAM_Graphics_Upload_Sequence: Complex VRAM Graphics Upload Sequence
 ; ==============================================================================
 ; Purpose: Upload multiple graphics layers with palette setup
 ; Used by: Battle scene initialization, character sprite loading
 ; Technique: Sequential VRAM uploads with palette interleaving
 ; ------------------------------------------------------------------------------
-Complex_VRAM_Graphics_Upload_Sequence:
+DB_Complex_VRAM_Graphics_Upload_Sequence:
 	phk ;0CA405|4B      |      ; Save program bank
 	plb ;0CA406|AB      |      ; Pull to data bank
 	ldx.w #$0000	;0CA407|A20000  |      ; Clear counter
@@ -3368,12 +3368,12 @@ Complex_VRAM_Graphics_Upload_Sequence:
 	ldx.w #$0000	;0CA437|A20000  |      ; Start index
 	ldy.w #$0006	;0CA43A|A00600  |      ; 6 colors
 
-Load_0CA43D:
+DB_Load_0CA43D:
 	lda.l DATA_0CB70E,X ;0CA43D|BF0EB70C|0CB70E; Load color word
 	sta.w !CGDATA	 ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
 	inx ;0CA444|E8      |      ; Next color
 	dey ;0CA445|88      |      ; Decrement counter
-	bne Load_0CA43D ;0CA446|D0F6    |0CA43D; Loop for 6 colors
+	bne DB_Load_0CA43D ;0CA446|D0F6    |0CA43D; Loop for 6 colors
 
 ; Setup palette group 2
 	lda.b #$91	  ;0CA448|A991    |      ; Palette index $91
@@ -3383,12 +3383,12 @@ Load_0CA43D:
 	ldx.w #$0000	;0CA44D|A20000  |      ; Start index
 	ldy.w #$000e	;0CA450|A00E00  |      ; 14 colors
 
-Load_0CA453:
+DB_Load_0CA453:
 	lda.l DATA_0CB9B4,X ;0CA453|BFB4B90C|0CB9B4; Load color word
 	sta.w !CGDATA	 ;0CA457|8D2221  |0C2122; Write to CGDATA
 	inx ;0CA45A|E8      |      ; Next
 	dey ;0CA45B|88      |      ; Decrement
-	bne Load_0CA453 ;0CA45C|D0F6    |0CA453; Loop
+	bne DB_Load_0CA453 ;0CA45C|D0F6    |0CA453; Loop
 
 	rtl ;0CA45E|6B      |      ; Return long
 
@@ -3892,10 +3892,10 @@ SpriteGraphicsData_Part4:
 ; 4x4 tile arrangement patterns for map rendering
 ; Format: Usually groups of 4-5 bytes defining tile IDs + control byte
 
-DATA8_0CEF85:
+DB_DATA8_0CEF85:
 	db $d7,$d7,$d7,$d7 ; Fill pattern marker
 
-DATA8_0CEF89:
+DB_DATA8_0CEF89:
 	db $55		 ; Control byte (flip/priority)
 	db $00		 ; Spacer
 	db $20,$21,$22,$23,$55 ; Pattern 1: 4 tiles + control

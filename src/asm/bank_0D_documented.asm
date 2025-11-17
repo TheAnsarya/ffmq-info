@@ -16,7 +16,7 @@
 ; Key Routines:
 ; - SPC_InitMain: Main SPC700 initialization
 ; - Secondary_APU_Command_Entry_Point: Sound data transfer routine
-; - DATA8_0D8008: Sound driver data pointers
+; - DB_DATA8_0d8008: Sound driver data pointers
 ;
 ; APU I/O Ports (used for communication):
 ; - $2140 (APUIO0): Command/status port
@@ -49,16 +49,16 @@ SPC_TransferData:
 ; Pointers to sound driver code and data for upload to SPC700.
 ; ==============================================================================
 
-DATA8_0d8008:
+DB_DATA8_0d8008:
 	db $87		 ;0D8008	; Driver size low byte
 
-DATA8_0d8009:
+DB_DATA8_0d8009:
 	db $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1 ;0D8009	; Pointers
 
-DATA8_0d8014:
+DB_DATA8_0d8014:
 	db $00		 ;0D8014	; Load address low
 
-DATA8_0d8015:
+DB_DATA8_0d8015:
 	db $02,$00,$2c,$00,$48,$00,$1b,$80,$1a,$00,$1a ;0D8015	; Pointers
 	db $ae,$bd,$ff,$bd,$35,$be,$7d,$be,$59,$be,$a1,$be ;0D8020
 
@@ -117,9 +117,9 @@ SPC_WaitReady:
 
 ; Begin sound driver upload
 	ldx.w #$0000	;0D807C	; Start at offset 0
-	lda.l DATA8_0d8014 ;0D807F	; Load target address low
+	lda.l DB_DATA8_0d8014 ;0D807F	; Load target address low
 	sta.w !SNES_APUIO2 ;0D8083	; Send to APU port 2
-	lda.l DATA8_0d8015 ;0D8086	; Load target address high
+	lda.l DB_DATA8_0d8015 ;0D8086	; Load target address high
 	sta.w !SNES_APUIO3 ;0D808A	; Send to APU port 3
 	lda.b #$01	  ;0D808D	; Upload start command
 	sta.w !SNES_APUIO1 ;0D808F	; Send to APU port 1
@@ -141,9 +141,9 @@ SPC_WaitAck:
 SPC_TransferBlock:
 	lda.b #$00	  ;0D809C	; Clear high byte
 	xba ;0D809E	; Swap A/B
-	lda.l DATA8_0d8008,x ;0D809F	; Load driver data byte
+	lda.l DB_DATA8_0d8008,x ;0D809F	; Load driver data byte
 	sta.b $14	   ;0D80A3	; Store to transfer buffer
-	lda.l DATA8_0d8009,x ;0D80A5	; Load pointer low
+	lda.l DB_DATA8_0d8009,x ;0D80A5	; Load pointer low
 	sta.b $15	   ;0D80A9	; Store to buffer
 	lda.b #$0d	  ;0D80AB	; Bank $0d
 	sta.b $16	   ;0D80AD	; Store bank to buffer
@@ -182,9 +182,9 @@ SPC_WaitTransfer:
 ; Sound driver upload complete
 	lda.b #$00	  ;0D80DD	; Zero value
 	sta.w !SNES_APUIO1 ;0D80DF	; Clear port 1
-	lda.l DATA8_0d8014 ;0D80E2	; Load start address low
+	lda.l DB_DATA8_0d8014 ;0D80E2	; Load start address low
 	sta.w !SNES_APUIO2 ;0D80E6	; Send to port 2
-	lda.l DATA8_0d8015 ;0D80E9	; Load start address high
+	lda.l DB_DATA8_0d8015 ;0D80E9	; Load start address high
 	sta.w !SNES_APUIO3 ;0D80ED	; Send to port 3
 	lda.b #$00	  ;0D80F0	; Start execution command
 	xba ;0D80F2	; Swap
@@ -282,13 +282,13 @@ Secondary_APU_Command_Entry_Point:
 ; ==============================================================================
 
 ; ------------------------------------------------------------------------------
-; DATA8_0D8008: Module Count/Header
+; DB_DATA8_0d8008: Module Count/Header
 ; ------------------------------------------------------------------------------
 DATA8_0d8008_1:
 	db $87		 ;0D8008|        |      ; Module count/header byte
 
 ; ------------------------------------------------------------------------------
-; DATA8_0D8009: Module Pointer Table (Low Bytes)
+; DB_DATA8_0d8009: Module Pointer Table (Low Bytes)
 ; ------------------------------------------------------------------------------
 ; Points to start of each SPC700 driver module in this bank
 ; These are 16-bit addresses offset from bank start ($0d8000)
@@ -297,7 +297,7 @@ DATA8_0d8009_1:
 	db $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1 ;0D8009|        |      ; Module pointers
 
 ; ------------------------------------------------------------------------------
-; DATA8_0D8014-0D8015: Module Size/Address Table
+; DB_DATA8_0d8014-0D8015: Module Size/Address Table
 ; ------------------------------------------------------------------------------
 ; Each pair defines: [size_low, size_high] for corresponding module
 ; Used to calculate transfer length during upload
@@ -397,9 +397,9 @@ SPC_WaitReady_1:
 ; Initialize upload parameters
 ; ------------------------------------------------------------------------------
 	ldx.w #$0000	;0D807C|A20000  |      ; Module index = 0
-	lda.l DATA8_0d8014 ;0D807F|AF14800D|0D8014; Load module address low
+	lda.l DB_DATA8_0d8014 ;0D807F|AF14800D|0D8014; Load module address low
 	sta.w !SNES_APUIO2 ;0D8083|8D4221  |002142; Send to APUIO2 (SPC700 RAM addr low)
-	lda.l DATA8_0d8015 ;0D8086|AF15800D|0D8015; Load module address high
+	lda.l DB_DATA8_0d8015 ;0D8086|AF15800D|0D8015; Load module address high
 	sta.w !SNES_APUIO3 ;0D808A|8D4321  |002143; Send to APUIO3 (SPC700 RAM addr high)
 	lda.b #$01	  ;0D808D|A901    |      ; Command $01 = upload data
 	sta.w !SNES_APUIO1 ;0D808F|8D4121  |002141; Send command to APUIO1
@@ -429,9 +429,9 @@ SPC_TransferBlock_1:
 ; Load module pointer from table
 ; $14-$16 = 24-bit pointer to module data in ROM
 ; ------------------------------------------------------------------------------
-	lda.l DATA8_0d8008,x ;0D809F|BF08800D|0D8008; Get module pointer (low)
+	lda.l DB_DATA8_0d8008,x ;0D809F|BF08800D|0D8008; Get module pointer (low)
 	sta.b $14	   ;0D80A3|8514    |000614; Store to DP $14
-	lda.l DATA8_0d8009,x ;0D80A5|BF09800D|0D8009; Get module pointer (mid)
+	lda.l DB_DATA8_0d8009,x ;0D80A5|BF09800D|0D8009; Get module pointer (mid)
 	sta.b $15	   ;0D80A9|8515    |000615; Store to DP $15
 	lda.b #$0d	  ;0D80AB|A90D    |      ; Bank $0d
 	sta.b $16	   ;0D80AD|8516    |000616; Store to DP $16 (complete 24-bit pointer)
@@ -486,10 +486,10 @@ SPC_WaitTransfer_1:
 	inc a;0D80D7|1A      |      ; Increment handshake
 	inc a;0D80D8|1A      |      ; +2 more (align for next)
 	inc a;0D80D9|1A      |      ; +3 total
-	bne Label_0D80DD ;0D80DA|D001    |0D80DD; If not rolled over
+	bne DB_Label_0D80DD ;0D80DA|D001    |0D80DD; If not rolled over
 	db $1a		 ;0D80DC|        |      ; +4 if rolled over (skip $00)
 
-Label_0D80DD:
+DB_Label_0D80DD:
 	inx ;0D80DD|E8      |      ; Next module index
 	inx ;0D80DE|E8      |      ; (2 bytes per entry)
 	cpx.w #$000c	;0D80DF|E00C00  |      ; 6 modules total (12 bytes)
@@ -499,9 +499,9 @@ Label_0D80DD:
 ; Send next module parameters to SPC700
 ; ------------------------------------------------------------------------------
 	xba ;0D80E4|EB      |      ; Get handshake
-	lda.l DATA8_0d8014,x ;0D80E5|BF14800D|0D8014; Next module address low
+	lda.l DB_DATA8_0d8014,x ;0D80E5|BF14800D|0D8014; Next module address low
 	sta.w !SNES_APUIO2 ;0D80E9|8D4221  |002142; Send to APUIO2
-	lda.l DATA8_0d8015,x ;0D80EC|BF15800D|0D8015; Next module address high
+	lda.l DB_DATA8_0d8015,x ;0D80EC|BF15800D|0D8015; Next module address high
 	sta.w !SNES_APUIO3 ;0D80F0|8D4321  |002143; Send to APUIO3
 	xba ;0D80F3|EB      |      ; Restore handshake
 	sta.w !SNES_APUIO1 ;0D80F4|8D4121  |002141; Send to APUIO1
@@ -510,9 +510,9 @@ Label_0D80DD:
 ; ------------------------------------------------------------------------------
 ; Wait for acknowledgment, then continue
 ; ------------------------------------------------------------------------------
-Label_0D80FA:
+DB_Label_0D80FA:
 	cmp.w !SNES_APUIO0 ;0D80FA|CD4021  |002140; Wait for echo
-	bne Label_0D80FA ;0D80FD|D0FB    |0D80FA; Loop until confirmed
+	bne DB_Label_0D80FA ;0D80FD|D0FB    |0D80FA; Loop until confirmed
 	bra SPC_TransferBlock ;0D80FF|809B    |0D809C; Transfer next module
 
 ; ==============================================================================
@@ -533,9 +533,9 @@ Start_SPC700_Driver_Execution:
 ; ------------------------------------------------------------------------------
 ; Wait for confirmation that driver started
 ; ------------------------------------------------------------------------------
-Label_0D8111:
+DB_Label_0D8111:
 	cmp.w !SNES_APUIO0 ;0D8111|CD4021  |002140; Wait for echo
-	bne Label_0D8111 ;0D8114|D0FB    |0D8111; Loop until confirmed
+	bne DB_Label_0D8111 ;0D8114|D0FB    |0D8111; Loop until confirmed
 
 ; ------------------------------------------------------------------------------
 ; Clear work RAM used during upload
@@ -543,10 +543,10 @@ Label_0D8111:
 	xba ;0D8116|EB      |      ; Get handshake to A
 	sta.w !SNES_APUIO0 ;0D8117|8D4021  |002140; Send final handshake
 	ldx.w #$0100	;0D811A|A20001  |      ; Clear 256 bytes
-Store_0D811D:
+DB_Store_0D811D:
 	sta.w $05ff,x   ;0D811D|9DFF05  |0005FF; Clear work RAM
 	dex ;0D8120|CA      |      ; Decrement counter
-	bne Store_0D811D ;0D8121|D0FA    |0D811D; Loop until done
+	bne DB_Store_0D811D ;0D8121|D0FA    |0D811D; Loop until done
 
 ; ------------------------------------------------------------------------------
 ; Set up driver status flags
@@ -559,7 +559,7 @@ Store_0D811D:
 ; Calculate and store checksum for warm start detection
 ; Checksum = driver_size + $4800 (base address in SPC700 RAM)
 ; ------------------------------------------------------------------------------
-	lda.l DATA8_0d9d78 ;0D8129|AF789D0D|0D9D78; Load driver size
+	lda.l DB_DATA8_0d9d78 ;0D8129|AF789D0D|0D9D78; Load driver size
 	clc ;0D812D|18      |      ;
 	adc.w #$4800	;0D812E|690048  |      ; Add base address
 	sta.b $f8	   ;0D8131|85F8    |0006F8; Store checksum value 1
@@ -570,9 +570,9 @@ Store_0D811D:
 ; 2048 cycle delay ensures driver is fully initialized
 ; ------------------------------------------------------------------------------
 	ldx.w #$0800	;0D8135|A20008  |      ; Delay counter = 2048
-Start_SPC700_Driver_Execution_Loop_0D8138:
+DB_Start_SPC700_Driver_Execution_Loop_0D8138:
 	dex ;0D8138|CA      |      ; Decrement
-	bne Start_SPC700_Driver_Execution_Loop_0D8138 ;0D8139|D0FD    |0D8138; Loop until zero
+	bne DB_Start_SPC700_Driver_Execution_Loop_0D8138 ;0D8139|D0FD    |0D8138; Loop until zero
 
 ; ------------------------------------------------------------------------------
 ; Set up driver callback pointer
@@ -628,7 +628,7 @@ APU_Command:
 	lda.b $00	   ;0D815E|A500    |000600; Read command byte
 	stz.b $00	   ;0D8160|6400    |000600; Clear command (mark processed)
 	beq Exit ;0D8162|F014    |0D8178; If $00, nop - exit
-	bmi Label_0D8172 ;0D8164|300C    |0D8172; If $80+, system command
+	bmi DB_Label_0D8172 ;0D8164|300C    |0D8172; If $80+, system command
 
 ; ------------------------------------------------------------------------------
 ; Standard command dispatch
@@ -643,7 +643,7 @@ APU_Command:
 ; ------------------------------------------------------------------------------
 ; System command handler (commands $80-$ff)
 ; ------------------------------------------------------------------------------
-Label_0D8172:
+DB_Label_0D8172:
 	jmp.w JumpSystemHandler ;0D8172|4CBA85  |0D85BA; Jump to system handler
 
 ;-------------------------------------------------------------------------------
@@ -706,14 +706,14 @@ MusicSFX_Load:
 ; Handshake protocol for parameter update
 ; ------------------------------------------------------------------------------
 	lda.b #$84	  ;0D8196|A984    |      ; Handshake $84
-Label_0D8198:
+DB_Label_0D8198:
 	cmp.w !SNES_APUIO0 ;0D8198|CD4021  |002140; Wait for different value
-	beq Label_0D8198 ;0D819B|F0FB    |0D8198; Loop until SPC700 not $84
+	beq DB_Label_0D8198 ;0D819B|F0FB    |0D8198; Loop until SPC700 not $84
 	sta.w !SNES_APUIO0 ;0D819D|8D4021  |002140; Send handshake
 
-Label_0D81A0:
+DB_Label_0D81A0:
 	cmp.w !SNES_APUIO0 ;0D81A0|CD4021  |002140; Wait for echo
-	bne Label_0D81A0 ;0D81A3|D0FB    |0D81A0; Loop until confirmed
+	bne DB_Label_0D81A0 ;0D81A3|D0FB    |0D81A0; Loop until confirmed
 	lda.b #$00	  ;0D81A5|A900    |      ; Clear APUIO0
 	sta.w !SNES_APUIO0 ;0D81A7|8D4021  |002140; (prepare for next)
 
@@ -729,14 +729,14 @@ Label_0D81A0:
 	sta.w !SNES_APUIO1 ;0D81B1|8D4121  |002141; Send to APUIO1
 	lda.b #$81	  ;0D81B4|A981    |      ; Handshake $81
 
-Label_0D81B6:
+DB_Label_0D81B6:
 	cmp.w !SNES_APUIO0 ;0D81B6|CD4021  |002140; Wait for different
-	beq Label_0D81B6 ;0D81B9|F0FB    |0D81B6; Loop
+	beq DB_Label_0D81B6 ;0D81B9|F0FB    |0D81B6; Loop
 	sta.w !SNES_APUIO0 ;0D81BB|8D4021  |002140; Send handshake
 
-Label_0D81BE:
+DB_Label_0D81BE:
 	cmp.w !SNES_APUIO0 ;0D81BE|CD4021  |002140; Wait for echo
-	bne Label_0D81BE ;0D81C1|D0FB    |0D81BE; Loop
+	bne DB_Label_0D81BE ;0D81C1|D0FB    |0D81BE; Loop
 	xba ;0D81C3|EB      |      ; Restore command
 	sta.w !SNES_APUIO0 ;0D81C4|8D4021  |002140; Send to APUIO0
 
@@ -754,14 +754,14 @@ Label_0D81BE:
 	sta.w !SNES_APUIO1 ;0D81D4|8D4121  |002141; Send to APUIO1
 	lda.b #$81	  ;0D81D7|A981    |      ; Handshake $81
 
-Label_0D81D9:
+DB_Label_0D81D9:
 	cmp.w !SNES_APUIO0 ;0D81D9|CD4021  |002140; Wait for different
-	beq Label_0D81D9 ;0D81DC|F0FB    |0D81D9; Loop
+	beq DB_Label_0D81D9 ;0D81DC|F0FB    |0D81D9; Loop
 	sta.w !SNES_APUIO0 ;0D81DE|8D4021  |002140; Send handshake
 
-Label_0D81E1:
+DB_Label_0D81E1:
 	cmp.w !SNES_APUIO0 ;0D81E1|CD4021  |002140; Wait for echo
-	bne Label_0D81E1 ;0D81E4|D0FB    |0D81E1; Loop
+	bne DB_Label_0D81E1 ;0D81E4|D0FB    |0D81E1; Loop
 	xba ;0D81E6|EB      |      ; Restore command
 	sta.w !SNES_APUIO0 ;0D81E7|8D4021  |002140; Send final handshake
 	jmp.w Exit ;0D81EA|4C7881  |0D8178; Exit
@@ -775,7 +775,7 @@ Label_0D81E1:
 Load_New_TrackSFX:
 	jsr.w CallHelperRoutine ;0D81ED|202586  |0D8625; Call helper routine
 	lda.b $05	   ;0D81F0|A505    |000605; Load current track status
-	bmi Load_0D81FA ;0D81F2|3006    |0D81FA; If negative, skip backup
+	bmi DB_Load_0D81FA ;0D81F2|3006    |0D81FA; If negative, skip backup
 	sta.b $09	   ;0D81F4|8509    |000609; Backup current track
 	ldx.b $06	   ;0D81F6|A606    |000606; Backup parameters
 	stx.b $0a	   ;0D81F8|860A    |00060A; Store backup
@@ -783,7 +783,7 @@ Load_New_TrackSFX:
 ; ------------------------------------------------------------------------------
 ; Set up new track parameters
 ; ------------------------------------------------------------------------------
-Load_0D81FA:
+DB_Load_0D81FA:
 	lda.b $01	   ;0D81FA|A501    |000601; Load new track number
 	sta.w !SNES_APUIO1 ;0D81FC|8D4121  |002141; Send to APUIO1
 	sta.b $05	   ;0D81FF|8505    |000605; Update current track
@@ -802,14 +802,14 @@ Load_0D81FA:
 ; ------------------------------------------------------------------------------
 ; Handshake for address transfer
 ; ------------------------------------------------------------------------------
-Label_0D8211:
+DB_Label_0D8211:
 	cmp.w !SNES_APUIO0 ;0D8211|CD4021  |002140; Wait for different
-	beq Label_0D8211 ;0D8214|F0FB    |0D8211; Loop
+	beq DB_Label_0D8211 ;0D8214|F0FB    |0D8211; Loop
 	sta.w !SNES_APUIO0 ;0D8216|8D4021  |002140; Send handshake
 
-Label_0D8219:
+DB_Label_0D8219:
 	cmp.w !SNES_APUIO0 ;0D8219|CD4021  |002140; Wait for echo
-	bne Label_0D8219 ;0D821C|D0FB    |0D8219; Loop
+	bne DB_Label_0D8219 ;0D821C|D0FB    |0D8219; Loop
 
 ; ------------------------------------------------------------------------------
 ; Send data type command
@@ -821,9 +821,9 @@ Label_0D8219:
 	stx.w !SNES_APUIO2 ;0D8226|8E4221  |002142; Send address
 	sta.w !SNES_APUIO0 ;0D8229|8D4021  |002140; Trigger command
 
-Label_0D822C:
+DB_Label_0D822C:
 	cmp.w !SNES_APUIO0 ;0D822C|CD4021  |002140; Wait for echo
-	bne Label_0D822C ;0D822F|D0FB    |0D822C; Loop
+	bne DB_Label_0D822C ;0D822F|D0FB    |0D822C; Loop
 
 ; ------------------------------------------------------------------------------
 ; Look up track data address in table
@@ -852,17 +852,17 @@ Label_0D822C:
 	lda.b [$14],y   ;0D824F|B714    |000614; Read size low from data
 	xba ;0D8251|EB      |      ; Swap to B accumulator
 	iny ;0D8252|C8      |      ; Next byte
-	bne Load_0D825A ;0D8253|D005    |0D825A; If no page wrap
+	bne DB_Load_0D825A ;0D8253|D005    |0D825A; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8255|        |000016; Increment bank, reset Y
 
-Load_0D825A:
+DB_Load_0D825A:
 	lda.b [$14],y   ;0D825A|B714    |000614; Read size high
 	pha ;0D825C|48      |      ; Push size high
 	iny ;0D825D|C8      |      ; Next byte
-	bne Label_0D8265 ;0D825E|D005    |0D8265; If no page wrap
+	bne DB_Label_0D8265 ;0D825E|D005    |0D8265; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8260|        |000016; Increment bank, reset Y
 
-Label_0D8265:
+DB_Label_0D8265:
 	xba ;0D8265|EB      |      ; Get size low from B
 	pha ;0D8266|48      |      ; Push size low
 	plx ;0D8267|FA      |      ; Pull both size bytes to X
@@ -880,28 +880,28 @@ Data_Block_Transfer_Loop:
 	lda.b [$14],y   ;0D826B|B714    |000614; Read data byte 1
 	sta.w !SNES_APUIO2 ;0D826D|8D4221  |002142; Send to APUIO2
 	iny ;0D8270|C8      |      ; Next byte
-	bne Load_0D8278 ;0D8271|D005    |0D8278; If no page wrap
+	bne DB_Load_0D8278 ;0D8271|D005    |0D8278; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8273|        |000016; Increment bank, reset Y
 
-Load_0D8278:
+DB_Load_0D8278:
 	lda.b [$14],y   ;0D8278|B714    |000614; Read data byte 2
 	sta.w !SNES_APUIO3 ;0D827A|8D4321  |002143; Send to APUIO3
 	iny ;0D827D|C8      |      ; Next byte
-	bne Label_0D8285 ;0D827E|D005    |0D8285; If no page wrap
+	bne DB_Label_0D8285 ;0D827E|D005    |0D8285; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8280|        |000016; Increment bank, reset Y
 
-Label_0D8285:
+DB_Label_0D8285:
 	xba ;0D8285|EB      |      ; Get handshake from B
 	sta.w !SNES_APUIO0 ;0D8286|8D4021  |002140; Send to trigger transfer
 
-Label_0D8289:
+DB_Label_0D8289:
 	cmp.w !SNES_APUIO0 ;0D8289|CD4021  |002140; Wait for SPC700 echo
-	bne Label_0D8289 ;0D828C|D0FB    |0D8289; Loop until confirmed
+	bne DB_Label_0D8289 ;0D828C|D0FB    |0D8289; Loop until confirmed
 	inc a;0D828E|1A      |      ; Increment handshake
-	bne Label_0D8292 ;0D828F|D001    |0D8292; If not $00
+	bne DB_Label_0D8292 ;0D828F|D001    |0D8292; If not $00
 	inc a;0D8291|1A      |      ; Skip $00 (use $01 instead)
 
-Label_0D8292:
+DB_Label_0D8292:
 	xba ;0D8292|EB      |      ; Save handshake to B
 	dex ;0D8293|CA      |      ; Decrement byte counter
 	dex ;0D8294|CA      |      ; (2 bytes per iteration)
@@ -926,13 +926,13 @@ Label_0D8292:
 ; These store active channel states for music playback
 ; ------------------------------------------------------------------------------
 	ldx.w #$0000	;0D829E|A20000  |      ; Start at offset 0
-Store_0D82A1:
+DB_Store_0D82A1:
 	stz.b $88,x	 ;0D82A1|7488    |000688; Clear buffer 1 entry
 	stz.b $c8,x	 ;0D82A3|74C8    |0006C8; Clear buffer 2 entry
 	inx ;0D82A5|E8      |      ; Next entry
 	inx ;0D82A6|E8      |      ; (2 bytes per entry)
 	cpx.w #$0020	;0D82A7|E02000  |      ; 16 entries total (32 bytes)
-	bne Store_0D82A1 ;0D82AA|D0F5    |0D82A1; Loop until all cleared
+	bne DB_Store_0D82A1 ;0D82AA|D0F5    |0D82A1; Loop until all cleared
 
 ; ------------------------------------------------------------------------------
 ; Calculate pattern table base address
@@ -970,13 +970,13 @@ Pattern_Table_Processing_Loop:
 ; ------------------------------------------------------------------------------
 ; Search for matching pattern in channel buffer
 ; ------------------------------------------------------------------------------
-Label_0D82CD:
+DB_Label_0D82CD:
 	cmp.w $0628,y   ;0D82CD|D92806  |000628; Compare with channel entry
-	beq Store_0D82E1 ;0D82D0|F00F    |0D82E1; If match found
+	beq DB_Store_0D82E1 ;0D82D0|F00F    |0D82E1; If match found
 	iny ;0D82D2|C8      |      ; Next channel
 	iny ;0D82D3|C8      |      ; (2 bytes per channel)
 	cpy.w #$0020	;0D82D4|C02000  |      ; 16 channels total
-	bne Label_0D82CD ;0D82D7|D0F4    |0D82CD; Loop until all checked
+	bne DB_Label_0D82CD ;0D82D7|D0F4    |0D82CD; Loop until all checked
 
 ; ------------------------------------------------------------------------------
 ; No match found - store to buffer 2
@@ -984,15 +984,15 @@ Label_0D82CD:
 	sta.b ($16)	 ;0D82D9|9216    |000616; Store to buffer 2
 	inc.b $16	   ;0D82DB|E616    |000616; Advance pointer
 	inc.b $16	   ;0D82DD|E616    |000616; (2 bytes per entry)
-	bra Label_0D82E4 ;0D82DF|8003    |0D82E4; Continue
+	bra DB_Label_0D82E4 ;0D82DF|8003    |0D82E4; Continue
 
 ; ------------------------------------------------------------------------------
 ; Match found - update channel buffer
 ; ------------------------------------------------------------------------------
-Store_0D82E1:
+DB_Store_0D82E1:
 	sta.w $0688,y   ;0D82E1|998806  |000688; Store to channel buffer
 
-Label_0D82E4:
+DB_Label_0D82E4:
 	inx ;0D82E4|E8      |      ; Next table entry
 	inx ;0D82E5|E8      |      ; (2 bytes per entry)
 	cpx.b $12	   ;0D82E6|E412    |000612; Check if at end
@@ -1022,7 +1022,7 @@ Sound_Effect_Processing:
 ; ------------------------------------------------------------------------------
 ; Loop through buffer 2 entries, accumulate sizes
 ; ------------------------------------------------------------------------------
-Load_0D82FD:
+DB_Load_0D82FD:
 	lda.b $c8,x	 ;0D82FD|B5C8    |0006C8; Load buffer 2 entry
 	beq Channel_Allocation_And_Memory_Management ;0D82FF|F03F    |0D8340; If zero, end of list
 	dec a;0D8301|3A      |      ; Convert to 0-based index
@@ -1035,11 +1035,11 @@ Load_0D82FD:
 ; Look up sound effect data pointer using multiply result
 ; ------------------------------------------------------------------------------
 	ldx.w !SNES_RDMPYL ;0D8308|AE1642  |004216; Get multiply result (index × 3)
-	lda.l DATA8_0dbdff,x ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
+	lda.l DB_DATA8_0dbdff,x ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
 	sta.b $14	   ;0D830F|8514    |000614; Store to DP
-	lda.l DATA8_0dbe00,x ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
+	lda.l DB_DATA8_0dbe00,x ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
 	sta.b $15	   ;0D8315|8515    |000615; Store to DP
-	lda.l DATA8_0dbe01,x ;0D8317|BF01BE0D|0DBE01; Load data pointer bank
+	lda.l DB_DATA8_0dbe01,x ;0D8317|BF01BE0D|0DBE01; Load data pointer bank
 	sta.b $16	   ;0D831B|8516    |000616; Store to DP
 
 ; ------------------------------------------------------------------------------
@@ -1058,17 +1058,17 @@ Load_0D82FD:
 	adc.b $17	   ;0D8329|6517    |000617; Add to accumulator
 	sta.b $17	   ;0D832B|8517    |000617; Store total size low
 	iny ;0D832D|C8      |      ; Next byte
-	bne Load_0D8335 ;0D832E|D005    |0D8335; If no page wrap
+	bne DB_Load_0D8335 ;0D832E|D005    |0D8335; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8330|        |000016; Increment bank, reset Y
 
-Load_0D8335:
+DB_Load_0D8335:
 	lda.b [$14],y   ;0D8335|B714    |000614; Read size high byte
 	adc.b $18	   ;0D8337|6518    |000618; Add to accumulator high
 	sta.b $18	   ;0D8339|8518    |000618; Store total size high
 	plx ;0D833B|FA      |      ; Restore buffer index
 	inx ;0D833C|E8      |      ; Next entry
 	inx ;0D833D|E8      |      ; (2 bytes per entry)
-	bra Load_0D82FD ;0D833E|80BD    |0D82FD; Loop for next SFX
+	bra DB_Load_0D82FD ;0D833E|80BD    |0D82FD; Loop for next SFX
 
 ; ==============================================================================
 ; Channel_Allocation_And_Memory_Management: Channel Allocation and Memory Management
@@ -1083,18 +1083,18 @@ Channel_Allocation_And_Memory_Management:
 ; ------------------------------------------------------------------------------
 ; Find first free channel slot
 ; ------------------------------------------------------------------------------
-Load_0D8345:
+DB_Load_0D8345:
 	lda.b $28,x	 ;0D8345|B528    |000628; Check channel status
-	beq Load_0D834D ;0D8347|F004    |0D834D; If free, found slot
+	beq DB_Load_0D834D ;0D8347|F004    |0D834D; If free, found slot
 	inx ;0D8349|E8      |      ; Next channel
 	inx ;0D834A|E8      |      ; (2 bytes per channel)
-	bra Load_0D8345 ;0D834B|80F8    |0D8345; Keep searching
+	bra DB_Load_0D8345 ;0D834B|80F8    |0D8345; Keep searching
 
 ; ------------------------------------------------------------------------------
 ; Check if new data fits in available SPC700 RAM
 ; SPC700 has limited RAM ($0000-$ffff), must not overflow
 ; ------------------------------------------------------------------------------
-Load_0D834D:
+DB_Load_0D834D:
 	lda.b $48,x	 ;0D834D|B548    |000648; Get current RAM position
 	clc ;0D834F|18      |      ; Clear carry
 	adc.b $17	   ;0D8350|6517    |000617; Add new data size
@@ -1111,41 +1111,41 @@ Load_0D834D:
 ; ==============================================================================
 Memory_Reallocation:
 	ldx.w #$001e	;0D835C|A21E00  |      ; Start from last channel
-Load_0D835F:
+DB_Load_0D835F:
 	lda.b $86,x	 ;0D835F|B586    |000686; Check channel active
-	bne Store_0D8367 ;0D8361|D004    |0D8367; If active, found last used
+	bne DB_Store_0D8367 ;0D8361|D004    |0D8367; If active, found last used
 	dex ;0D8363|CA      |      ; Previous channel
 	dex ;0D8364|CA      |      ; (2 bytes per channel)
-	bne Load_0D835F ;0D8365|D0F8    |0D835F; Loop until found
+	bne DB_Load_0D835F ;0D8365|D0F8    |0D835F; Loop until found
 
-Store_0D8367:
+DB_Store_0D8367:
 	stx.b $24	   ;0D8367|8624    |000624; Store last used channel
 	ldx.w #$0000	;0D8369|A20000  |      ; Start from first channel
 
 ; ------------------------------------------------------------------------------
 ; Find first free slot in pattern buffer
 ; ------------------------------------------------------------------------------
-Load_0D836C:
+DB_Load_0D836C:
 	lda.b $88,x	 ;0D836C|B588    |000688; Check pattern buffer
-	beq Label_0D8377 ;0D836E|F007    |0D8377; If free, found slot
+	beq DB_Label_0D8377 ;0D836E|F007    |0D8377; If free, found slot
 	inx ;0D8370|E8      |      ; Next slot
 	inx ;0D8371|E8      |      ; (2 bytes per slot)
 	cpx.w #$0020	;0D8372|E02000  |      ; 16 slots total
-	bne Load_0D836C ;0D8375|D0F5    |0D836C; Loop
+	bne DB_Load_0D836C ;0D8375|D0F5    |0D836C; Loop
 
-Label_0D8377:
+DB_Label_0D8377:
 	cpx.b $24	   ;0D8377|E424    |000624; Compare with last used
 	bne Channel_Reallocation_Pattern_Swap ;0D8379|D00C    |0D8387; If different, proceed
 
 ; ------------------------------------------------------------------------------
 ; All channels full - clear from this point
 ; ------------------------------------------------------------------------------
-Store_0D837B:
+DB_Store_0D837B:
 	stz.b $28,x	 ;0D837B|7428    |000628; Clear channel status
 	inx ;0D837D|E8      |      ; Next channel
 	inx ;0D837E|E8      |      ; (2 bytes per channel)
 	cpx.w #$0020	;0D837F|E02000  |      ; All channels
-	bne Store_0D837B ;0D8382|D0F7    |0D837B; Loop
+	bne DB_Store_0D837B ;0D8382|D0F7    |0D837B; Loop
 	jmp.w Sound_Effect_Upload ;0D8384|4C0E84  |0D840E; Continue processing
 
 ; ==============================================================================
@@ -1165,29 +1165,29 @@ Channel_Reallocation_Pattern_Swap:
 ; ------------------------------------------------------------------------------
 ; Find patterns to swap out
 ; ------------------------------------------------------------------------------
-Load_0D8395:
+DB_Load_0D8395:
 	lda.w $0688,y   ;0D8395|B98806  |000688; Check pattern buffer
-	beq Label_0D83A2 ;0D8398|F008    |0D83A2; If empty, found slot
-Label_0D839A:
+	beq DB_Label_0D83A2 ;0D8398|F008    |0D83A2; If empty, found slot
+DB_Label_0D839A:
 	iny ;0D839A|C8      |      ; Next slot
 	iny ;0D839B|C8      |      ; (2 bytes per slot)
 	cpy.b $24	   ;0D839C|C424    |000624; Check if at last used
-	bne Load_0D8395 ;0D839E|D0F5    |0D8395; Continue search
+	bne DB_Load_0D8395 ;0D839E|D0F5    |0D8395; Continue search
 	db $80,$62	 ;0D83A0|        |0D8404; Jump to cleanup
 
-Label_0D83A2:
+DB_Label_0D83A2:
 	tyx ;0D83A2|BB      |      ; X = found slot
-	bra Label_0D83A9 ;0D83A3|8004    |0D83A9; Continue
+	bra DB_Label_0D83A9 ;0D83A3|8004    |0D83A9; Continue
 
-Load_0D83A5:
+DB_Load_0D83A5:
 	lda.b $88,x	 ;0D83A5|B588    |000688; Check pattern buffer
 	bne Perform_Pattern_Swap ;0D83A7|D008    |0D83B1; If occupied, swap it
 
-Label_0D83A9:
+DB_Label_0D83A9:
 	inx ;0D83A9|E8      |      ; Next slot
 	inx ;0D83AA|E8      |      ;
 	cpx.b $24	   ;0D83AB|E424    |000624; Check limit
-	bne Load_0D83A5 ;0D83AD|D0F6    |0D83A5; Continue search
+	bne DB_Load_0D83A5 ;0D83AD|D0F6    |0D83A5; Continue search
 	bra Cleanup_After_Reallocation ;0D83AF|8053    |0D8404; Jump to cleanup
 
 ; ==============================================================================
@@ -1206,9 +1206,9 @@ Perform_Pattern_Swap:
 	lda.b $10	   ;0D83BF|A510    |000610; Get handshake
 	sta.w !SNES_APUIO0 ;0D83C1|8D4021  |002140; Send to SPC700
 
-Label_0D83C4:
+DB_Label_0D83C4:
 	cmp.w !SNES_APUIO0 ;0D83C4|CD4021  |002140; Wait for echo
-	bne Label_0D83C4 ;0D83C7|D0FB    |0D83C4; Loop
+	bne DB_Label_0D83C4 ;0D83C7|D0FB    |0D83C4; Loop
 	inc.b $10	   ;0D83C9|E610    |000610; Increment handshake
 	rep #$20		;0D83CB|C220    |      ; 16-bit accumulator
 
@@ -1221,9 +1221,9 @@ Label_0D83C4:
 	lda.b $10	   ;0D83D5|A510    |000610; Get handshake
 	sta.w !SNES_APUIO0 ;0D83D7|8D4021  |002140; Send to SPC700
 
-Label_0D83DA:
+DB_Label_0D83DA:
 	cmp.w !SNES_APUIO0 ;0D83DA|CD4021  |002140; Wait for echo
-	bne Label_0D83DA ;0D83DD|D0FB    |0D83DA; Loop
+	bne DB_Label_0D83DA ;0D83DD|D0FB    |0D83DA; Loop
 	inc.b $10	   ;0D83DF|E610    |000610; Increment handshake
 	rep #$20		;0D83E1|C220    |      ; 16-bit accumulator
 
@@ -1240,12 +1240,12 @@ Label_0D83DA:
 	lda.b $10	   ;0D83F4|A510    |000610; Get handshake
 	sta.w !SNES_APUIO0 ;0D83F6|8D4021  |002140; Send to SPC700
 
-Label_0D83F9:
+DB_Label_0D83F9:
 	cmp.w !SNES_APUIO0 ;0D83F9|CD4021  |002140; Wait for echo
-	bne Label_0D83F9 ;0D83FC|D0FB    |0D83F9; Loop
+	bne DB_Label_0D83F9 ;0D83FC|D0FB    |0D83F9; Loop
 	inc.b $10	   ;0D83FE|E610    |000610; Increment handshake
 	rep #$20		;0D8400|C220    |      ; 16-bit accumulator
-	bra Label_0D839A ;0D8402|8096    |0D839A; Continue swapping
+	bra DB_Label_0D839A ;0D8402|8096    |0D839A; Continue swapping
 
 ; ==============================================================================
 ; Cleanup_After_Reallocation: Cleanup After Reallocation
@@ -1254,12 +1254,12 @@ Label_0D83F9:
 ; ==============================================================================
 Cleanup_After_Reallocation:
 	tyx ;0D8404|BB      |      ; X = current position
-Store_0D8405:
+DB_Store_0D8405:
 	stz.b $28,x	 ;0D8405|7428    |000628; Clear channel
 	inx ;0D8407|E8      |      ; Next channel
 	inx ;0D8408|E8      |      ;
 	cpx.w #$0020	;0D8409|E02000  |      ; All 16 channels
-	bne Store_0D8405 ;0D840C|D0F7    |0D8405; Loop
+	bne DB_Store_0D8405 ;0D840C|D0F7    |0D8405; Loop
 
 ; ==============================================================================
 ; Sound_Effect_Upload: Sound Effect Upload
@@ -1277,17 +1277,17 @@ Sound_Effect_Upload:
 ; ------------------------------------------------------------------------------
 ; Find next free channel for SFX
 ; ------------------------------------------------------------------------------
-Load_0D841B:
+DB_Load_0D841B:
 	lda.b $28,x	 ;0D841B|B528    |000628; Check channel status
-	beq Store_0D8423 ;0D841D|F004    |0D8423; If free, use it
+	beq DB_Store_0D8423 ;0D841D|F004    |0D8423; If free, use it
 	inx ;0D841F|E8      |      ; Next channel
 	inx ;0D8420|E8      |      ;
-	bra Load_0D841B ;0D8421|80F8    |0D841B; Continue search
+	bra DB_Load_0D841B ;0D8421|80F8    |0D841B; Continue search
 
 ; ------------------------------------------------------------------------------
 ; Set SFX destination address in SPC700 RAM
 ; ------------------------------------------------------------------------------
-Store_0D8423:
+DB_Store_0D8423:
 	stx.b $24	   ;0D8423|8624    |000624; Store channel index
 	lda.b $48,x	 ;0D8425|B548    |000648; Get RAM address low
 	sta.w !SNES_APUIO2 ;0D8427|8D4221  |002142; Send to SPC700
@@ -1296,9 +1296,9 @@ Store_0D8423:
 	lda.b #$00	  ;0D842F|A900    |      ; Initial handshake
 	sta.w !SNES_APUIO0 ;0D8431|8D4021  |002140; Send to trigger
 
-Label_0D8434:
+DB_Label_0D8434:
 	cmp.w !SNES_APUIO0 ;0D8434|CD4021  |002140; Wait for echo
-	bne Label_0D8434 ;0D8437|D0FB    |0D8434; Loop
+	bne DB_Label_0D8434 ;0D8437|D0FB    |0D8434; Loop
 	inc a;0D8439|1A      |      ; Handshake = $01
 	sta.b $10	   ;0D843A|8510    |000610; Store handshake
 	ldx.w #$0000	;0D843C|A20000  |      ; Buffer index
@@ -1312,13 +1312,13 @@ Label_0D8434:
 SFX_Data_Transfer_Loop:
 	sep #$20		;0D843F|E220    |      ; 8-bit accumulator
 	lda.b $c8,x	 ;0D8441|B5C8    |0006C8; Check buffer entry
-	bne Load_0D8448 ;0D8443|D003    |0D8448; If valid, process
+	bne DB_Load_0D8448 ;0D8443|D003    |0D8448; If valid, process
 	jmp.w Channel_Pattern_Management ;0D8445|4CDD84  |0D84DD; If empty, done
 
 ; ------------------------------------------------------------------------------
 ; Process SFX entry
 ; ------------------------------------------------------------------------------
-Load_0D8448:
+DB_Load_0D8448:
 	ldy.b $24	   ;0D8448|A424    |000624; Get channel index
 	sta.w $0628,y   ;0D844A|992806  |000628; Assign to channel
 	dec a;0D844D|3A      |      ; Convert to 0-based
@@ -1331,11 +1331,11 @@ Load_0D8448:
 ; Look up SFX data pointer in table
 ; ------------------------------------------------------------------------------
 	ldx.w !SNES_RDMPYL ;0D8454|AE1642  |004216; Get table index
-	lda.l DATA8_0dbdff,x ;0D8457|BFFFBD0D|0DBDFF; Load pointer low
+	lda.l DB_DATA8_0dbdff,x ;0D8457|BFFFBD0D|0DBDFF; Load pointer low
 	sta.b $14	   ;0D845B|8514    |000614; Store to DP
-	lda.l DATA8_0dbe00,x ;0D845D|BF00BE0D|0DBE00; Load pointer mid
+	lda.l DB_DATA8_0dbe00,x ;0D845D|BF00BE0D|0DBE00; Load pointer mid
 	sta.b $15	   ;0D8461|8515    |000615; Store to DP
-	lda.l DATA8_0dbe01,x ;0D8463|BF01BE0D|0DBE01; Load pointer bank
+	lda.l DB_DATA8_0dbe01,x ;0D8463|BF01BE0D|0DBE01; Load pointer bank
 	sta.b $16	   ;0D8467|8516    |000616; Store to DP
 
 ; ------------------------------------------------------------------------------
@@ -1352,19 +1352,19 @@ Load_0D8448:
 	lda.b [$14],y   ;0D8472|B714    |000614; Read size low
 	xba ;0D8474|EB      |      ; Save to B
 	iny ;0D8475|C8      |      ; Next byte
-	bne Load_0D847D ;0D8476|D005    |0D847D; If no page wrap
+	bne DB_Load_0D847D ;0D8476|D005    |0D847D; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8478|        |000016; Increment bank
 
-Load_0D847D:
+DB_Load_0D847D:
 	lda.b [$14],y   ;0D847D|B714    |000614; Read size high
 	iny ;0D847F|C8      |      ; Next byte
-	bne Label_0D8487 ;0D8480|D005    |0D8487; If no page wrap
+	bne DB_Label_0D8487 ;0D8480|D005    |0D8487; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8482|        |000016; Increment bank
 
 ; ------------------------------------------------------------------------------
 ; Store size and update channel pointers
 ; ------------------------------------------------------------------------------
-Label_0D8487:
+DB_Label_0D8487:
 	xba ;0D8487|EB      |      ; Get size from B
 	rep #$20		;0D8488|C220    |      ; 16-bit accumulator
 	pha ;0D848A|48      |      ; Push size
@@ -1389,40 +1389,40 @@ SFX_Byte_Transfer_Loop:
 	lda.b [$14],y   ;0D849B|B714    |000614; Read byte 1
 	sta.w !SNES_APUIO1 ;0D849D|8D4121  |002141; Send to APUIO1
 	iny ;0D84A0|C8      |      ; Next byte
-	bne Load_0D84A8 ;0D84A1|D005    |0D84A8; If no wrap
+	bne DB_Load_0D84A8 ;0D84A1|D005    |0D84A8; If no wrap
 	inc.b $16	   ;0D84A3|E616    |000616; Increment bank
 	ldy.w #$8000	;0D84A5|A00080  |      ; Reset Y
 
-Load_0D84A8:
+DB_Load_0D84A8:
 	lda.b [$14],y   ;0D84A8|B714    |000614; Read byte 2
 	sta.w !SNES_APUIO2 ;0D84AA|8D4221  |002142; Send to APUIO2
 	iny ;0D84AD|C8      |      ; Next byte
-	bne Load_0D84B5 ;0D84AE|D005    |0D84B5; If no wrap
+	bne DB_Load_0D84B5 ;0D84AE|D005    |0D84B5; If no wrap
 	inc.b $16	   ;0D84B0|E616    |000616; Increment bank
 	ldy.w #$8000	;0D84B2|A00080  |      ; Reset Y
 
-Load_0D84B5:
+DB_Load_0D84B5:
 	lda.b [$14],y   ;0D84B5|B714    |000614; Read byte 3
 	sta.w !SNES_APUIO3 ;0D84B7|8D4321  |002143; Send to APUIO3
 	iny ;0D84BA|C8      |      ; Next byte
-	bne Load_0D84C2 ;0D84BB|D005    |0D84C2; If no wrap
+	bne DB_Load_0D84C2 ;0D84BB|D005    |0D84C2; If no wrap
 	db $e6,$16,$a0,$00,$80 ;0D84BD|        |000016; Increment bank
 
 ; ------------------------------------------------------------------------------
 ; Handshake protocol
 ; ------------------------------------------------------------------------------
-Load_0D84C2:
+DB_Load_0D84C2:
 	lda.b $10	   ;0D84C2|A510    |000610; Get handshake
 	sta.w !SNES_APUIO0 ;0D84C4|8D4021  |002140; Send to trigger
 
-Label_0D84C7:
+DB_Label_0D84C7:
 	cmp.w !SNES_APUIO0 ;0D84C7|CD4021  |002140; Wait for echo
-	bne Label_0D84C7 ;0D84CA|D0FB    |0D84C7; Loop
+	bne DB_Label_0D84C7 ;0D84CA|D0FB    |0D84C7; Loop
 	inc.b $10	   ;0D84CC|E610    |000610; Increment handshake
-	bne Label_0D84D2 ;0D84CE|D002    |0D84D2; If not $00
+	bne DB_Label_0D84D2 ;0D84CE|D002    |0D84D2; If not $00
 	inc.b $10	   ;0D84D0|E610    |000610; Skip $00
 
-Label_0D84D2:
+DB_Label_0D84D2:
 	dex ;0D84D2|CA      |      ; Decrement byte count
 	dex ;0D84D3|CA      |      ;
 	dex ;0D84D4|CA      |      ; (3 bytes per iteration)
@@ -1658,7 +1658,7 @@ SPC_CommandProcessorData:	db				   $dc,$8f,$00,$05,$43,$c0,$05,$8f,$09,$c1,$2f,$
 ; Lookup tables for music track and SFX pattern data.
 ; Format: 24-bit pointers [bank, addr_low, addr_high] for each track.
 
-DATA8_0d9c3c:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$85,$06,$91 ;0D9C3C| Track pointers 0-7 |
+DB_DATA8_0d9c3c:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$85,$06,$91 ;0D9C3C| Track pointers 0-7 |
 	db $06,$13,$07,$1f,$07,$5b,$07,$9a,$07,$ac,$07,$b0,$07,$c2,$07,$c6 ;0D9C4C| Track pointers 8-15 |
 	db $07,$17,$08,$9b,$08,$5a,$08,$87,$08,$ab,$08,$c4,$08,$31,$08,$4a ;0D9C5C| Track pointers 16-23 |
 	db $08,$2d,$08,$23,$08,$29,$08,$6a,$07,$66,$07,$16,$0a,$d4,$08,$fe ;0D9C6C| Track pointers 24-31 |
@@ -1683,7 +1683,7 @@ DATA8_0d9c3c:	db					   $12,$d3,$12,$b5,$12,$fd,$12,$fd,$12,$fd,$12,$0a,$13,$85,
 ; ===========================================================================
 ; Driver initialization parameters, timing values, buffer sizes, etc.
 
-DATA8_0d9cfc:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$e5,$01,$fc ;0D9CFC| Config: Timing/buffers |
+DB_DATA8_0d9cfc:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$e5,$01,$fc ;0D9CFC| Config: Timing/buffers |
 	db $eb,$c0,$90,$60,$40,$48,$30,$20,$24,$18,$10,$0c,$08,$06,$04,$03 ;0D9D0C| Config: Rate table |
 	db $bd,$18,$cc,$18,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0D9D1C| Config: Reserved |
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0D9D2C| Padding/alignment |
@@ -1693,13 +1693,13 @@ DATA8_0d9cfc:	db					   $f9,$58,$bf,$db,$f0,$fe,$07,$0c,$0c,$34,$33,$00,$d9,$e5,
 	db $b6,$ca	 ;0D9D6C|        |
 
 ; ===========================================================================
-; DATA8_0D9D78 - SPC700 MUSIC TRACK DATA
+; DB_DATA8_0d9d78 - SPC700 MUSIC TRACK DATA
 ; ===========================================================================
 ; Embedded music sequence data for multiple tracks.
 ; Format: Proprietary music notation (notes, durations, commands, loops, etc.)
 ; Processed by SPC700 sequencer uploaded during initialization.
 
-DATA8_0d9d78:	db					   $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,$31,$ee ;0D9D78| Track data block 0 |
+DB_DATA8_0d9d78:	db					   $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,$31,$ee ;0D9D78| Track data block 0 |
 	db $1e,$ce,$41,$f0,$86,$e5,$0d,$23,$00,$10,$23,$fd,$47,$96,$fd,$35 ;0D9D88|        |
 	db $fd,$35,$fd,$35,$0f,$34,$9a,$e0,$21,$11,$00,$33,$f1,$42,$bd,$aa ;0D9D98|        |
 	db $1f,$be,$42,$e0,$32,$ef,$00,$f0,$96,$0f,$02,$0f,$23,$fe,$34,$ed ;0D9DA8|        |
@@ -1868,47 +1868,47 @@ Sound_DataPtrBank:	db						 $0e		 ;0DBDB0| Pointer bank bytes |
 	db $d3,$fb,$0e ;0DBDFC| Ends at 0DBDFE |
 
 ; ===========================================================================
-; DATA8_0DBDFF - Music/SFX Data Pointer Tables
+; DB_DATA8_0dbdff - Music/SFX Data Pointer Tables
 ; ===========================================================================
 ; 24-bit pointers (bank:address) to music and SFX pattern data.
 ; Format: [bank_byte, addr_low, addr_high] for each entry.
 ; Used by music loader to locate track data in ROM.
 
-DATA8_0dbdff:	db					   $01	   ;0DBDFF| Bank byte for entry 0 |
-DATA8_0dbe00:	db					   $c2	   ;0DBE00| Address low byte |
-DATA8_0dbe01:	db					   $0d,$21,$c8,$0d,$2e,$cc,$0d,$08,$e8,$0d,$ff,$f5,$0d,$5d,$fa,$0d ;0DBE01| Music track pointers 0-5 |
+DB_DATA8_0dbdff:	db					   $01	   ;0DBDFF| Bank byte for entry 0 |
+DB_DATA8_0dbe00:	db					   $c2	   ;0DBE00| Address low byte |
+DB_DATA8_0dbe01:	db					   $0d,$21,$c8,$0d,$2e,$cc,$0d,$08,$e8,$0d,$ff,$f5,$0d,$5d,$fa,$0d ;0DBE01| Music track pointers 0-5 |
 	db $fb,$00,$0e,$30,$0d,$0e,$16,$14,$0e,$4e,$14,$0e,$06,$22,$0e,$65 ;0DBE11| Music track pointers 6-11 |
 	db $31,$0e,$a2,$4d,$0e,$84,$55,$0e,$c4,$5c,$0e,$6e,$69,$0e,$4a,$77 ;0DBE21| Music track pointers 12-17 |
 	db $0e,$f3,$81,$0e ;0DBE31| Music track pointers 18-19 |
 
 ; ===========================================================================
-; DATA8_0DBE35 - Track Length/Size Table
+; DB_DATA8_0dbe35 - Track Length/Size Table
 ; ===========================================================================
 ; 16-bit size values for each music/SFX track (bytes to upload to SPC700).
 ; Used to calculate memory requirements and transfer sizes.
 
-DATA8_0dbe35:	db					   $df,$05,$0b,$04,$26,$0d,$36,$09,$d5,$03,$81,$06,$fe,$04,$c9,$06 ;0DBE35| Track sizes 0-7 |
+DB_DATA8_0dbe35:	db					   $df,$05,$0b,$04,$26,$0d,$36,$09,$d5,$03,$81,$06,$fe,$04,$c9,$06 ;0DBE35| Track sizes 0-7 |
 	db $1b,$00,$a8,$0c,$7d,$07,$1b,$00,$59,$07,$ff,$06,$21,$0c,$a9,$05 ;0DBE45| Track sizes 8-15 |
 	db $c1,$08,$18,$03 ;0DBE55| Track sizes 16-17 |
 
 ; ===========================================================================
-; DATA8_0DBE59 - Track Type/Flags Table
+; DB_DATA8_0dbe59 - Track Type/Flags Table
 ; ===========================================================================
 ; Configuration flags for each track (looping, priority, channel assignment).
 ; $00 = no loop, $80 = loop enabled, $cd = special behavior, $ef = extended.
 
-DATA8_0dbe59:	db					   $ef,$00,$00,$00,$80,$00,$80,$00,$80,$00,$cd,$00,$00,$00,$cd,$00 ;0DBE59| Track flags 0-7 |
+DB_DATA8_0dbe59:	db					   $ef,$00,$00,$00,$80,$00,$80,$00,$80,$00,$cd,$00,$00,$00,$cd,$00 ;0DBE59| Track flags 0-7 |
 	db $cd,$00,$00,$00,$00,$00,$e4,$00,$80,$00,$ef,$00,$00,$00,$00,$00 ;0DBE69| Track flags 8-15 |
 	db $80,$00,$00,$00 ;0DBE79| Track flags 16-17 |
 
 ; ===========================================================================
-; DATA8_0DBE7D - DSP ADSR Configuration Values
+; DB_DATA8_0dbe7d - DSP ADSR Configuration Values
 ; ===========================================================================
 ; ADSR envelope bytes for different instrument types.
 ; Format: 2 bytes per instrument [ADSR1, ADSR2].
 ; Controls attack rate, decay rate, sustain level, release rate.
 
-DATA8_0dbe7d:	db					   $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,$8f,$a4 ;0DBE7D| ADSR values 0-7 |
+DB_DATA8_0dbe7d:	db					   $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,$8f,$a4 ;0DBE7D| ADSR values 0-7 |
 	db $ff,$84,$cf,$68,$8f,$b8,$a7,$c0,$ff,$d4,$9f,$a4,$bf,$ac,$af,$11 ;0DBE8D| ADSR values 8-15 |
 	db $ff,$b2,$ff,$e0 ;0DBE9D| ADSR values 16-17 |
 
@@ -2041,7 +2041,7 @@ Sound_PatternAssignment:	db						 $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$0
 ; Contains note sequences, duration values, envelope commands, loop markers,
 ; tempo changes, and pattern control opcodes for various game music tracks.
 ; Each byte sequence encodes musical events using custom SPC700 driver format.
-DATA8_0dc451:
+DB_DATA8_0dc451:
 	db $6d,$b0,$75,$fb,$8a,$df,$10,$f1,$0e,$f3,$30,$dd,$02,$8a,$0f,$fd ;0DC451 - Note patterns with $8a (possible voice/channel marker)
 	db $04,$20,$dc,$c1,$41,$bb,$8a,$df,$ff,$10,$bd,$11,$e9,$bf,$12,$8a ;0DC461 - $8a appears frequently (likely channel/command separator)
 	db $1c,$c0,$30,$ff,$ed,$e0,$21,$ff,$8a,$24,$3d,$e4,$52,$0d,$03,$32 ;0DC471 - $ff (max value), $ed (likely envelope end)
@@ -2108,7 +2108,7 @@ DATA8_0dc451:
 ; Extensive pattern data with repeated byte sequences suggesting voice patterns.
 ; Pattern: Many sequences contain repeating nibbles (AA, BB, AB, etc) indicating
 ; possible voice channel routing or sample selection data for SPC700 hardware.
-DATA8_0dc821:
+DB_DATA8_0dc821:
 	db $0b,$04,$00,$00,$00,$00,$00,$00,$00,$00,$00,$88,$61,$ff,$00,$11 ;0DC821 - $88 marker, zeros (padding/init?)
 	db $12,$20,$05,$2c,$88,$c3,$53,$23,$1f,$ee,$55,$d1,$7d,$b8,$f2,$1e ;0DC831 - $88, $b8 markers
 	db $f3,$2d,$d2,$50,$be,$56,$c4,$1d,$d1,$42,$fd,$df,$34,$1e,$ef,$b8 ;0DC841 - $be, $c4, $b8 values
@@ -2179,7 +2179,7 @@ DATA8_0dc821:
 ; Contains extensive sequences with $c2, $b2, $a6, $ba, $aa markers.
 ; Pattern suggests voice/channel assignment data or DSP register configurations.
 ; Frequent $96, $9a markers (lower values) may indicate specific voice mappings.
-DATA8_0dcc31:
+DB_DATA8_0dcc31:
 	db $00,$00,$00,$03,$4f,$de,$ef,$00,$a6,$e0,$20,$00,$00,$15,$3a,$a0 ;0DCC31 - $4f, $de, $ef, $a6, $3a, $a0
 	db $01,$c2,$00,$00,$13,$1d,$df,$00,$00,$11,$86,$bb,$9e,$22,$00,$1f ;0DCC41 - $c2 marker, $86, $bb, $9e
 	db $df,$36,$21,$b6,$01,$41,$ab,$31,$f1,$ff,$11,$10,$b2,$00,$00,$14 ;0DCC51 - $b6, $ab, $b2 markers
@@ -2316,7 +2316,7 @@ DATA8_0dcc31:
 
 ; Pattern Block A ($0ddd51-$ddfb1, 608 bytes):
 ; Extended music sequences with $a6, $ba, $aa markers
-DATA8_0ddd51:
+DB_DATA8_0ddd51:
 	db $f5,$3b,$bf,$f1,$41,$de,$02,$aa,$1c,$c2,$51,$fe,$e2,$11,$fc,$10 ;0DDD51 - $aa marker, $1c, $c2 values
 	db $a2,$c0,$31,$ec,$cd,$16,$2a,$ac,$ef,$a6,$ff,$22,$22,$ff,$13,$2e ;0DDD61 - $a2, $c0, $cd, $ac, $a6 markers
 	db $dd,$f5,$a6,$3b,$bf,$01,$41,$ce,$13,$2f,$bc,$96,$26,$76,$dd,$25 ;0DDD71 - $dd, $a6, $3b, $bf, $ce, $bc, $96 (lower value)
@@ -2359,7 +2359,7 @@ DATA8_0ddd51:
 
 ; Pattern Block B ($0ddfc1-$de421, 1,121 bytes):
 ; Continued sequences with heavy use of $a6, $96, $ba markers
-DATA8_0ddfc1:
+DB_DATA8_0ddfc1:
 	db $53,$1a,$ad,$f1,$a6,$44,$cb,$ff,$02,$31,$f1,$2f,$e1,$a6,$22,$1e ;0DDFC1 - $1a, $ad, $a6, $cb, $a6
 	db $e2,$31,$ec,$ef,$df,$11,$92,$d5,$5e,$ce,$12,$03,$66,$0b,$cf,$a6 ;0DDFD1 - $e2, $ec, $ef, $df, $92, $d5, $5e, $ce, $66, $0b, $cf, $a6
 	db $2f,$e1,$21,$1f,$dd,$f0,$44,$dc,$96,$ed,$04,$62,$f2,$40,$bf,$34 ;0DDFE1 - $e1, $dd, $dc, $96, $ed, $62, $bf
@@ -2435,7 +2435,7 @@ DATA8_0ddfc1:
 ; Final Music Pattern Block ($de431-$df601, 4,561 bytes):
 ; Last major music/SFX data block before termination.
 ; Continued use of $ba, $b6, $96, $9a, $92, $86, $aa voice/channel markers.
-DATA8_0de431:
+DB_DATA8_0de431:
 	db $d9,$06,$aa,$ff,$10,$0d,$f4,$ec,$55,$db,$21,$9a,$e2,$e0,$79,$a6 ;0DE431 - $d9, $aa, $0d, $ec, $db, $9a, $e2, $e0, $79, $a6
 	db $31,$cc,$62,$c0,$a6,$11,$20,$d0,$fd,$14,$31,$0f,$ef,$96,$fa,$e2 ;0DE441 - $cc, $62, $c0, $a6, $d0, $ef, $96, $fa, $e2
 	db $57,$eb,$cb,$16,$42,$42,$a6,$10,$d0,$0c,$05,$3d,$ef,$e1,$20,$9a ;0DE451 - $57, $eb, $cb, $a6, $d0, $0c, $3d, $ef, $e1, $9a

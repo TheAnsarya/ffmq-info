@@ -1,4 +1,4 @@
-﻿; ============================================================================
+; ============================================================================
 ; FFMQ Boot Sequence Analysis
 ; ============================================================================
 ; Analyzed from Diztinguish disassembly bank_00.asm
@@ -10,7 +10,7 @@
 
 ; Entry point after SNES reset vector
 ; This is the first code executed when the game starts
-BootEntry:	; Original: Label_008000
+BootEntry:	; Original: DB_Label_008000
 	clc                             ; Clear carry flag
 	xce                             ; Switch to native 65816 mode (not emulation)
 	jsr.W InitializeHardware        ; Initialize SNES hardware registers
@@ -24,13 +24,13 @@ BootEntry:	; Original: Label_008000
 	bra ContinueBootSequence
 
 ; Alternative entry point (NMI/Reset handler?)
-AlternateEntry:	; Original: Label_008016
+AlternateEntry:	; Original: DB_Label_008016
 	jsr.W InitializeHardware
 	lda.B #$f0
 	sta.L $000600                   ; Set interrupt vector?
 	jsl.L InitializeInterrupts      ; Setup interrupts ($0d8004)
 
-ContinueBootSequence:	; Original: Label_008023
+ContinueBootSequence:	; Original: DB_Label_008023
 	rep #$30                        ; Set A and X/Y to 16-bit mode
 	ldx.W #$1fff                    ; Stack pointer = $1fff (top of RAM)
 	txs                             ; Transfer X to Stack pointer
@@ -46,7 +46,7 @@ ContinueBootSequence:	; Original: Label_008023
 	bra SetupComplete
 
 ; Third entry point for warm boot
-WarmBootEntry:	; Original: Label_00803A
+WarmBootEntry:	; Original: DB_Label_00803A
 	jsr.W InitializeHardware
 	lda.B #$f0
 	sta.L $000600                   ; Interrupt vector
@@ -55,7 +55,7 @@ WarmBootEntry:	; Original: Label_00803A
 	ldx.W #$1fff                    ; Reset stack
 	txs
 
-SetupComplete:	; Original: Label_00804D
+SetupComplete:	; Original: DB_Label_00804D
 	jsr.W ClearMemory               ; Clear RAM again
 	sep #$20                        ; 8-bit accumulator
 
@@ -71,7 +71,7 @@ SetupComplete:	; Original: Label_00804D
 	lda.B #$01                      ; Enable channel 0
 	sta.W !SNES_MDMAEN               ; Start DMA transfer
 
-SkipDMAFill:	; Original: Label_00806E
+SkipDMAFill:	; Original: DB_Label_00806E
 	jsl.L $00011f                   ; Call unknown routine (BIOS?)
 	rep #$30                        ; 16-bit mode
 	lda.W #$0000
@@ -105,14 +105,14 @@ SkipDMAFill:	; Original: Label_00806E
 	jsl.L ContinueGame              ; Load continue data ($00b950)
 	bra EnterMainLoop
 
-LoadSaveData:	; Original: Label_0080A8
+LoadSaveData:	; Original: DB_Label_0080A8
 	jsr.W LoadSaveGameData
 	bra MainGameLoop
 
-StartNewGame:	; Original: Label_0080AD
+StartNewGame:	; Original: DB_Label_0080AD
 	jsr.W InitializeNewGame
 
-EnterMainLoop:	; Original: Load_0080B0
+EnterMainLoop:	; Original: DB_Load_0080B0
 ; Clear various flags
 	lda.B #$80
 	trb.w !system_flags_8                     ; Clear bit 7 of flags

@@ -1,4 +1,4 @@
-﻿; ===========================================================================
+; ===========================================================================
 ; Character Status Animation (continued from earlier sections)
 ; ===========================================================================
 
@@ -56,7 +56,7 @@ StatusIcon_ToggleTileFrame:
 ; Format: Table of 16-bit addresses for input handler functions
 ; ===========================================================================
 
-Input_Handler_Table:
+DB_Input_Handler_Table:
 	dw											 Input_Down  ; $008a3d: Down button handler
 	dw											 Input_Up	; $008a3f: Up button handler
 	dw											 Input_Action ; $008a41: A/B button handler
@@ -406,7 +406,7 @@ Menu_UpdateCharacterTile:
 	beq					 Single_Buffer_Update ; If clear, single buffer only
 
 ; Dual buffer mode - update both WRAM buffers
-	lda.L				   DATA8_049800,x ; Get character tile number
+	lda.L				   DB_DATA8_049800,x ; Get character tile number
 	adc.B				   #$0a	  ; Add offset for animation frame
 	xba							   ; Swap to high byte
 
