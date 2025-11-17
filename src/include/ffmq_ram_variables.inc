@@ -375,6 +375,25 @@
 !ram_1031_long                  = $001031   ; Legacy label (long address)
 
 ; ============================================================================
+; Control Flow & Command System ($1050-$10d2)
+; ============================================================================
+; Command execution and state machine control
+!control_region_1   = $1050     ; Control region 1 initialization state
+!control_region_2   = $1051     ; Control region 2 initialization state  
+!control_region_3   = $1052     ; Control region 3 initialization state (10 uses)
+!menu_command_id    = $10d0     ; Menu/system command ID (28 uses)
+!menu_command_param = $10d1     ; Menu/system command parameter (26 uses)
+!menu_command_type  = $10d2     ; Menu/system command type (21 uses)
+
+; Other $10xx variables
+!ram_1010           = $1010     ; Data region start / buffer pointer (10 uses)
+!ram_1020           = $1020     ; Buffer region (10 uses)
+!ram_1080           = $1080     ; Buffer region (12 uses)
+!ram_10a0           = $10a0     ; Buffer region (9 uses)
+!ram_10b0           = $10b0     ; Buffer region (8 uses)
+!ram_10b1           = $10b1     ; Buffer region (13 uses)
+
+; ============================================================================
 ; Graphics System Variables ($1900-$1aff)
 ; ============================================================================
 

@@ -241,12 +241,12 @@ validate_entity_system:
 
 init_memory_regions:
 	lda.b #$ff	  ;02807D|A9FF    |      ; Set pattern marker
-	sta.w $1050	 ;02807F|8D5010  |021050; Initialize region 1
-	sta.w $1051	 ;028082|8D5110  |021051; Initialize region 2
-	sta.w $1052	 ;028085|8D5210  |021052; Initialize region 3
-	sta.w $10d0	 ;028088|8DD010  |0210D0; Initialize extended region 1
-	sta.w $10d1	 ;02808B|8DD110  |0210D1; Initialize extended region 2
-	sta.w $10d2	 ;02808E|8DD210  |0210D2; Initialize extended region 3
+	sta.w !control_region_1	 ;02807F|8D5010  |021050; Initialize region 1
+	sta.w !control_region_2	 ;028082|8D5110  |021051; Initialize region 2
+	sta.w !control_region_3	 ;028085|8D5210  |021052; Initialize region 3
+	sta.w !menu_command_id	 ;028088|8DD010  |0210D0; Initialize extended region 1
+	sta.w !menu_command_param	 ;02808B|8DD110  |0210D1; Initialize extended region 2
+	sta.w !menu_command_type	 ;02808E|8DD210  |0210D2; Initialize extended region 3
 
 ;--------------------------------------------------------------------
 ; Advanced Control Flow Processing System
@@ -3262,7 +3262,7 @@ Idle_StateHandler:
 	and.b #$02                           ;02A34E|2902    |
 	beq +                                ;02A350|F00B    |02A35D
 	lda.b #$11                           ;02A352|A911    |
-	sta.w $10d0                          ;02A354|8DD010  |0110D0
+	sta.w !menu_command_id                          ;02A354|8DD010  |0110D0
 	lda.b #$30                           ;02A357|A930    |
 	tsb.w $1020                          ;02A359|0C2010  |011020
 	rts ;02A35C|60      |
@@ -3271,7 +3271,7 @@ Idle_StateHandler:
 	bne +                                ;02A362|D001    |02A365
 	rts ;02A364|60      |
 +	lda.b #$01                           ;02A365|A901    |
-	sta.w $10d0                          ;02A367|8DD010  |0110D0
+	sta.w !menu_command_id                          ;02A367|8DD010  |0110D0
 	rts ;02A36A|60      |
 .data:
 	db $5a,$50,$46,$3c,$5a,$50,$46,$3c  ;02A36B|        |
@@ -3613,14 +3613,14 @@ Menu_AdvancedState:
 	xba ;02A5DD|EB      |      ; Swap back
 	beq Menu_AltPath ; Branch if zero
 	lda.b #$20	  ;02A5E0|A920    |      ; Set command ID
-	sta.w $10d0	 ;02A5E2|8DD010  |0210D0; Store command
+	sta.w !menu_command_id	 ;02A5E2|8DD010  |0210D0; Store command
 	lda.b #$15	  ;02A5E5|A915    |      ; Set command type
-	sta.w $10d2	 ;02A5E7|8DD210  |0210D2; Store command type
+	sta.w !menu_command_type	 ;02A5E7|8DD210  |0210D2; Store command type
 	lda.b $ce	   ;02A5EA|A5CE    |0004CE; Read controller state
 	and.b #$80	  ;02A5EC|2980    |      ; Test high bit
 	bne Menu_ExtendedState ; Branch if set
 	lda.b $ce	   ;02A5F0|A5CE    |0004CE; Reload state
-	sta.w $10d1	 ;02A5F2|8DD110  |0210D1; Store parameter
+	sta.w !menu_command_param	 ;02A5F2|8DD110  |0210D1; Store parameter
 	rts ;02A5F5|60      |      ; Return
 ;      |        |      ;
 ;      |        |      ;
@@ -3628,7 +3628,7 @@ Menu_AdvancedState:
 ; Extended Controller State Handler
 Menu_ExtendedState:
 	lda.b $ce	   ;02A5F6|A5CE    |0004CE; Read controller state
-	sta.w $10d1	 ;02A5F8|8DD110  |0210D1; Store parameter
+	sta.w !menu_command_param	 ;02A5F8|8DD110  |0210D1; Store parameter
 	sta.b $39	   ;02A5FB|8539    |000439; Store in system register
 	rts ;02A5FD|60      |      ; Return
 ;      |        |      ;
@@ -3642,9 +3642,9 @@ Menu_AltPath:
 	dec a;02A605|3A      |      ; Decrement back
 	beq Menu_StateResolution ; Branch if zero
 	lda.b #$30	  ;02A608|A930    |      ; Set alternate command
-	sta.w $10d0	 ;02A60A|8DD010  |0210D0; Store command
+	sta.w !menu_command_id	 ;02A60A|8DD010  |0210D0; Store command
 	lda.b #$10	  ;02A60D|A910    |      ; Set alternate type
-	sta.w $10d2	 ;02A60F|8DD210  |0210D2; Store type
+	sta.w !menu_command_type	 ;02A60F|8DD210  |0210D2; Store type
 	lda.b $ce	   ;02A612|A5CE    |0004CE; Read controller state
 	cmp.b #$80	  ;02A614|C980    |      ; Compare to threshold
 	bne Controller_StoreParam ;02A616|D002    |02A61A; Branch if different
@@ -3652,7 +3652,7 @@ Menu_AltPath:
 ;      |        |      ;
 
 Controller_StoreParam:
-	sta.w $10d1	 ;02A61A|8DD110  |0210D1; Store final parameter
+	sta.w !menu_command_param	 ;02A61A|8DD110  |0210D1; Store final parameter
 	sta.b $39	   ;02A61D|8539    |000439; Store in system register
 	rts ;02A61F|60      |      ; Return
 ;      |        |      ;
@@ -3877,10 +3877,10 @@ Controller_ValidateNext:
 Controller_ProcessActive:
 	sta.b $a7	   ;02A74A|85A7    |0004A7; Store controller status
 	stz.b $38	   ;02A74C|6438    |000438; Clear system flag
-	stz.w $10d0	 ;02A74E|9CD010  |0210D0; Clear command register
+	stz.w !menu_command_id	 ;02A74E|9CD010  |0210D0; Clear command register
 	lda.w !char1_cursor_pos	 ;02A751|ADB110  |0210B1; Read system parameter
 	sta.b $3a	   ;02A754|853A    |00043A; Store parameter
-	sta.w $10d2	 ;02A756|8DD210  |0210D2; Store in command type
+	sta.w !menu_command_type	 ;02A756|8DD210  |0210D2; Store in command type
 	jsr.w ExecuteAdvancedCalc ;02A759|200F8B  |028B0F; Process system state
 	lda.b $db	   ;02A75C|A5DB    |0004DB; Read processing result
 	and.b $a7	   ;02A75E|25A7    |0004A7; Mask with controller status
@@ -3898,7 +3898,7 @@ Controller_ProcessActive:
 Controller_ParamSpecial:
 	lda.w $10b0	 ;02A770|ADB010  |0210B0; Read system state
 	beq Controller_DirectionHandler ;02A773|F015    |02A78A; Branch if zero
-	stz.w $10d0	 ;02A775|9CD010  |0210D0; Clear command
+	stz.w !menu_command_id	 ;02A775|9CD010  |0210D0; Clear command
 	lda.b $e0	   ;02A778|A5E0    |0004E0; Read error state
 	and.b #$02	  ;02A77A|2902    |      ; Test error bit
 	beq Controller_StoreSuccess ;02A77C|F006    |02A784; Branch if no error
@@ -3906,14 +3906,14 @@ Controller_ParamSpecial:
 
 Controller_ErrorState:
 	lda.b #$81	  ;02A77E|A981    |      ; Set error flag
-	sta.w $10d1	 ;02A780|8DD110  |0210D1; Store error state
+	sta.w !menu_command_param	 ;02A780|8DD110  |0210D1; Store error state
 	rts ;02A783|60      |      ; Return with error
 ;      |        |      ;
 ;      |        |      ;
 
 Controller_StoreSuccess:
 	lda.b $8d	   ;02A784|A58D    |00048D; Read processed value
-	sta.w $10d1	 ;02A786|8DD110  |0210D1; Store as parameter
+	sta.w !menu_command_param	 ;02A786|8DD110  |0210D1; Store as parameter
 	rts ;02A789|60      |      ; Return success
 ;      |        |      ;
 ;      |        |      ;

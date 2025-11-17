@@ -19233,10 +19233,10 @@ Character_CheckPlayerInput:
 	lda.w !char1_status                          ;00D381|AD2110  |001021;
 	and.B #$f8                           ;00D384|29F8    |      ;
 	bne Character_ReturnToMenu                      ;00D386|D0AD    |00D335;
-	lda.W $1050                          ;00D388|AD5010  |001050;
+	lda.W !control_region_1                          ;00D388|AD5010  |001050;
 	cmp.B #$30                           ;00D38B|C930    |      ;
 	bne Character_InputLoop                      ;00D38D|D0C1    |00D350;
-	lda.W $1052                          ;00D38F|AD5210  |001052;
+	lda.W !control_region_3                          ;00D38F|AD5210  |001052;
 	jsr.W Item_AddItem                    ;00D392|203BDB  |00DB3B;
 	bra Character_InputLoop                      ;00D395|80B9    |00D350;
 ;      |        |      ;
@@ -19245,20 +19245,20 @@ Character_UpdateFlags:
 	lda.B #$30                           ;00D397|A930    |      ;
 	trb.W $1020                          ;00D399|1C2010  |001020;
 	trb.w !char2_active_flag                          ;00D39C|1CA010  |0010A0;
-	lda.W $1050                          ;00D39F|AD5010  |001050;
+	lda.W !control_region_1                          ;00D39F|AD5010  |001050;
 	dec a;00D3A2|3A      |      ;
 	bne Character_UpdateP1Flags                      ;00D3A3|D005    |00D3AA;
 	lda.B #$20                           ;00D3A5|A920    |      ;
 	tsb.W $1020                          ;00D3A7|0C2010  |001020;
 ;      |        |      ;
 Character_UpdateP1Flags:
-	lda.W $10d0                          ;00D3AA|ADD010  |0010D0;
+	lda.W !menu_command_id                          ;00D3AA|ADD010  |0010D0;
 	dec a;00D3AD|3A      |      ;
 	bne Character_UpdateP2Flags                      ;00D3AE|D005    |00D3B5;
 	db $a9,$30,$0c,$a0,$10               ;00D3B0|        |      ;
 ;      |        |      ;
 Character_UpdateP2Flags:
-	lda.W $1050                          ;00D3B5|AD5010  |001050;
+	lda.W !control_region_1                          ;00D3B5|AD5010  |001050;
 	cmp.B #$11                           ;00D3B8|C911    |      ;
 	bne Character_CheckP1                      ;00D3BA|D00A    |00D3C6;
 	lda.B #$30                           ;00D3BC|A930    |      ;
@@ -19267,24 +19267,24 @@ Character_UpdateP2Flags:
 	tsb.w !char2_active_flag                          ;00D3C3|0CA010  |0010A0;
 ;      |        |      ;
 Character_CheckP1:
-	lda.W $10d0                          ;00D3C6|ADD010  |0010D0;
+	lda.W !menu_command_id                          ;00D3C6|ADD010  |0010D0;
 	cmp.B #$11                           ;00D3C9|C911    |      ;
 	bne Character_CheckP2                      ;00D3CB|D005    |00D3D2;
 	lda.B #$30                           ;00D3CD|A930    |      ;
 	tsb.W $1020                          ;00D3CF|0C2010  |001020;
 ;      |        |      ;
 Character_CheckP2:
-	lda.W $1050                          ;00D3D2|AD5010  |001050;
+	lda.W !control_region_1                          ;00D3D2|AD5010  |001050;
 	cmp.B #$30                           ;00D3D5|C930    |      ;
 	bne Character_UpdateP1Portrait                      ;00D3D7|D006    |00D3DF;
-	lda.W $1052                          ;00D3D9|AD5210  |001052;
+	lda.W !control_region_3                          ;00D3D9|AD5210  |001052;
 	jsr.W Item_AddItem                    ;00D3DC|203BDB  |00DB3B;
 ;      |        |      ;
 Character_UpdateP1Portrait:
-	lda.W $10d0                          ;00D3DF|ADD010  |0010D0;
+	lda.W !menu_command_id                          ;00D3DF|ADD010  |0010D0;
 	cmp.B #$30                           ;00D3E2|C930    |      ;
 	bne Character_UpdateP2Portrait                      ;00D3E4|D006    |00D3EC;
-	lda.W $10d2                          ;00D3E6|ADD210  |0010D2;
+	lda.W !menu_command_type                          ;00D3E6|ADD210  |0010D2;
 	jsr.W Item_AddItem                    ;00D3E9|203BDB  |00DB3B;
 ;      |        |      ;
 Character_UpdateP2Portrait:
@@ -19299,7 +19299,7 @@ Character_CalculateInputMask:
 	ldx.B $14                            ;00D401|A614    |000014;
 	beq Character_DefaultMask                      ;00D403|F00D    |00D412;
 	lda.W #$4000                         ;00D405|A90040  |      ;
-	ldx.W $1050                          ;00D408|AE5010  |001050;
+	ldx.W !control_region_1                          ;00D408|AE5010  |001050;
 	bne Character_ApplyMask                      ;00D40B|D010    |00D41D;
 	lda.W #$4030                         ;00D40D|A93040  |      ;
 	bra Character_ApplyMask                      ;00D410|800B    |00D41D;
@@ -19388,7 +19388,7 @@ Character_Confirm:
 	ldx.W #$0080                         ;00D4A7|A28000  |      ;
 ;      |        |      ;
 Character_CheckEquipment:
-	eor.W $1051,x                        ;00D4AA|5D5110  |001051;
+	eor.W !control_region_2,x                        ;00D4AA|5D5110  |001051;
 	asl a;00D4AD|0A      |      ;
 	asl a;00D4AE|0A      |      ;
 	asl a;00D4AF|0A      |      ;
@@ -19458,7 +19458,7 @@ Character_StoreSelection:
 ;      |        |      ;
 Character_UpdateCharacterSlot:
 	tya                                  ;00D50D|98      |      ;
-	sta.W $1050,x                        ;00D50E|9D5010  |001050;
+	sta.W !control_region_1,x                        ;00D50E|9D5010  |001050;
 	bra Character_CleanupDisplay                      ;00D511|80C0    |00D4D3;
 ;      |        |      ;
 ;      |        |      ;
@@ -19581,7 +19581,7 @@ Abilities_Confirm:
 ;      |        |      ;
 Abilities_LoadCharacterAbility:
 	phx                                  ;00D5E7|DA      |      ;
-	lda.W $1052,x                        ;00D5E8|BD5210  |001052;
+	lda.W !control_region_3,x                        ;00D5E8|BD5210  |001052;
 	jsl.L Item_GetCharacterStats                    ;00D5EB|2265DA00|00DA65;
 	plx                                  ;00D5EF|FA      |      ;
 	cmp.B #$00                           ;00D5F0|C900    |      ;
@@ -19598,7 +19598,7 @@ Abilities_PlayConfirm:
 	lda.B $16                            ;00D606|A516    |000016;
 	bit.B #$80                           ;00D608|8980    |      ;
 	bne Abilities_DisplayLoop                      ;00D60A|D098    |00D5A4;
-	lda.W $1052,x                        ;00D60C|BD5210  |001052;
+	lda.W !control_region_3,x                        ;00D60C|BD5210  |001052;
 	jsr.W Item_RemoveItem                    ;00D60F|20F8DB  |00DBF8;
 	bra Abilities_CleanupDisplay                      ;00D612|8003    |00D617;
 ;      |        |      ;
@@ -19706,7 +19706,7 @@ Weapon_Confirm:
 	ldx.W #$0080                         ;00D6C2|A28000  |      ;
 ;      |        |      ;
 Weapon_CheckWeapon:
-	lda.W $1052,x                        ;00D6C5|BD5210  |001052;
+	lda.W !control_region_3,x                        ;00D6C5|BD5210  |001052;
 	cmp.B #$ff                           ;00D6C8|C9FF    |      ;
 	bne Weapon_ValidWeapon                      ;00D6CA|D005    |00D6D1;
 ;      |        |      ;
@@ -19720,9 +19720,9 @@ Weapon_ValidWeapon:
 	inc a;00D6D4|1A      |      ;
 	bne Weapon_PlayError                      ;00D6D5|D0F5    |00D6CC;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D6D7|2008B9  |00B908;
-	lda.W $1052,x                        ;00D6DA|BD5210  |001052;
+	lda.W !control_region_3,x                        ;00D6DA|BD5210  |001052;
 	jsr.W Item_RemoveWeapon                    ;00D6DD|2016DC  |00DC16;
-	lda.W $1052,x                        ;00D6E0|BD5210  |001052;
+	lda.W !control_region_3,x                        ;00D6E0|BD5210  |001052;
 	sta.W $043a                          ;00D6E3|8D3A04  |00043A;
 	phx                                  ;00D6E6|DA      |      ;
 	jsl.L Sub_028AE0                    ;00D6E7|22E08A02|028AE0;
@@ -20009,7 +20009,7 @@ Equipment_ReturnDefault:
 	lda.B #$81                           ;00D8E8|A981    |      ;
 ;      |        |      ;
 Equipment_StoreResult:
-	sta.W $1051,y                        ;00D8EA|995110  |001051;
+	sta.W !control_region_2,y                        ;00D8EA|995110  |001051;
 	sta.L $7e365e,x                      ;00D8ED|9F5E367E|7E365E;
 	ldx.W #$d3f9                         ;00D8F1|A2F9D3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D8F4|20C49B  |009BC4;

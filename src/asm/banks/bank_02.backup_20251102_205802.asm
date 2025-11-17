@@ -55,12 +55,12 @@ Battle_SetupEnvironment:
 	jsr.W Battle_CheckEscape                    ;028078|208781  |028187;
 	stz.B $b5                            ;02807B|64B5    |0004B5;
 	lda.B #$ff                           ;02807D|A9FF    |      ;
-	sta.W $1050                          ;02807F|8D5010  |021050;
-	sta.W $1051                          ;028082|8D5110  |021051;
-	sta.W $1052                          ;028085|8D5210  |021052;
-	sta.W $10d0                          ;028088|8DD010  |0210D0;
-	sta.W $10d1                          ;02808B|8DD110  |0210D1;
-	sta.W $10d2                          ;02808E|8DD210  |0210D2;
+	sta.W !control_region_1                          ;02807F|8D5010  |021050;
+	sta.W !control_region_2                          ;028082|8D5110  |021051;
+	sta.W !control_region_3                          ;028085|8D5210  |021052;
+	sta.W !menu_command_id                          ;028088|8DD010  |0210D0;
+	sta.W !menu_command_param                          ;02808B|8DD110  |0210D1;
+	sta.W !menu_command_type                          ;02808E|8DD210  |0210D2;
 	lda.B $76                            ;028091|A576    |000476;
 	dec a;028093|3A      |      ;
 	beq Battle_ProcessTurn                      ;028094|F014    |0280AA;
@@ -4992,11 +4992,11 @@ DB_UNREACH_02A511:
 ;      |        |      ;
 Battle_ApplySpeedModifier:
 	lda.B #$20                           ;02A516|A920    |      ;
-	sta.W $10d0                          ;02A518|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A518|8DD010  |0210D0;
 	lda.B #$17                           ;02A51B|A917    |      ;
-	sta.W $10d2                          ;02A51D|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A51D|8DD210  |0210D2;
 	lda.B $ce                            ;02A520|A5CE    |0004CE;
-	sta.W $10d1                          ;02A522|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A522|8DD110  |0210D1;
 	sta.B $39                            ;02A525|8539    |000439;
 	rts                                  ;02A527|60      |      ;
 ;      |        |      ;
@@ -5032,11 +5032,11 @@ Battle_ApplyMagicModifier:
 	dec a;02A557|3A      |      ;
 	beq Battle_MagicModifierApplied                      ;02A558|F012    |02A56C;
 	lda.B #$30                           ;02A55A|A930    |      ;
-	sta.W $10d0                          ;02A55C|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A55C|8DD010  |0210D0;
 	lda.B #$11                           ;02A55F|A911    |      ;
-	sta.W $10d2                          ;02A561|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A561|8DD210  |0210D2;
 	lda.B $ce                            ;02A564|A5CE    |0004CE;
-	sta.W $10d1                          ;02A566|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A566|8DD110  |0210D1;
 	sta.B $39                            ;02A569|8539    |000439;
 	rts                                  ;02A56B|60      |      ;
 ;      |        |      ;
@@ -5053,11 +5053,11 @@ Battle_MagicModifierApplied:
 	xba                                  ;02A57A|EB      |      ;
 	beq Battle_ProcessTemporaryBuff                      ;02A57B|F012    |02A58F;
 	lda.B #$20                           ;02A57D|A920    |      ;
-	sta.W $10d0                          ;02A57F|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A57F|8DD010  |0210D0;
 	lda.B #$16                           ;02A582|A916    |      ;
-	sta.W $10d2                          ;02A584|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A584|8DD210  |0210D2;
 	lda.B $ce                            ;02A587|A5CE    |0004CE;
-	sta.W $10d1                          ;02A589|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A589|8DD110  |0210D1;
 	sta.B $39                            ;02A58C|8539    |000439;
 	rts                                  ;02A58E|60      |      ;
 ;      |        |      ;
@@ -5107,20 +5107,20 @@ Battle_UpdateBuffTimers:
 	xba                                  ;02A5DD|EB      |      ;
 	beq Battle_CheckBuffExpired                      ;02A5DE|F01E    |02A5FE;
 	lda.B #$20                           ;02A5E0|A920    |      ;
-	sta.W $10d0                          ;02A5E2|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A5E2|8DD010  |0210D0;
 	lda.B #$15                           ;02A5E5|A915    |      ;
-	sta.W $10d2                          ;02A5E7|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A5E7|8DD210  |0210D2;
 	lda.B $ce                            ;02A5EA|A5CE    |0004CE;
 	and.B #$80                           ;02A5EC|2980    |      ;
 	bne Battle_DecrementBuffTimer                      ;02A5EE|D006    |02A5F6;
 	lda.B $ce                            ;02A5F0|A5CE    |0004CE;
-	sta.W $10d1                          ;02A5F2|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A5F2|8DD110  |0210D1;
 	rts                                  ;02A5F5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Battle_DecrementBuffTimer:
 	lda.B $ce                            ;02A5F6|A5CE    |0004CE;
-	sta.W $10d1                          ;02A5F8|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A5F8|8DD110  |0210D1;
 	sta.B $39                            ;02A5FB|8539    |000439;
 	rts                                  ;02A5FD|60      |      ;
 ;      |        |      ;
@@ -5132,16 +5132,16 @@ Battle_CheckBuffExpired:
 	dec a;02A605|3A      |      ;
 	beq Battle_BuffTimersUpdated                      ;02A606|F018    |02A620;
 	lda.B #$30                           ;02A608|A930    |      ;
-	sta.W $10d0                          ;02A60A|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A60A|8DD010  |0210D0;
 	lda.B #$10                           ;02A60D|A910    |      ;
-	sta.W $10d2                          ;02A60F|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A60F|8DD210  |0210D2;
 	lda.B $ce                            ;02A612|A5CE    |0004CE;
 	cmp.B #$80                           ;02A614|C980    |      ;
 	bne Battle_RemoveExpiredBuff                      ;02A616|D002    |02A61A;
 	db $a9,$01                           ;02A618|        |      ;
 ;      |        |      ;
 Battle_RemoveExpiredBuff:
-	sta.W $10d1                          ;02A61A|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A61A|8DD110  |0210D1;
 	sta.B $39                            ;02A61D|8539    |000439;
 	rts                                  ;02A61F|60      |      ;
 ;      |        |      ;
@@ -5329,10 +5329,10 @@ Battle_RollEvadeDice:
 Battle_EvadeSuccess:
 	sta.B $a7                            ;02A74A|85A7    |0004A7;
 	stz.B $38                            ;02A74C|6438    |000438;
-	stz.W $10d0                          ;02A74E|9CD010  |0210D0;
+	stz.W !menu_command_id                          ;02A74E|9CD010  |0210D0;
 	lda.w !char1_cursor_pos                          ;02A751|ADB110  |0210B1;
 	sta.B $3a                            ;02A754|853A    |00043A;
-	sta.W $10d2                          ;02A756|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A756|8DD210  |0210D2;
 	jsr.W Battle_SetupTargeting                    ;02A759|200F8B  |028B0F;
 	lda.B $db                            ;02A75C|A5DB    |0004DB;
 	and.B $a7                            ;02A75E|25A7    |0004A7;
@@ -5348,20 +5348,20 @@ Battle_EvadeSuccess:
 Battle_EvadeFailed:
 	lda.W $10b0                          ;02A770|ADB010  |0210B0;
 	beq Battle_ProcessBlock                      ;02A773|F015    |02A78A;
-	stz.W $10d0                          ;02A775|9CD010  |0210D0;
+	stz.W !menu_command_id                          ;02A775|9CD010  |0210D0;
 	lda.B $e0                            ;02A778|A5E0    |0004E0;
 	and.B #$02                           ;02A77A|2902    |      ;
 	beq Battle_EvadeComplete                      ;02A77C|F006    |02A784;
 ;      |        |      ;
 Battle_DisplayEvade:
 	lda.B #$81                           ;02A77E|A981    |      ;
-	sta.W $10d1                          ;02A780|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A780|8DD110  |0210D1;
 	rts                                  ;02A783|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Battle_EvadeComplete:
 	lda.B $8d                            ;02A784|A58D    |00048D;
-	sta.W $10d1                          ;02A786|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A786|8DD110  |0210D1;
 	rts                                  ;02A789|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -5421,7 +5421,7 @@ Battle_BlockSuccess:
 ;      |        |      ;
 Battle_BlockFailed:
 	sta.B $3a                            ;02A7D5|853A    |00043A;
-	sta.W $10d2                          ;02A7D7|8DD210  |0210D2;
+	sta.W !menu_command_type                          ;02A7D7|8DD210  |0210D2;
 	cmp.B #$1c                           ;02A7DA|C91C    |      ;
 	bne Battle_DisplayBlock                      ;02A7DC|D007    |02A7E5;
 	lda.w !char2_temp_bank                          ;02A7DE|AD9A10  |02109A;
@@ -5441,7 +5441,7 @@ Battle_BlockComplete:
 Battle_ProcessParry:
 	lda.B #$20                           ;02A7F5|A920    |      ;
 	sta.B $38                            ;02A7F7|8538    |000438;
-	sta.W $10d0                          ;02A7F9|8DD010  |0210D0;
+	sta.W !menu_command_id                          ;02A7F9|8DD010  |0210D0;
 	jsr.W Battle_SetupTargeting                    ;02A7FC|200F8B  |028B0F;
 	and.B #$03                           ;02A7FF|2903    |      ;
 	cmp.B #$02                           ;02A801|C902    |      ;
@@ -5463,7 +5463,7 @@ Battle_RollParryDice:
 ;      |        |      ;
 Battle_ParrySuccess:
 	lda.B $8d                            ;02A81A|A58D    |00048D;
-	sta.W $10d1                          ;02A81C|8DD110  |0210D1;
+	sta.W !menu_command_param                          ;02A81C|8DD110  |0210D1;
 ;      |        |      ;
 Battle_ParryFailed:
 	phd                                  ;02A81F|0B      |      ;
