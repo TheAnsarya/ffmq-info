@@ -8073,7 +8073,7 @@ Battle_Initialization_Complete:
 Advanced_Graphics_Loading:
 	lda.w !world_map_flag	 ; Load graphics loading state
 	bne Graphics_Loading_Error ; Branch if loading conflict
-	lda.w DB_DATA8_01f42d,x ; Load graphics data reference
+	lda.w DB_Battle_ConfigData1,x ; Load graphics data reference
 	tay ; Transfer to index register
 	lda.w !env_context_value	 ; Load graphics context
 	dec a; Decrement for zero-based indexing
@@ -8146,7 +8146,7 @@ Special_Graphics_Continue:
 ; Continue special graphics processing with advanced algorithms
 	sta.w $0513	 ; Store special processing state
 	tax ; Transfer to special index
-	lda.l DB_DATA8_01f437,x ; Load special graphics data
+	lda.l DB_Battle_WaveformPattern,x ; Load special graphics data
 	sep #$10		; Set 8-bit index mode
 	pha ; Preserve special data
 	lsr a; Shift for special analysis
@@ -8541,7 +8541,7 @@ DB_Battle_GraphicsTable6:
 	db $5e,$ec
 	db $82,$ec,$82,$ec,$82,$ec,$b5,$ec,$b5,$ec,$d5,$ec,$da,$ed,$da,$ed
 
-DB_DATA8_01f42d:
+DB_Battle_ConfigData1:
 	db $42,$ee,$01
 	db $20
 	db $03
@@ -8551,12 +8551,12 @@ DB_DATA8_01f42d:
 	db $00
 	db $00
 
-DB_DATA8_01f437:
+DB_Battle_WaveformPattern:
 	db $a1,$ca,$ca,$aa,$b2,$b2,$aa,$aa,$ba,$aa,$c2,$08,$08,$08,$08,$08
 	db $08,$08
 	db $d4,$d4,$3c,$ff,$08,$ff,$ff,$2a,$ff,$05
 
-DB_DATA8_01f453:
+DB_Battle_ConfigWord1:
 	db $20,$10
 
 ; Advanced Sound and Music Processing System
@@ -8645,7 +8645,7 @@ Advanced_Battle_Direction_Processing:
 
 ; Advanced Graphics Data Processing Engine
 ; Sophisticated graphics data management with coordinate transformation systems
-DB_DATA8_01f846:
+DB_Battle_ConfigData2:
 	db $fe,$fa,$ea,$aa ; Advanced graphics transformation data
 
 ; Advanced Graphics Initialization and Management System
@@ -8668,7 +8668,7 @@ Advanced_Graphics_Initialization:
 Advanced_Graphics_Processing_Loop:
 	phx ; Preserve graphics loop index
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w DB_DATA8_01f892,x ; Load graphics data reference
+	lda.w DB_Battle_ConfigData3,x ; Load graphics data reference
 	sta.w !gfx_buffer_addr_1	 ; Store primary graphics buffer address
 	clc ; Clear carry for address calculation
 	adc.w #$0400	; Add graphics buffer offset
@@ -8688,7 +8688,7 @@ Advanced_Graphics_Processing_Loop:
 
 ; Advanced Graphics Data Table
 ; Sophisticated graphics reference data for buffer management
-DB_DATA8_01f892:
+DB_Battle_ConfigData3:
 	db $00,$48,$c0,$4b,$80,$4b,$40,$4b,$00,$4b,$c0,$4a,$80,$4a,$40,$4a
 	db $00,$4a,$c0,$49
 
@@ -8823,7 +8823,7 @@ Advanced_Graphics_Enhancement:
 	lda.w !coord_modify_data	 ; Load coordinate modification data
 	sta.w !coord_modifier	 ; Store coordinate modification
 	phx ; Preserve coordinate processing index
-	jsr.w (DB_DATA8_01f9fc,x) ; Execute coordinate processing function
+	jsr.w (DB_Battle_ConfigData4,x) ; Execute coordinate processing function
 	plx ; Restore coordinate processing index
 	lda.w !gfx_mode_control	 ; Load coordinate processing mode
 	dec a; Decrement for mode analysis
@@ -8847,17 +8847,17 @@ Advanced_Coordinate_Adjustment:
 	stz.w !coord_flag	 ; Clear coordinate flags
 	lda.w !coord_finalize_data	 ; Load coordinate finalization data
 	sta.w !coord_modifier	 ; Store coordinate finalization
-	jsr.w (DB_DATA8_01fa04,x) ; Execute coordinate finalization
+	jsr.w (DB_Battle_ConfigData5,x) ; Execute coordinate finalization
 
 Coordinate_Processing_Complete:
 	rts ; Return coordinate processing complete
 
 ; Coordinate Processing Function Table
-DB_DATA8_01f9fc:
+DB_Battle_ConfigData4:
 	db $0c,$fa,$af,$fa,$0c,$fa,$af,$fa
 
 ; Coordinate Finalization Function Table
-DB_DATA8_01fa04:
+DB_Battle_ConfigData5:
 	db $4a,$fb,$f0,$fb,$4a,$fb,$f0,$fb
 
 ; Advanced Graphics Sprite Processing System
@@ -9292,13 +9292,13 @@ Buffer_Control_Standard:
 	rep #$20		; Set 16-bit accumulator mode
 	and.w #$001e	; Mask buffer control for range
 	clc ; Clear carry for address calculation
-	adc.w DB_DATA8_01fd4d,x ; Add buffer base address
+	adc.w DB_Battle_ConfigData6,x ; Add buffer base address
 	clc ; Clear carry for final calculation
 	adc.w !RDMPYL	 ; Add multiplication result
 	rts ; Return buffer finalization complete
 
 ; Buffer Address Table
-DB_DATA8_01fd4d:
+DB_Battle_ConfigData6:
 	db $00,$40,$00,$44
 
 ; Advanced Coordinate Validation Engine
@@ -9515,12 +9515,12 @@ Final_Graphics_Processing:
 	lda.w !gfx_mode_control	 ; Load final processing mode
 	asl a; Shift for final processing indexing
 	tax ; Transfer final processing index
-	jsr.w (DB_DATA8_01fe7b,x) ; Execute final processing function
+	jsr.w (DB_Battle_ConfigData7,x) ; Execute final processing function
 	jsr.w BattleGraphics_FinalCoordination ; Execute final graphics coordination
 	rts ; Return final graphics processing complete
 
 ; Final Processing Function Table
-DB_DATA8_01fe7b:
+DB_Battle_ConfigData7:
 	db $7a,$fe,$7a,$fe,$d5,$fe,$89,$fe,$89,$fe,$8d,$fe
 	db $d5,$fe
 

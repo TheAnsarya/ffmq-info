@@ -2623,13 +2623,13 @@ Input_ScanLoop:
 	iny ; Increment bit scanner by 1 (total +2)
 	rol a; Rotate left to test next bit
 	bcc Input_ScanLoop ; Continue scanning if bit not set
-	ldx.w DB_DATA8_029ba0,y ; Load handler address from table
+	ldx.w DB_Input_HandlerTable,y ; Load handler address from table
 	jsr.w ExecuteSystemHandler ; Execute selected handler
 	bra Input_Finalize ; Branch to processing finalization
 
 ;Input handler dispatch table
 ;Table of handler addresses for different input combinations
-DB_DATA8_029ba0:
+DB_Input_HandlerTable:
 	db $6a,$d3,$6e,$d3,$72,$d3,$77,$d3 ; Handlers for bits 0-3
 	db $c9,$d3	 ; Handler for bit 4
 	db $cf,$d3,$d3,$d3,$8c,$d3 ; Handlers for bits 5-7
@@ -3091,23 +3091,23 @@ System_ValidateEnhanced:
 ;----------------------------------------------------------------------------
 ; System Initialization Data Tables
 ;----------------------------------------------------------------------------
-DB_DATA8_02a272:
+DB_System_ConfigByte1:
 	db $07		 ;02A272|        |      ;
 ;      |        |      ;
 
 ; Configuration Parameter Array for System Setup
-DB_DATA8_02a273:
+DB_System_ConfigArray:
 	db $17,$27,$37,$47,$57 ;02A273|        |      ;
 ;      |        |      ;
 
 ; System State Default Value
-DB_DATA8_02a278:
+DB_System_DefaultValue:
 	db $00		 ;02A278|        |      ;
 ;      |        |      ;
 
 ; Audio Waveform Pattern Data for Sound Effects
 ; Complex 16-bit sound synthesis parameters
-DB_DATA8_02a279:
+DB_Audio_WaveformPattern:
 	db $00,$08,$21,$52,$4a,$f7,$5e,$9c,$73,$9c,$73,$f7,$5e,$52,$4a,$08 ;02A279|        |      ;
 	db $21,$00,$00 ;02A289|        |      ;
 ;      |        |      ;
@@ -4255,7 +4255,7 @@ Math_FinalResult:
 ;----------------------------------------------------------------------------
 
 ; Mathematical Transformation Table
-DB_DATA8_02aa79:
+DB_System_ConfigData1:
 	db $00,$03,$09,$0c,$12,$15,$1b,$1e ;02AA79|        |      ; Progressive value sequence
 	db $24,$27,$2a,$30,$36,$39,$3c,$3f ;02AA81|        |      ; Continued progression
 	db $42,$45,$48,$4b,$4e,$51,$54,$57 ;02AA89|        |      ; Linear increment pattern
@@ -4267,7 +4267,7 @@ DB_DATA8_02aa79:
 	db $24		 ;02AAB8|        |000003; End marker
 
 ; System Configuration Data
-DB_DATA8_02aab9:
+DB_System_ConfigData2:
 	db $03,$03,$03,$03 ;02AAB9|        |      ; Uniform configuration
 
 ; Coordinate Offset Table

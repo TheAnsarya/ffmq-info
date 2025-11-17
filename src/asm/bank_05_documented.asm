@@ -2039,10 +2039,10 @@ DB_Graphics_TileData1:
 DB_Graphics_TileData2:
 	db $10                               ;05F72B|        |      ;
 ;      |        |      ;
-DB_DATA8_05f72c:
+DB_Graphics_ConfigByte1:
 	db $14                               ;05F72C|        |      ;
 ;      |        |      ;
-DB_DATA8_05f72d:
+DB_Graphics_MapIndexTable:
 	db $0b,$11,$14,$23,$14,$3d,$36,$14,$31,$27,$15,$1a,$88,$14,$21,$45;05F72D|        |      ;
 	db $15,$17,$b6,$15,$0c,$3b,$15,$1c,$3b,$16,$1b,$1e,$1a,$0b,$1d,$1b;05F73D|        |      ;
 	db $2b,$33                           ;05F74D|        |      ;
@@ -2133,7 +2133,7 @@ DB_DEAD_05F920:
 	db $44,$04,$4a,$04,$50,$04,$56,$04,$5f,$04,$6e,$04,$89,$04,$98,$04;05F9DA|        |      ;
 	db $b3,$04,$c2,$04,$c2,$04,$c5,$04,$c8,$04,$c8,$04,$d7,$04;05F9EA|        |000004;
 ;      |        |      ;
-DB_DATA8_05f9f8:
+DB_Graphics_ConfigData2:
 	db $18,$13                           ;05F9F8|        |      ;
 ;-------------------------------------------------------------------------------
 ; DEAD CODE - Single Orphaned Byte
