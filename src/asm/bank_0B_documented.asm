@@ -130,13 +130,13 @@ BattleSprite_UpdateOAM:
 	lda.l DATA8_01a63a,x ;0B8083	; Load OAM base address
 	tay ;0B8087	; Transfer to Y
 	plx ;0B8088	; Restore X
-	lda.w $1a73,x   ;0B8089	; Load sprite X position
+	lda.w !sprite_x_array,x   ;0B8089	; Load sprite X position
 	sta.w !oam_sprite0_tile,y   ;0B808C	; Store to OAM
-	lda.w $1a75,x   ;0B808F	; Load sprite Y position
+	lda.w !sprite_y_array,x   ;0B808F	; Load sprite Y position
 	sta.w !oam_sprite1_tile,y   ;0B8092	; Store to OAM
-	lda.w $1a77,x   ;0B8095	; Load sprite tile index
+	lda.w !sprite_tile_array,x   ;0B8095	; Load sprite tile index
 	sta.w !oam_sprite2_tile,y   ;0B8098	; Store to OAM
-	lda.w $1a79,x   ;0B809B	; Load sprite attributes
+	lda.w !sprite_attrs_array,x   ;0B809B	; Load sprite attributes
 	sta.w !oam_sprite3_tile,y   ;0B809E	; Store to OAM
 
 BattleSprite_AnimationExit:
@@ -329,13 +329,13 @@ BattleSprite_UpdateOAM_1:	; OAM Data Update Routine
 	plx ; Restore sprite index
 
 ; Copy sprite data to OAM mirror
-	lda.w $1a73,x   ; Load sprite X position
+	lda.w !sprite_x_array,x   ; Load sprite X position
 	sta.w !oam_sprite0_tile,y   ; Store to OAM X position
-	lda.w $1a75,x   ; Load sprite Y position
+	lda.w !sprite_y_array,x   ; Load sprite Y position
 	sta.w !oam_sprite1_tile,y   ; Store to OAM Y position
-	lda.w $1a77,x   ; Load sprite tile index
+	lda.w !sprite_tile_array,x   ; Load sprite tile index
 	sta.w !oam_sprite2_tile,y   ; Store to OAM tile index
-	lda.w $1a79,x   ; Load sprite attributes
+	lda.w !sprite_attrs_array,x   ; Load sprite attributes
 	sta.w !oam_sprite3_tile,y   ; Store to OAM attributes
 
 BattleSprite_AnimationExit_1:	; Exit routine
@@ -442,12 +442,12 @@ BattleSprite_SearchLoop:	; Search loop
 	cmp.b #$ff	  ; Check if slot inactive
 	beq BattleSprite_SearchNext ; Skip this slot if inactive
 	lda.b $19,x	 ; Load sprite ID (DP+$19+X)
-	cmp.w $1502	 ; Compare with target sprite ID
+	cmp.w !sprite_target_id	 ; Compare with target sprite ID
 	bne BattleSprite_SearchNext ; Skip if no match
 
 ; Match found!
 	ldy.b $0b,x	 ; Load sprite data offset (DP+$0b+X)
-	sty.w $1500	 ; Store to output variable
+	sty.w !sprite_output_var	 ; Store to output variable
 	pld ; Restore direct page
 	plp ; Restore processor status
 	pla ; Restore accumulator
@@ -692,8 +692,8 @@ BattleGfx_InitLayerData:
 	ldx.w #$0000	; X = index
 	txa ; Clear A
 	xba ; Clear B (16-bit clear)
-	stx.w $190c	 ; Clear layer 1 scroll X
-	stx.w $190e	 ; Clear layer 2 scroll X
+	stx.w !layer1_scroll_x	 ; Clear layer 1 scroll X
+	stx.w !layer2_scroll_x	 ; Clear layer 2 scroll X
 
 BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DB_Battle_LayerDefaults,x ; Load default byte
@@ -732,7 +732,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 
 ; Load layer configuration (3 bytes from second table)
 	lda.w DB_Battle_ConfigByte9,x ; Load config byte 0
-	sta.w $1a50	 ; Store layer config 0
+	sta.w !color_math_control	 ; Store layer config 0
 	lda.w DB_Battle_ConfigByte10,x ; Load config byte 1
 	sta.w !buffer_state	 ; Store layer config 1
 	lda.w DB_Battle_ConfigByte12,x ; Load config byte 2
@@ -900,7 +900,7 @@ BattleState_CopyLoop:	; Copy loop
 	ldx.w #$0e0e	; Alternate BG map = $0e0e (for special enemies)
 
 BattleState_SetMapPtr:
-	stx.w $19b2	 ; Store BG map pointer
+	stx.w !bg_map_ptr_19b2	 ; Store BG map pointer
 	rtl ; Return
 
 ; Configuration Data Tables
@@ -1138,7 +1138,7 @@ BattlePPU_ConfigureRegisters:
 	lda.b #$41	  ; BG1 map = $4100, size 32×32 tiles
 	sta.w !BG1SC	 ; Write to BG1 tilemap register
 
-	lda.w $1a4d	 ; Load BG2 tilemap config
+	lda.w !bg2_tilemap_config	 ; Load BG2 tilemap config
 	sta.w !BG2SC	 ; Write to BG2 tilemap register
 
 	lda.w !gfx_completion_mode	 ; Load main screen layers
@@ -1147,7 +1147,7 @@ BattlePPU_ConfigureRegisters:
 	lda.w !gfx_completion_flags	 ; Load subscreen layers (for blending)
 	sta.w !TS	 ; Write to subscreen designation
 
-	lda.w $1a50	 ; Load color math control
+	lda.w !color_math_control	 ; Load color math control
 	sta.w !CGWSEL	 ; Write to color math register
 
 ; Special handling for battle mode $70

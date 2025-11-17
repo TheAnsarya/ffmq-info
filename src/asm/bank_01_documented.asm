@@ -9085,12 +9085,12 @@ Advanced_Memory_Graphics_Buffer_Management:
 	sta.w !buffer_ref_1	 ; Store memory graphics buffer primary
 	clc ; Clear carry for address calculation
 	adc.w !buffer_size_ref	 ; Add configuration offset
-	sta.w $1a20	 ; Store memory graphics buffer secondary
+	sta.w !mem_gfx_buffer_sec	 ; Store memory graphics buffer secondary
 	lda.w #$0980	; Set memory graphics extended buffer
 	sta.w !buffer_ref_1_backup	 ; Store memory graphics extended primary
 	clc ; Clear carry for extended calculation
 	adc.w !buffer_size_backup	 ; Add configuration extended offset
-	sta.w $1a22	 ; Store memory graphics extended secondary
+	sta.w !mem_gfx_ext_sec	 ; Store memory graphics extended secondary
 	jsr.w .BattleDialogue_AdvanceText ; Execute memory graphics finalization
 	ora.w #$0800	; Set memory graphics bank flag
 	sta.w !gfx_buffer_addr_1	 ; Store memory graphics result
@@ -9099,10 +9099,10 @@ Advanced_Memory_Graphics_Buffer_Management:
 	sta.w !gfx_buffer_addr_2	 ; Store memory graphics next
 	eor.w #$0400	; Toggle memory graphics bank
 	and.w #$4fc0	; Mask memory graphics flags
-	sta.w $1a18	 ; Store memory graphics flags
+	sta.w !mem_gfx_flags	 ; Store memory graphics flags
 	clc ; Clear carry for final calculation
 	adc.w #$0020	; Add memory graphics final increment
-	sta.w $1a1a	 ; Store memory graphics final
+	sta.w !mem_gfx_final	 ; Store memory graphics final
 	sep #$20		; Set 8-bit accumulator mode
 	rts ; Return memory graphics processing complete
 
@@ -9167,12 +9167,12 @@ Alternative_Memory_Buffer_Management:
 	sta.w !buffer_ref_1	 ; Store alternative memory primary
 	clc ; Clear carry for alternative address calc
 	adc.w !buffer_size_ref	 ; Add alternative config offset
-	sta.w $1a20	 ; Store alternative memory secondary
+	sta.w !mem_gfx_buffer_sec	 ; Store alternative memory secondary
 	lda.w #$0980	; Set alternative memory extended
 	sta.w !buffer_ref_1_backup	 ; Store alternative memory extended primary
 	clc ; Clear carry for alternative extended calc
 	adc.w !buffer_size_backup	 ; Add alternative extended offset
-	sta.w $1a22	 ; Store alternative memory extended secondary
+	sta.w !mem_gfx_ext_sec	 ; Store alternative memory extended secondary
 	jsr.w .BattleDialogue_AdvanceText ; Execute alternative memory finalization
 	ora.w #$0800	; Set alternative memory bank flag
 	sta.w !gfx_buffer_addr_1	 ; Store alternative memory result
@@ -9181,9 +9181,9 @@ Alternative_Memory_Buffer_Management:
 	dec a; Decrement for alternative flag calculation
 	and.w #$4c1e	; Mask alternative memory flags
 	clc ; Clear carry for alternative final calc
-	sta.w $1a18	 ; Store alternative memory flags
+	sta.w !mem_gfx_flags	 ; Store alternative memory flags
 	inc a; Increment alternative final
-	sta.w $1a1a	 ; Store alternative memory final
+	sta.w !mem_gfx_final	 ; Store alternative memory final
 	sep #$20		; Set 8-bit accumulator mode
 	rts ; Return alternative memory processing complete
 
@@ -9263,7 +9263,7 @@ Coordinate_Attribute_Special:
 	plx ; Restore attribute index
 	ora.w !coord_modifier	 ; Combine with attribute base
 	ora.w !bg_control	 ; Combine with processed attributes
-	sta.w $1a3e,x   ; Store final attribute result
+	sta.w !sprite_final_attrs,x   ; Store final attribute result
 	inx ; Increment attribute index
 	inx ; Continue increment for double-byte data
 	iny ; Increment component index
@@ -9534,7 +9534,7 @@ Advanced_Graphics_Completion_Alt:
 	lda.b #$40	  ; Set graphics completion mode B
 
 Execute_Graphics_Completion:
-	sta.w $1a2c	 ; Store graphics completion mode
+	sta.w !gfx_completion_mode	 ; Store graphics completion mode
 	lda.w !coord_finalize_data	 ; Load graphics completion reference
 	sta.w !coord_modifier	 ; Store graphics completion context
 	lda.w !layer_flags	 ; Load graphics completion validation
@@ -9565,7 +9565,7 @@ Graphics_Completion_Loop:
 Graphics_Completion_Validation_Loop:
 	jsr.w ExecuteCompletionValidation ; Execute completion validation
 	jsr.w DB_Load_018401 ; Execute completion coordination
-	dec.w $1a2c	 ; Decrement completion counter
+	dec.w !gfx_completion_mode	 ; Decrement completion counter
 	bne Graphics_Completion_Validation_Loop ; Continue completion validation
 	rts ; Return graphics completion processing complete
 

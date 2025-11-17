@@ -273,7 +273,7 @@ process_control_flow:
 
 enhanced_status_monitor:
 	jsl.l CallExternalMonitor ;028096|22A6D200|00D2A6; Call external monitor
-	lda.w $1020	 ;02809A|AD2010  |021020; Read status register
+	lda.w !sys_status_register	 ;02809A|AD2010  |021020; Read status register
 	and.b #$40	  ;02809D|2940    |      ; Mask specific bits
 	beq standard_flow_path ;02809F|F009    |0280AA; Branch if clear
 	jsr.w ProcessSpecialStatus ;0280A1|201982  |028219; Process special status
@@ -3194,7 +3194,7 @@ Controller_ButtonCheck:
 	and.b $c4	   ;02A2F3|25C4    |0004C4; Check simultaneous press
 	and.w #$0010	;02A2F5|291000  |      ; Verify action button
 	beq Controller_CheckPrecedence ; Branch if not simultaneous
-	lda.w $10a5	 ;02A2FA|ADA510  |0210A5; Check timing parameter
+	lda.w !sys_timing_param	 ;02A2FA|ADA510  |0210A5; Check timing parameter
 	cmp.w #$0032	;02A2FD|C93200  |      ; Compare to threshold
 	bcc Controller_CheckPrecedence ; Branch if below threshold
 	lda.w #$0080	;02A302|A98000  |      ; Set rapid-fire mode
@@ -3264,7 +3264,7 @@ Idle_StateHandler:
 	lda.b #$11                           ;02A352|A911    |
 	sta.w !menu_command_id                          ;02A354|8DD010  |0110D0
 	lda.b #$30                           ;02A357|A930    |
-	tsb.w $1020                          ;02A359|0C2010  |011020
+	tsb.w !sys_status_register                          ;02A359|0C2010  |011020
 	rts ;02A35C|60      |
 +	lda.w !char1_state_flags                          ;02A35D|AD2F10  |01102F
 	and.b #$02                           ;02A360|2902    |
@@ -3896,7 +3896,7 @@ Controller_ProcessActive:
 
 ; Special Parameter Processing
 Controller_ParamSpecial:
-	lda.w $10b0	 ;02A770|ADB010  |0210B0; Read system state
+	lda.w !sys_state_1	 ;02A770|ADB010  |0210B0; Read system state
 	beq Controller_DirectionHandler ;02A773|F015    |02A78A; Branch if zero
 	stz.w !menu_command_id	 ;02A775|9CD010  |0210D0; Clear command
 	lda.b $e0	   ;02A778|A5E0    |0004E0; Read error state
@@ -4849,35 +4849,35 @@ Graphics_DataSetup:
 	db $40,$00,$20,$70,$60,$01,$40,$20,$70                              ;02D2F9|        |
 Graphics_DataSetup.data2:
 	ldx.w $d09e                          ;02D302|AE9ED0  |
-	stx.w $1158                          ;02D305|8E5811  |
+	stx.w !gfx_buffer_1158                          ;02D305|8E5811  |
 	ldx.w $d0a0                          ;02D308|AEA0D0  |
-	stx.w $115a                          ;02D30B|8E5A11  |
+	stx.w !gfx_buffer_115a                          ;02D30B|8E5A11  |
 	ldx.w $d0a2                          ;02D30E|AEA2D0  |
-	stx.w $115c                          ;02D311|8E5C11  |
+	stx.w !gfx_buffer_115c                          ;02D311|8E5C11  |
 	ldx.w $d0aa                          ;02D314|AEAAD0  |
-	stx.w $1144                          ;02D317|8E4411  |
+	stx.w !gfx_buffer_1144                          ;02D317|8E4411  |
 	ldx.w $d0ac                          ;02D31A|AEACD0  |
-	stx.w $1146                          ;02D31D|8E4611  |
+	stx.w !gfx_buffer_1146                          ;02D31D|8E4611  |
 	ldx.w $d0ae                          ;02D320|AEAED0  |
-	stx.w $1148                          ;02D323|8E4811  |
+	stx.w !gfx_buffer_1148                          ;02D323|8E4811  |
 	ldx.w $d0b0                          ;02D326|AEB0D0  |
-	stx.w $114a                          ;02D329|8E4A11  |
+	stx.w !gfx_buffer_114a                          ;02D329|8E4A11  |
 	rts ;02D32C|60      |
 Graphics_DataSetup.data3:
 	ldx.w $d0a4                          ;02D32D|AEA4D0  |
-	stx.w $1158                          ;02D330|8E5811  |
+	stx.w !gfx_buffer_1158                          ;02D330|8E5811  |
 	ldx.w $d0a6                          ;02D333|AEA6D0  |
-	stx.w $115a                          ;02D336|8E5A11  |
+	stx.w !gfx_buffer_115a                          ;02D336|8E5A11  |
 	ldx.w $d0a8                          ;02D339|AEA8D0  |
-	stx.w $115c                          ;02D33C|8E5C11  |
+	stx.w !gfx_buffer_115c                          ;02D33C|8E5C11  |
 	ldx.w $d0b2                          ;02D33F|AEB2D0  |
-	stx.w $1144                          ;02D342|8E4411  |
+	stx.w !gfx_buffer_1144                          ;02D342|8E4411  |
 	ldx.w $d0b4                          ;02D345|AEB4D0  |
-	stx.w $1146                          ;02D348|8E4611  |
+	stx.w !gfx_buffer_1146                          ;02D348|8E4611  |
 	ldx.w $d0b6                          ;02D34B|AEB6D0  |
-	stx.w $1148                          ;02D34E|8E4811  |
+	stx.w !gfx_buffer_1148                          ;02D34E|8E4811  |
 	ldx.w $d0b8                          ;02D351|AEB8D0  |
-	stx.w $114a                          ;02D354|8E4A11  |
+	stx.w !gfx_buffer_114a                          ;02D354|8E4A11  |
 	rts ;02D357|60      |
 
 ; Memory Initialization Engine

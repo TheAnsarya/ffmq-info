@@ -321,12 +321,12 @@ DB_Label_079030:
 	php ;079031|08      |      ;
 	sep #$20		;079032|E220    |      ;
 	rep #$10		;079034|C210    |      ;
-	lda.w $19ab	 ;079036|ADAB19  |0119AB;
+	lda.w !bg_variable_19ab	 ;079036|ADAB19  |0119AB;
 	cmp.b #$ff	  ;079039|C9FF    |      ;
 	beq DB_Label_079050 ;07903B|F013    |079050;
-	pea.w $1953	 ;07903D|F45319  |011953;
+	pea.w !bg_data_1953	 ;07903D|F45319  |011953;
 	pld ;079040|2B      |      ;
-	ldx.w $19d8	 ;079041|AED819  |0119D8;
+	ldx.w !bg_variable_19d8	 ;079041|AED819  |0119D8;
 	lda.l UNREACH_0CD500,x ;079044|BF00D50C|0CD500;
 	inx ;079048|E8      |      ;
 	inx ;079049|E8      |      ;
