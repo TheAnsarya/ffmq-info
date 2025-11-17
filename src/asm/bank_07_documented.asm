@@ -1745,101 +1745,101 @@ DB_Graphics_AnimationTable:
 DB_Graphics_EffectTable:
 	db $00		 ;07D7F4|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7f5:
+DB_Graphics_ConfigByte1:
 	db $00		 ;07D7F5|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7f6:
+DB_Graphics_ConfigByte2:
 	db $ff		 ;07D7F6|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7f7:
+DB_Graphics_ConfigByte3:
 	db $7f		 ;07D7F7|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7f8:
+DB_Graphics_ConfigByte4:
 	db $08		 ;07D7F8|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7f9:
+DB_Graphics_ConfigByte5:
 	db $65		 ;07D7F9|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7fa:
+DB_Graphics_ConfigByte6:
 	db $6b		 ;07D7FA|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7fb:
+DB_Graphics_ConfigByte7:
 	db $69		 ;07D7FB|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7fc:
+DB_Graphics_ConfigByte8:
 	db $73		 ;07D7FC|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7fd:
+DB_Graphics_ConfigByte9:
 	db $66		 ;07D7FD|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7fe:
+DB_Graphics_ConfigByte10:
 	db $92		 ;07D7FE|        |      ;
 ;      |        |      ;
-DB_DATA8_07d7ff:
+DB_Graphics_ConfigByte11:
 	db $00		 ;07D7FF|        |      ;
 ;      |        |      ;
-DB_DATA8_07d800:
+DB_Graphics_ConfigByte12:
 	db $3d		 ;07D800|        |      ;
 ;      |        |      ;
-DB_DATA8_07d801:
+DB_Graphics_ConfigByte13:
 	db $02		 ;07D801|        |      ;
 ;      |        |      ;
-DB_DATA8_07d802:
+DB_Graphics_ConfigByte14:
 	db $fd		 ;07D802|        |      ;
 ;      |        |      ;
-DB_DATA8_07d803:
+DB_Graphics_ColorPalette1:
 	db $02,$00,$00,$ff,$7f,$0b,$28,$73,$4e,$b2,$01,$e7,$1c,$ce,$39,$58 ;07D803|        |      ;
 	db $02		 ;07D813|        |      ;
 ;      |        |      ;
-DB_DATA8_07d814:
+DB_Graphics_ConfigByte15:
 	db $00		 ;07D814|        |      ;
 ;      |        |      ;
-DB_DATA8_07d815:
+DB_Graphics_ConfigByte16:
 	db $00		 ;07D815|        |      ;
 ;      |        |      ;
-DB_DATA8_07d816:
+DB_Graphics_ConfigByte17:
 	db $a5		 ;07D816|        |      ;
 ;      |        |      ;
-DB_DATA8_07d817:
+DB_Graphics_ConfigByte18:
 	db $14		 ;07D817|        |      ;
 ;      |        |      ;
-DB_DATA8_07d818:
+DB_Graphics_ConfigByte19:
 	db $bd		 ;07D818|        |      ;
 ;      |        |      ;
-DB_DATA8_07d819:
+DB_Graphics_ConfigByte20:
 	db $73		 ;07D819|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81a:
+DB_Graphics_ConfigByte21:
 	db $b5		 ;07D81A|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81b:
+DB_Graphics_ConfigByte22:
 	db $56		 ;07D81B|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81c:
+DB_Graphics_ConfigByte23:
 	db $8c		 ;07D81C|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81d:
+DB_Graphics_ConfigByte24:
 	db $31		 ;07D81D|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81e:
+DB_Graphics_ConfigByte25:
 	db $bc		 ;07D81E|        |      ;
 ;      |        |      ;
-DB_DATA8_07d81f:
+DB_Graphics_ConfigByte26:
 	db $01		 ;07D81F|        |      ;
 ;      |        |      ;
-DB_DATA8_07d820:
+DB_Graphics_ConfigByte27:
 	db $db		 ;07D820|        |      ;
 ;      |        |      ;
-DB_DATA8_07d821:
+DB_Graphics_ConfigByte28:
 	db $02		 ;07D821|        |      ;
 ;      |        |      ;
-DB_DATA8_07d822:
+DB_Graphics_ConfigByte29:
 	db $00		 ;07D822|        |      ;
 ;      |        |      ;
-DB_DATA8_07d823:
+DB_Graphics_ConfigByte30:
 	db $00		 ;07D823|        |      ;
 ;      |        |      ;
-DB_DATA8_07d824:
+DB_Graphics_ColorPalette2:
 	db $00,$00,$c5,$20,$5d,$22,$96,$01,$0e,$01,$38,$7f,$b5,$7e,$ae,$51 ;07D824|        |      ;
 	db $00,$00,$a5,$14,$17,$5b,$1d,$03,$52,$42,$ad,$31,$b6,$01,$5c,$01 ;07D834|        |      ;
 	db $00,$00,$84,$10,$5d,$22,$5f,$03,$37,$01,$f7,$5e,$0e,$6e,$bd,$7b ;07D844|        |      ;
@@ -1853,52 +1853,52 @@ DB_DATA8_07d824:
 	db $00,$00,$c6,$18,$5a,$6b,$52,$4a,$ad,$35,$29,$25,$f7,$5e,$00,$00 ;07D8C4|        |      ;
 	db $00,$00,$c5,$20,$ff,$7f,$5a,$6b,$cc,$45,$37,$73,$14,$6b,$4f,$56 ;07D8D4|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e4:
+DB_Graphics_ColorPalette3:
 	db $00		 ;07D8E4|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e5:
+DB_Graphics_ConfigByte31:
 	db $00		 ;07D8E5|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e6:
+DB_Graphics_ConfigByte32:
 	db $d6		 ;07D8E6|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e7:
+DB_Graphics_ConfigByte33:
 	db $5a		 ;07D8E7|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e8:
+DB_Graphics_ConfigByte34:
 	db $fb		 ;07D8E8|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8e9:
+DB_Graphics_ConfigByte35:
 	db $02		 ;07D8E9|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8ea:
+DB_Graphics_ConfigByte36:
 	db $ce		 ;07D8EA|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8eb:
+DB_Graphics_ConfigByte37:
 	db $39		 ;07D8EB|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8ec:
+DB_Graphics_ConfigByte38:
 	db $4a		 ;07D8EC|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8ed:
+DB_Graphics_ConfigByte39:
 	db $29		 ;07D8ED|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8ee:
+DB_Graphics_ConfigByte40:
 	db $f8		 ;07D8EE|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8ef:
+DB_Graphics_ConfigByte41:
 	db $01		 ;07D8EF|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8f0:
+DB_Graphics_ConfigByte42:
 	db $69		 ;07D8F0|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8f1:
+DB_Graphics_ConfigByte43:
 	db $32		 ;07D8F1|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8f2:
+DB_Graphics_ConfigByte44:
 	db $d1		 ;07D8F2|        |      ;
 ;      |        |      ;
-DB_DATA8_07d8f3:
+DB_Graphics_ConfigByte45:
 	db $7e,$00,$00,$4e,$37,$d3,$01,$db,$02,$39,$77,$70,$7e,$76,$14,$6b ;07D8F3|        |      ;
 	db $2d,$00,$00,$ba,$02,$93,$01,$17,$02,$18,$63,$52,$42,$10,$3e,$6b ;07D903|        |      ;
 	db $2d,$00,$00,$7b,$6b,$f7,$76,$ac,$45,$73,$4e,$37,$00,$fd,$01,$3d ;07D913|        |      ;
@@ -1935,7 +1935,7 @@ DB_DATA8_07d8f3:
 	db $00,$00,$32,$3d,$ae,$2c,$4a,$29,$4b,$55,$09,$4d,$54,$26,$00,$00 ;07DAF4|        |      ;
 	db $00,$00,$dd,$7f,$74,$73,$11,$67,$4f,$46,$6d,$25,$ea,$49,$00,$00 ;07DB04|        |      ;
 ;      |        |      ;
-DB_DATA8_07db14:
+DB_Graphics_EffectData1:
 	db $00,$00,$a0,$02,$20,$02,$a0,$01,$e0,$00,$6d,$25,$84,$10,$00,$00 ;07DB14|        |      ;
 	db $00,$00,$33,$6f,$af,$62,$2b,$4e,$a7,$3d,$04,$29,$fd,$7f,$d8,$77 ;07DB24|        |      ;
 	db $00,$00,$9c,$73,$94,$52,$10,$42,$8c,$31,$08,$21,$00,$00,$79,$51 ;07DB34|        |      ;
@@ -2196,19 +2196,19 @@ DB_DATA8_07db14:
 	db $8c,$88,$89,$8b,$8b,$5f,$37,$01,$fb,$4e,$fb,$ae,$fb,$6e,$7b,$2e ;07EB24|        |      ;
 	db $7f,$2e,$56,$04,$6c,$00,$80,$00,$31,$11,$91,$d1,$d1,$fa,$ec,$80 ;07EB34|        |      ;
 ;      |        |      ;
-DB_DATA8_07eb44:
+DB_Graphics_ConfigByte46:
 	db $07		 ;07EB44|        |      ;
 ;      |        |      ;
-DB_DATA8_07eb45:
+DB_Graphics_ConfigByte47:
 	db $0f		 ;07EB45|        |      ;
 ;      |        |      ;
-DB_DATA8_07eb46:
+DB_Graphics_ConfigByte48:
 	db $36		 ;07EB46|        |      ;
 ;      |        |      ;
-DB_DATA8_07eb47:
+DB_Graphics_ConfigByte49:
 	db $2c		 ;07EB47|        |      ;
 ;      |        |      ;
-DB_DATA8_07eb48:
+DB_Graphics_ConfigByte50:
 	db $21,$08,$0f,$36,$2e,$21,$07,$10,$36,$2c,$61,$08,$10,$36,$2e,$61 ;07EB48|        |      ;
 	db $0e,$0f,$37,$2c,$21,$0e,$10,$37,$2c,$61,$23,$2c,$7b,$cc,$21,$24 ;07EB58|        |      ;
 	db $2c,$7b,$ce,$21,$23,$2d,$7b,$cc,$61,$24,$2d,$7b,$e0,$21,$26,$28 ;07EB68|        |      ;
@@ -2307,19 +2307,19 @@ DB_DATA8_07eb48:
 	db $78,$6f,$60,$2b,$78,$77,$60,$2b,$78,$87,$64,$2b,$88,$87,$62,$2b ;07EE65|        |      ;
 	db $98,$87,$62,$2b,$a8,$87,$62,$2b,$b8,$87,$66,$2b,$b8,$97,$60 ;07EE75|        |      ;
 ;      |        |      ;
-DB_DATA8_07ee84:
+DB_Graphics_ConfigByte51:
 	db $2b		 ;07EE84|        |      ;
 ;      |        |      ;
-DB_DATA8_07ee85:
+DB_Graphics_ConfigByte52:
 	db $b8		 ;07EE85|        |      ;
 ;      |        |      ;
-DB_DATA8_07ee86:
+DB_Graphics_ConfigByte53:
 	db $a7		 ;07EE86|        |      ;
 ;      |        |      ;
-DB_DATA8_07ee87:
+DB_Graphics_ConfigByte54:
 	db $60		 ;07EE87|        |      ;
 ;      |        |      ;
-DB_DATA8_07ee88:
+DB_Graphics_ConfigByte55:
 	db $2b,$81,$1e,$00,$1e,$00,$82,$00,$6e,$00,$00,$83,$00,$1f,$00,$1f ;07EE88|        |      ;
 	db $84,$23,$00,$23,$00,$85,$00,$70,$00,$70,$86,$00,$70,$00,$70,$87 ;07EE98|        |      ;
 	db $4d,$00,$00,$4d,$88,$00,$e0,$00,$00,$89,$73,$00,$73,$00,$8a,$00 ;07EEA8|        |      ;
@@ -2340,7 +2340,7 @@ DB_DATA8_07ee88:
 	db $00,$00,$00,$01,$00,$00,$57,$00,$20,$00,$00,$00,$00,$23,$00,$00 ;07EF8A|        |      ;
 	db $57,$00,$23,$57,$00,$00,$00 ;07EF9A|        |000000;
 ;      |        |      ;
-DB_DATA8_07efa1:
+DB_Graphics_EffectData2:
 	db $12,$80,$3d,$40,$32,$00,$21,$80,$64,$00,$3e,$40,$21,$80,$c8,$00 ;07EFA1|        |      ;
 	db $b4,$80,$14,$40,$f8,$80,$2c,$01,$0a,$40,$10,$81,$90,$01,$1c,$40 ;07EFB1|        |      ;
 	db $90,$81,$64,$81 ;07EFC1|        |      ;
@@ -2352,7 +2352,7 @@ DB_DATA8_07efa1:
 	db $1b,$01,$1c,$01,$1d,$01,$1e,$01,$1f,$01,$20,$01,$3e,$01,$21,$01 ;07EFFB|        |      ;
 	db $23,$01,$24,$01,$24,$01 ;07F00B|        |000001;
 ;      |        |      ;
-DB_DATA8_07f011:
+DB_Graphics_EffectData3:
 	db $81,$f0,$87,$f0,$8e,$f0,$9a,$f0,$a9,$f0,$b3,$f0,$be,$f0,$c5,$f0 ;07F011|        |      ;
 	db $cc,$f0,$d2,$f0,$d8,$f0,$df,$f0,$e8,$f0,$ee,$f0,$f6,$f0,$ff,$f0 ;07F021|        |      ;
 	db $05,$f1,$0c,$f1 ;07F031|        |      ;

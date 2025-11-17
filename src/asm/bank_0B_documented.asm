@@ -624,7 +624,7 @@ BattleInit_CopyEnemyStats:	; Copy enemy data loop (7 bytes)
 	ldy.w #$0000	; Y = destination index
 
 BattleInit_CopyEnemyExtendedData:	; Copy extended enemy data (10 bytes)
-	lda.l DB_DATA8_0b8cd9,x ; Load data from Bank $0b table
+	lda.l DB_Battle_ConfigTable7,x ; Load data from Bank $0b table
 	sta.w !tileset_copy_buffer,y   ; Store to battle RAM at $1918+Y
 	inx ; Increment source
 	iny ; Increment destination
@@ -640,7 +640,7 @@ BattleInit_CopyEnemyExtendedData:	; Copy extended enemy data (10 bytes)
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 2 (word table)
 	tax ; Transfer to X for lookup
-	lda.l DB_DATA8_0b8892,x ; Load graphics pointer from table
+	lda.l DB_Battle_ConfigTable5,x ; Load graphics pointer from table
 	tax ; Transfer to X (pointer value)
 	sep #$20		; Set A to 8-bit mode
 
@@ -800,7 +800,7 @@ DB_Battle_ScrollTable2:
 ; - Bank $01: Sprite rendering (CallAnimationLoader), OAM tables (DATA8_01A63A)
 ; - Bank $07: Enemy data (DATA8_07AF3B, DATA8_07B013, UNREACH_07F7C3)
 ; - Bank $0a: Graphics tile data (referenced by pointers at !audio_coord_register-!audio_effect_control)
-; - Bank $0b: Enemy graphics pointers (DB_DATA8_0b8892), layer config (multiple tables)
+; - Bank $0b: Enemy graphics pointers (DB_Battle_ConfigTable5), layer config (multiple tables)
 ;
 ; Hardware Registers Used:
 ; - $211b/$211c: Hardware multiply (SNES PPU math unit)
@@ -1253,7 +1253,7 @@ DB_Battle_ConfigByte12:
 ;   1. Extract bits 4-7 from $1918 (enemy graphics mode)
 ;   2. Lookup tile stride from Battle_TileStride table
 ;   3. Calculate tile data pointer from enemy ID ($1910 bits 0-5)
-;   4. Multiply by 3, lookup in DB_DATA8_0b8735 table
+;   4. Multiply by 3, lookup in DB_Battle_ConfigTable3 table
 ;   5. Setup DMA parameters for graphics transfer
 
 BattleEnemy_SetupTileData:
@@ -1281,10 +1281,10 @@ BattleEnemy_SetupTileData:
 
 	ldx.w !RDMPYL	 ; Load multiply result (enemy_type × 3)
 	rep #$20		; Set A to 16-bit
-	lda.l DB_DATA8_0b8735,x ; Load source address from table
+	lda.l DB_Battle_ConfigTable3,x ; Load source address from table
 	sta.w !tilemap_wram_source_start_2	 ; Store to DMA source pointer
 	sep #$20		; Set A to 8-bit
-	lda.l DB_DATA8_0b8737,x ; Load source bank from table
+	lda.l DB_Battle_ConfigByte14,x ; Load source bank from table
 	sta.w $0902	 ; Store to DMA source bank
 
 	jsl.l BattleGfx_DecompressLoad ; Call graphics loading routine
@@ -1309,7 +1309,7 @@ Battle_TileStride:
 ; -----------------------------------------------------------------------------
 ; Purpose: Jump table for different background layer rendering modes
 ; Input: $1a4c = Layer type index (0-7)
-; Method: Indirect jsr through table DB_DATA8_0b856c
+; Method: Indirect jsr through table DB_Battle_BgLayerHandlers
 
 BattleLayer_TypeDispatcher:
 	lda.b #$00	  ; Clear A high byte
@@ -1317,11 +1317,11 @@ BattleLayer_TypeDispatcher:
 	lda.w !gfx_mode_control	 ; Load layer type
 	asl a; Multiply by 2 (word table)
 	tax ; Transfer to X
-	jsr.w (DB_DATA8_0b856c,x) ; Indirect jump to handler
+	jsr.w (DB_Battle_BgLayerHandlers,x) ; Indirect jump to handler
 	rtl ; Return after handler completes
 
 ; Background layer handler jump table (8 entries)
-DB_DATA8_0b856c:
+DB_Battle_BgLayerHandlers:
 	dw $8633	   ; Type 0 handler
 	dw $857a	   ; Type 1 handler
 	dw $85bf	   ; Type 2 handler
@@ -1408,7 +1408,7 @@ BattleLayer_TypeHandlerReturn:
 ; - DB_Battle_ConfigByte8: Layer scroll/animation (18 configs × 4 bytes)
 ; - DB_Battle_ConfigByte9-E2: Layer blending/priority configs
 ; - Battle_TileStride: Tile stride lookup (16 modes × 2 bytes)
-; - DB_DATA8_0b856c: Background handler jump table (8 entries)
+; - DB_Battle_BgLayerHandlers: Background handler jump table (8 entries)
 ;
 ; Hardware Registers Used:
 ; - $4202/$4203/$4216: Hardware multiply/divide unit
@@ -1439,10 +1439,10 @@ BattleLayer_TypeHandlerReturn:
 ; =============================================================================
 
 ; Background layer scroll data (continuation from Cycle 2)
-DB_DATA8_0b8659:
+DB_Battle_ConfigTable2:
 	db $00,$00	 ; Scroll offset 0
 
-DB_DATA8_0b865b:
+DB_Battle_ConfigByte13:
 	db $01,$00,$ff,$ff,$00,$00,$00,$00,$ff,$ff,$01,$00,$00,$00
 ; Layer scrolling animation table (14 bytes)
 ; Format: [x_offset] [y_offset] pairs for animated backgrounds
@@ -1662,10 +1662,10 @@ BattleGfx_WRAMContinue:
 ; Format: 3 bytes per entry [addr_low] [addr_high] [bank]
 ; Indexed by (enemy_type × 3)
 
-DB_DATA8_0b8735:
+DB_Battle_ConfigTable3:
 	db $00,$80	 ; Entry 0: Address $8000
 
-DB_DATA8_0b8737:
+DB_Battle_ConfigByte14:
 	db $08		 ; Entry 0: Bank $08
 	db $9a,$85,$08 ; Entry 1: Bank$08:$859a
 	db $40,$8b,$08 ; Entry 2: Bank$08:$8b40
@@ -1757,10 +1757,10 @@ BattleOAM_ClearBuffers:
 ; -----------------------------------------------------------------------------
 ; Used during battle setup to configure sprite attributes and behaviors
 
-DB_DATA8_0b87e4:
+DB_Battle_ConfigTable4:
 	db $80		 ; Default sprite attribute flags
 
-DB_DATA8_0b87e5:
+DB_Battle_ConfigByte15:
 	db $00,$40,$00,$00,$00 ; Sprite position/flags table
 	db $81,$00	 ; Attribute flags
 	db $41,$00,$01,$00 ; Position offsets
@@ -1789,14 +1789,14 @@ DB_DATA8_0b87e5:
 ; Attributes encode: palette (bits 1-3), priority (bits 4-5), flip (bits 6-7)
 
 ; -----------------------------------------------------------------------------
-; DB_DATA8_0b8892: Enemy Graphics Pointer Table
+; DB_Battle_ConfigTable5: Enemy Graphics Pointer Table
 ; -----------------------------------------------------------------------------
 ; Purpose: Map enemy IDs to graphics data offsets within sprite sheets
 ; Format: 2 bytes per enemy (16-bit offset)
 ; Indexed by enemy ID
 ; Points to sprite tile patterns within decompressed graphics buffers
 
-DB_DATA8_0b8892:
+DB_Battle_ConfigTable5:
 	db $00,$00	 ; Enemy 0: Offset $0000 (no graphics)
 	db $0d,$00	 ; Enemy 1: Offset $000d
 	db $1d,$00	 ; Enemy 2: Offset $001d
@@ -1855,7 +1855,7 @@ DB_DATA8_0b8892:
 ; Graphics data is sprite tile indices + attributes
 
 ; -----------------------------------------------------------------------------
-; DB_DATA8_0b88fc: Enemy Battle Configuration Data
+; DB_Battle_ConfigTable6: Enemy Battle Configuration Data
 ; -----------------------------------------------------------------------------
 ; Purpose: Comprehensive enemy battle parameters and behaviors
 ; Format: Variable-length entries, $ff byte marks end of each entry
@@ -1870,7 +1870,7 @@ DB_DATA8_0b8892:
 ;
 ; Total Entries: 53 (matching enemy count in graphics table)
 
-DB_DATA8_0b88fc:
+DB_Battle_ConfigTable6:
 ; Enemy 0 configuration
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	db $ff		 ; End marker
@@ -2039,7 +2039,7 @@ DB_DATA8_0b88fc:
 ; Each enemy has unique AI, element resistances, attack patterns
 
 ; -----------------------------------------------------------------------------
-; DB_DATA8_0b8cd9: Enemy Extended Attributes Table
+; DB_Battle_ConfigTable7: Enemy Extended Attributes Table
 ; -----------------------------------------------------------------------------
 ; Purpose: Additional enemy parameters (HP multipliers, defenses, etc.)
 ; Format: 10 bytes per enemy
@@ -2048,7 +2048,7 @@ DB_DATA8_0b88fc:
 ;   Bytes 2-7: Elemental defense values (6 elements)
 ;   Bytes 8-9: Special flags ($ff = unused)
 
-DB_DATA8_0b8cd9:
+DB_Battle_ConfigTable7:
 ; Enemy extended stats (10 bytes each)
 	db $b0,$16,$1e,$1f,$20,$21,$ff,$ff,$ff,$ff
 	db $b0,$17,$1e,$1f,$20,$21,$ff,$ff,$ff,$ff
@@ -2158,12 +2158,12 @@ BattleAnim_SkipTransfer:
 ; 4. CodeBattleAnimationStateHandler: Battle animation state handler (V-blank updates)
 ;
 ; Major Data Tables:
-; 1. DB_DATA8_0b8735/37: Enemy graphics sources (44 entries, Banks $07/$08)
-; 2. DB_DATA8_0b8892: Enemy graphics pointers (53 enemies, tile offsets)
-; 3. DB_DATA8_0b88fc: Battle configurations (~700 bytes, AI/stats/abilities)
-; 4. DB_DATA8_0b8cd9: Extended attributes (43 × 10 bytes, HP/defense)
-; 5. DB_DATA8_0b87e4/E5: Sprite tile/attribute mappings (~140 bytes)
-; 6. DB_DATA8_0b865b: Background scroll animation (14 bytes)
+; 1. DB_Battle_ConfigTable3/37: Enemy graphics sources (44 entries, Banks $07/$08)
+; 2. DB_Battle_ConfigTable5: Enemy graphics pointers (53 enemies, tile offsets)
+; 3. DB_Battle_ConfigTable6: Battle configurations (~700 bytes, AI/stats/abilities)
+; 4. DB_Battle_ConfigTable7: Extended attributes (43 × 10 bytes, HP/defense)
+; 5. DB_Battle_ConfigTable4/E5: Sprite tile/attribute mappings (~140 bytes)
+; 6. DB_Battle_ConfigByte13: Background scroll animation (14 bytes)
 ;
 ; Technical Discoveries:
 ; - Custom RLE compression: Control byte [HHHHLLLL] format
@@ -2218,12 +2218,12 @@ BattleAnim_CompareAndUpdate:	; Animation comparison/update path
 
 ; Animation frame changed - trigger update
 	sta.b $f4	   ; Store new cached frame value
-	pea.w DB_DATA8_0b8f15 ; Push animation table pointer (changed state)
+	pea.w DB_Battle_AnimChangedState ; Push animation table pointer (changed state)
 	jsl.l CallSpriteInitializer ; Call animation dispatcher (Bank $00)
 	bra BattleAnim_UpdateSecondary ; Jump to next section
 
 BattleAnim_FrameUnchanged:	; Animation frame unchanged path
-	pea.w DB_DATA8_0b8f03 ; Push animation table pointer (same state)
+	pea.w DB_Battle_AnimSameState ; Push animation table pointer (same state)
 	jsl.l CallSpriteInitializer ; Call animation dispatcher
 ; Fall through to BattleAnim_UpdateSecondary
 
@@ -2240,12 +2240,12 @@ BattleAnim_UpdateSecondary:	; Secondary animation counter update
 
 ; Secondary animation changed
 	sta.b $f5	   ; Store new cached value
-	pea.w DB_DATA8_0b8f15 ; Push changed-state table
+	pea.w DB_Battle_AnimChangedState ; Push changed-state table
 	jsl.l CallSpriteInitializer ; Call dispatcher
 	bra BattleAnim_Disabled ; Exit
 
 BattleAnim_SecondaryUnchanged:	; Secondary animation unchanged
-	pea.w DB_DATA8_0b8f03 ; Push same-state table
+	pea.w DB_Battle_AnimSameState ; Push same-state table
 	jsl.l CallSpriteInitializer ; Call dispatcher
 ; Fall through to exit
 
@@ -2256,10 +2256,10 @@ BattleAnim_Disabled:
 ; -----------------------------------------------------------------------------
 ; Animation State Jump Tables
 ; -----------------------------------------------------------------------------
-; Two tables: One for unchanged frames (DB_DATA8_0b8f03), one for changed (DB_DATA8_0b8f15)
+; Two tables: One for unchanged frames (DB_Battle_AnimSameState), one for changed (DB_Battle_AnimChangedState)
 ; Format: 16-bit pointers to animation handler routines
 
-DB_DATA8_0b8f03:	; Same-state animation handlers
+DB_Battle_AnimSameState:	; Same-state animation handlers
 	db $4a,$8f	 ; Handler 0: $0b8f4a
 	db $9c,$8f	 ; Handler 1: $0b8f9c
 	db $14,$90	 ; Handler 2: $0b9014
@@ -2270,7 +2270,7 @@ DB_DATA8_0b8f03:	; Same-state animation handlers
 	db $b0,$92	 ; Handler 7: $0b92b0 (continues beyond this section)
 	db $d5,$92	 ; Handler 8: $0b92d5
 
-DB_DATA8_0b8f15:	; Changed-state animation handlers
+DB_Battle_AnimChangedState:	; Changed-state animation handlers
 	db $33,$8f	 ; Handler 0: $0b8f33
 	db $4b,$8f	 ; Handler 1: $0b8f4b
 	db $fa,$8f	 ; Handler 2: $0b8ffa
@@ -2503,11 +2503,11 @@ BattleAnim_SpinningUpdate:
 	lsr a
 	lsr a
 	and.b #$03	  ; Mask to 0-3 (4 frames)
-	pea.w DB_DATA8_0b905f ; Push animation table pointer
+	pea.w DB_Battle_RotationFrames ; Push animation table pointer
 	jsl.l CallSpriteInitializer ; Call dispatcher
 	rts ; Return
 
-DB_DATA8_0b905f:	; Rotation frame handlers
+DB_Battle_RotationFrames:	; Rotation frame handlers
 	db $67,$90	 ; Frame 0 handler: $0b9067
 	db $72,$90	 ; Frame 1 handler: $0b9072
 	db $7d,$90	 ; Frame 2 handler: $0b907d
@@ -2623,11 +2623,11 @@ BattleAnim_4FrameTileCycle:
 	lsr a
 	lsr a
 	and.b #$03	  ; Mask to 0-3 (4 frames)
-	pea.w DB_DATA8_0b9113 ; Push tile pattern table
+	pea.w DB_Battle_TilePattern4Frame ; Push tile pattern table
 	jsl.l CallSpriteInitializer ; Call dispatcher
 
 
-DB_DATA8_0b9113:	; 4-frame tile pattern handlers
+DB_Battle_TilePattern4Frame:	; 4-frame tile pattern handlers
 	db $1b,$91	 ; Frame 0: $0b911b
 	db $29,$91	 ; Frame 1: $0b9129
 	db $3e,$91	 ; Frame 2: $0b913e
@@ -2749,11 +2749,11 @@ TAY_Label:
 	lsr a
 	lsr a
 	and.b #$03	  ; Mask to 4 frames
-	pea.w DB_DATA8_0b91d0 ; Push motion table
+	pea.w DB_Battle_AttackMotionFrames ; Push motion table
 	jsl.l CallSpriteInitializer ; Dispatch
 
 
-DB_DATA8_0b91d0:	; Attack motion frames
+DB_Battle_AttackMotionFrames:	; Attack motion frames
 	db $d8,$91	 ; Frame 0: Neutral
 	db $e1,$91	 ; Frame 1: Forward
 	db $ec,$91	 ; Frame 2: Max forward
@@ -3650,9 +3650,9 @@ Battlefield_GfxPointers:
 ; These tables define enemy sprite tile layouts, animation frame sequences,
 ; palette configurations, and battle background selection data.
 
-DB_DATA8_0bf08f:
+DB_Battle_ConfigByte16:
 	db $f3,$f3	 ; Configuration header
-DB_DATA8_0bf091:
+DB_Battle_ConfigByte17:
 	db $00,$00,$f6,$f3,$0b,$00,$05,$f4,$0b,$00,$14,$f4,$0b,$00,$23,$f4 ;
 	db $0b,$00,$32,$f4,$0b,$00,$41,$f4,$0b,$00,$50,$f4,$00,$00,$56,$f4 ;
 	db $00,$00,$5c,$f4,$00,$00,$62,$f4,$00,$00,$69,$f4,$0e,$00,$76,$f4 ;

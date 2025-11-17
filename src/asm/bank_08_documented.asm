@@ -33,7 +33,7 @@
 ; Pointers reference text strings later in bank
 ; ------------------------------------------------------------------------------
 
-DB_DATA8_088000:
+DB_Text_DialogPointers:
 ; Dialog pointer 0
 	dw $032d	   ; Pointer to string (lo/hi)
 	db $f1		 ; Flags: end marker?
@@ -66,7 +66,7 @@ DB_DATA8_088000:
 ; Decoded: "Hello, traveler..."
 ; ($00=H, $26=e, $07=l, ... using simple.tbl mapping)
 
-DB_DATA8_088330:
+DB_Text_StringData:
 ; NPC greeting text
 	db $00,$26,$07,$07,$07 ; "Hello"
 	db $00,$06,$11 ; ", "
