@@ -5300,9 +5300,9 @@ Got_Layer_Offset:
 	lda.b $db	   ; Get calculated value 1
 	sta.w !audio_data_buffer_8,x   ; Store to buffer
 	lda.b $dc	   ; Get calculated value 2
-	sta.w $3671,x   ; Store to buffer
+	sta.w !delta_buffer_base,x   ; Store to buffer
 	lda.b $e5	   ; Get calculated value 3
-	sta.w $3672,x   ; Store to buffer
+	sta.w !delta_buffer_base+1,x   ; Store to buffer
 	lda.b $e6	   ; Get calculated value 4
 	adc.w !audio_data_buffer_2,x   ; Add to existing value
 	sta.w !audio_data_buffer_2,x   ; Store accumulated value
@@ -5514,10 +5514,10 @@ Setup_Done:
 ; ===========================================================================
 
 Stat_CalcOR:
-	lda.w $3679,x   ; A = delta buffer 1 value
-	ora.w $3689,x   ; OR with delta buffer 2
-	ora.w $3699,x   ; OR with delta buffer 3
-	ora.w $36a9,x   ; OR with delta buffer 4
+	lda.w !delta_buffer_1,x   ; A = delta buffer 1 value
+	ora.w !delta_buffer_2,x   ; OR with delta buffer 2
+	ora.w !delta_buffer_3,x   ; OR with delta buffer 3
+	ora.w !delta_buffer_4,x   ; OR with delta buffer 4
 	inx ; Increment offset to next stat
 	rts ; Return with result in A
 
@@ -5536,10 +5536,10 @@ Stat_CalcOR:
 
 Stat_CalcSum:
 	lda.w !audio_data_buffer_1,x   ; A = base buffer value
-	adc.w $3679,x   ; Add delta buffer 1 (with carry)
-	adc.w $3689,x   ; Add delta buffer 2
-	adc.w $3699,x   ; Add delta buffer 3
-	adc.w $36a9,x   ; Add delta buffer 4
+	adc.w !delta_buffer_1,x   ; Add delta buffer 1 (with carry)
+	adc.w !delta_buffer_2,x   ; Add delta buffer 2
+	adc.w !delta_buffer_3,x   ; Add delta buffer 3
+	adc.w !delta_buffer_4,x   ; Add delta buffer 4
 	inx ; Increment offset to next stat
 	rts ; Return with result in A
 
@@ -7011,18 +7011,18 @@ Palette_InitColorProcessing:
 
 ; Initialize color values
 	lda.l $000e9c   ; Load base color
-	sta.w $5011	 ; Store at offset $11
-	sta.w $5014	 ; Store at offset $14
-	sta.w $501a	 ; Store at offset $1a
+	sta.w !color_buffer_5011	 ; Store at offset $11
+	sta.w !color_buffer_5014	 ; Store at offset $14
+	sta.w !color_buffer_501a	 ; Store at offset $1a
 	jsr.w Color_AdjustBrightness ; Adjust color brightness
-	sta.w $5017	 ; Store adjusted color
+	sta.w !color_adjusted_5017	 ; Store adjusted color
 
 	lda.l DATA8_07800c ; Load another base color
-	sta.w $501e	 ; Store at offset $1e
-	sta.w $5021	 ; Store at offset $21
-	sta.w $5027	 ; Store at offset $27
+	sta.w !color_buffer_501e	 ; Store at offset $1e
+	sta.w !color_buffer_5021	 ; Store at offset $21
+	sta.w !color_buffer_5027	 ; Store at offset $27
 	jsr.w Color_AdjustBrightness ; Adjust color brightness
-	sta.w $5024	 ; Store adjusted color
+	sta.w !color_adjusted_5024	 ; Store adjusted color
 
 ; Setup DMA channels 3, 6, 7 for palette transfer
 	phk ; Push program bank

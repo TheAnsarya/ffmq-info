@@ -144,9 +144,9 @@ DB_Label_008000:
 ; ===========================================================================
 
 	lda.B #$00              ; A = 0
-	sta.L $7e3667           ; Clear save file state flag 1
+	sta.L !save_file_flag_1           ; Clear save file state flag 1
 	dec a; A = $ff (-1)
-	sta.L $7e3668           ; Set save file state flag 2 to $ff
+	sta.L !save_file_flag_2           ; Set save file state flag 2 to $ff
 	bra DB_Label_008023         ; Skip to main initialization
 
 DB_Label_008016:
@@ -254,7 +254,7 @@ DB_Label_00806E:
 	jsl.L CWaitTimingRoutine       ; Called again (loading screens? fade?)
 
 ; Check save file state
-	lda.L $7e3665           ; Load save state flag
+	lda.L !save_state_flag           ; Load save state flag
 	bne DB_Label_0080A8         ; If not zero, handle differently
 
 ; Check if save data exists in SRAM

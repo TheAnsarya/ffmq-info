@@ -2114,9 +2114,9 @@ BattleAnim_StateHandler:
 
 ; Update animation frame counter
 	ldx.b $de	   ; Load animation index (DP)
-	lda.l $7ec360,x ; Load frame counter from WRAM
+	lda.l !sprite_frame_array,x ; Load frame counter from WRAM
 	inc a; Increment frame
-	sta.l $7ec360,x ; Store updated frame
+	sta.l !sprite_frame_array,x ; Store updated frame
 
 ; Check for special animation mode
 	lda.w !char1_status	 ; Load battle mode flags
@@ -2229,9 +2229,9 @@ BattleAnim_FrameUnchanged:	; Animation frame unchanged path
 
 BattleAnim_UpdateSecondary:	; Secondary animation counter update
 	ldx.w $0adf	 ; Load secondary animation index
-	lda.l $7ec360,x ; Load frame counter from WRAM
+	lda.l !sprite_frame_array,x ; Load frame counter from WRAM
 	inc a; Increment frame
-	sta.l $7ec360,x ; Store updated frame
+	sta.l !sprite_frame_array,x ; Store updated frame
 
 	lda.w !char2_status	 ; Load battle mode flags
 	jsr.w BattleAnim_BitScanRoutine ; Call bit scan routine (find first set bit)
@@ -2315,7 +2315,7 @@ BattleAnim_BitFound:
 
 ; Entry at $0b8f33
 	lda.b #$00	  ; Sprite state = 0 (inactive/default)
-	sta.l $7ec400,x ; Store to WRAM sprite state
+	sta.l !sprite_state_array,x ; Store to WRAM sprite state
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate sprite OAM positions
 	cpx.b #$00	  ; Check if sprite index = 0
 	beq BattleAnim_SetStateFlag ; Skip setup if index 0
@@ -2344,9 +2344,9 @@ BattleAnim_SetStateFlag:
 ; Relocate direct page to !oam_sprite_buffer (OAM buffer area)
 
 	lda.b #$00	  ; Clear A
-	sta.l $7ec360,x ; Reset animation frame counter
+	sta.l !sprite_frame_array,x ; Reset animation frame counter
 	xba ; Clear B
-	lda.l $7ec320,x ; Load sprite base index
+	lda.l !sprite_base_array,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset 9
 	jsl.l DB_Label_0B92D6 ; Call position calculator
@@ -2381,7 +2381,7 @@ BattleAnim_SetStateFlag:
 ; Entry at $0b8f9c
 	db $da,$0b,$f4,$00,$0c,$2b ; Save X, relocate DP to !oam_sprite_buffer
 
-	lda.l $7ec360,x ; Load animation frame counter
+	lda.l !sprite_frame_array,x ; Load animation frame counter
 	clc ; Clear carry
 	adc.b #$04	  ; Add 4 to frame
 	asl a; Multiply by 2
@@ -2391,7 +2391,7 @@ BattleAnim_SetStateFlag:
 	lda.w !oam_sprite0_tile,y   ; Load OAM sprite data byte
 	pha ; Save it
 
-	lda.l $7ec360,x ; Load frame counter again
+	lda.l !sprite_frame_array,x ; Load frame counter again
 	beq BattleAnim_Frame0 ; Branch if frame 0
 	cmp.b #$40	  ; Check if frame = $40
 	beq BattleAnim_Frame40_C0 ; Branch if frame $40
@@ -2439,7 +2439,7 @@ BattleAnim_Frame40_C0:	; Frame $40/$c0: Alternate flip
 
 BattleAnim_VerticalSpriteSetup:
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate OAM positions
-	lda.l $7ec480,x ; Load sprite base tile ID
+	lda.l !sprite_tile_id_array,x ; Load sprite base tile ID
 	sec ; Set carry
 	sbc.b #$0c	  ; Subtract 12 (start 12 tiles back)
 	sta.w !oam_sprite0_tile,y   ; Store to sprite 0 tile
@@ -2462,10 +2462,10 @@ BattleAnim_VerticalSpriteSetup:
 
 BattleAnim_ExpandingSetup:
 	lda.b #$00	  ; Clear animation counter
-	sta.l $7ec360,x ; Store to WRAM
+	sta.l !sprite_frame_array,x ; Store to WRAM
 	lda.b #$0e	  ; A high byte = $0e
 	xba ; Swap to high byte
-	lda.l $7ec320,x ; Load sprite base index
+	lda.l !sprite_base_array,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset 9
 	jsl.l DB_Label_0B92D6 ; Call position calculator
@@ -2492,12 +2492,12 @@ BattleAnim_ExpandingSetup:
 ; Cycles through 4 tile patterns based on frame counter
 
 BattleAnim_SpinningUpdate:
-	lda.l $7ec260,x ; Load sprite slot index
+	lda.l !sprite_slot_array,x ; Load sprite slot index
 	asl a; Multiply by 4
 	asl a
 	tay ; Transfer to Y (OAM offset)
 
-	lda.l $7ec360,x ; Load animation frame counter
+	lda.l !sprite_frame_array,x ; Load animation frame counter
 	lsr a; Shift right 4 times (divide by 16)
 	lsr a
 	lsr a
@@ -2558,7 +2558,7 @@ BattleAnim_MultiSpriteSetup:
 	php ; Save processor status
 	lda.b #$00	  ; Clear A
 	xba ; Clear B
-	lda.l $7ec320,x ; Load sprite base index
+	lda.l !sprite_base_array,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset
 	jsl.l DB_Label_0B92D6 ; Calculate positions
@@ -2611,12 +2611,12 @@ BattleAnim_MultiSpriteSetup:
 ; Purpose: Cycle through 4 tile patterns for multi-sprite effect
 
 BattleAnim_4FrameTileCycle:
-	lda.l $7ec260,x ; Load sprite slot
+	lda.l !sprite_slot_array,x ; Load sprite slot
 	asl a; Multiply by 4
 	asl a
 	tay ; Transfer to Y
 
-	lda.l $7ec360,x ; Load frame counter
+	lda.l !sprite_frame_array,x ; Load frame counter
 	lsr a; Divide by 32 (shift right 5)
 	lsr a
 	lsr a
@@ -2687,20 +2687,20 @@ BattleAnim_AttackSetup:
 	phx ; Save X
 	phy ; Save Y
 	lda.b #$00	  ; Clear A
-	lda.l $7ec360,x ; Load frame counter
+	lda.l !sprite_frame_array,x ; Load frame counter
 	lda.b #$04	  ; A high = $04
 	xba ; Swap
-	lda.l $7ec320,x ; Load sprite base
+	lda.l !sprite_base_array,x ; Load sprite base
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset
 	jsl.l DB_Label_0B92D6 ; Calculate positions
 	jsr.w BattleSprite_CalculateOAMPositions ; Setup OAM
 
 	lda.b #$04	  ; Sprite count = 4
-	sta.l $7ec400,x ; Store sprite state
+	sta.l !sprite_state_array,x ; Store sprite state
 
 ; Position attack sprites (moving forward)
-	lda.l $7ec480,x ; Load base tile
+	lda.l !sprite_tile_id_array,x ; Load base tile
 	clc ; Clear carry
 	adc.b #$08	  ; Add 8 (forward offset)
 	sta.w !oam_sprite0_tile,y   ; Store sprite 0
@@ -2737,12 +2737,12 @@ BattleAnim_AttackSetup:
 ; Purpose: 4-frame attack motion (thrust/retreat cycle)
 
 BattleAnim_AttackMotion:
-	lda.l $7ec260,x ; Load sprite slot
+	lda.l !sprite_slot_array,x ; Load sprite slot
 	asl a; Multiply by 4
 	asl a
 TAY_Label:
 
-	lda.l $7ec360,x ; Load frame counter
+	lda.l !sprite_frame_array,x ; Load frame counter
 	lsr a; Divide by 32
 	lsr a
 	lsr a
@@ -2795,13 +2795,13 @@ BattleAnim_WingFlapSetup:
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate OAM positions
 	lda.b #$04	  ; A high = $04
 	xba ; Swap
-	lda.l $7ec320,x ; Load sprite base
+	lda.l !sprite_base_array,x ; Load sprite base
 
 	adc.b #$09	  ; Add offset
 	jsl.l DB_Label_0B92D6 ; Calculate
 
 	lda.b #$04	  ; Sprite count = 4
-	sta.l $7ec400,x ; Store state
+	sta.l !sprite_state_array,x ; Store state
 
 ; Setup wing tiles ($b7, $b8)
 	lda.b #$b7	  ; Wing tile 1
@@ -2844,12 +2844,12 @@ SEC_Label:
 ; Purpose: Animate wing positions with sinusoidal motion
 
 BattleAnim_WingOscillation:
-	lda.l $7ec260,x ; Load sprite slot
+	lda.l !sprite_slot_array,x ; Load sprite slot
 	asl a
 	asl a
 TAY_Label_1:
 
-	lda.l $7ec360,x ; Load frame counter
+	lda.l !sprite_frame_array,x ; Load frame counter
 	and.b #$01	  ; Check if odd/even frame
 	beq BattleAnim_WingsOutward ; Branch if even
 
@@ -2982,10 +2982,10 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	php ;0B9296 Preserve processor flags
 	jsr.w DB_Load_0B9304 ;0B9297 → Setup base tiles + attributes
 	lda.b #$04	  ;0B929A Animation state = 4
-	sta.l $7ec400,x ;0B929C Store sprite animation state
+	sta.l !sprite_state_array,x ;0B929C Store sprite animation state
 	lda.b #$0f	  ;0B92A0 High byte = palette $0f
 	xba ;0B92A2 Swap to high byte of A
-	lda.l $7ec320,x ;0B92A3 Get sprite X-position
+	lda.l !sprite_base_array,x ;0B92A3 Get sprite X-position
 	clc ;0B92A7 Clear carry
 	adc.b #$08	  ;0B92A8 Offset X+8 pixels
 	jsl.l DB_Label_0B92D6 ;0B92AA → Upload 4×4 tile pattern to OAM
@@ -3007,8 +3007,8 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	phy ;0B92B2 Preserve Y register
 	jsr.w DB_Load_0B9304 ;0B92B3 → Setup base tiles + attributes
 	lda.b #$04	  ;0B92B6 Animation state = 4
-	sta.l $7ec400,x ;0B92B8 Store sprite animation state
-	lda.l $7ec480,x ;0B92BC Get base tile index
+	sta.l !sprite_state_array,x ;0B92B8 Store sprite animation state
+	lda.l !sprite_tile_id_array,x ;0B92BC Get base tile index
 	clc ;0B92C0 Clear carry
 	adc.b #$08	  ;0B92C1 Offset tile+8
 	sta.w !oam_sprite0_tile,y   ;0B92C3 OAM tile #0 index
@@ -3106,13 +3106,13 @@ DB_Label_0B92D6:
 ; ==============================================================================
 DB_Load_0B9304:
 ; Get OAM buffer offset (slot × 4 bytes per sprite)
-	lda.l $7ec260,x ;0B9304 Get sprite slot number
+	lda.l !sprite_slot_array,x ;0B9304 Get sprite slot number
 	asl a;0B9308 × 2
 	asl a;0B9309 × 4 (4 bytes per OAM entry)
 	tay ;0B930A Y = OAM offset (!oam_sprite_buffer + Y)
 
 ; Setup sequential tile indexes
-	lda.l $7ec480,x ;0B930B Get base tile index
+	lda.l !sprite_tile_id_array,x ;0B930B Get base tile index
 	sta.w !oam_sprite0_tile,y   ;0B930F OAM tile #0
 	inc a;0B9312 Base+1
 	sta.w !oam_sprite1_tile,y   ;0B9313 OAM tile #1

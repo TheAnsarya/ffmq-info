@@ -138,7 +138,7 @@ Display_ProcessStatValue:
 Display_InitScreen:
 	jsl.l CallInitializationHelper ;0C8080	; Call initialization helper
 	lda.w #$0000	;0C8084	; Clear value
-	sta.l $7e3665   ;0C8087	; Clear WRAM variable
+	sta.l !save_state_flag   ;0C8087	; Clear WRAM variable
 	lda.w #$2100	;0C808B	; PPU register base address
 	tcd ;0C808E	; Transfer to direct page
 	sep #$20		;0C808F	; 8-bit accumulator
@@ -230,7 +230,7 @@ Display_InitScreen:
 	jsr.w CallMainScreenInit ;0C80EB	; Call main screen init
 	rep #$30		;0C80EE	; 16-bit A/X/Y
 	lda.w #$0001	;0C80F0	; Screen initialized flag
-	sta.l $7e3665   ;0C80F3	; Set screen ready flag (WRAM)
+	sta.l !save_state_flag   ;0C80F3	; Set screen ready flag (WRAM)
 	jsl.l GameStateHandler ;0C80F7	; Game state handler
 	sei ;0C80FB	; Disable interrupts
 	lda.w #$0008	;0C80FC	; VBLANK processing flag

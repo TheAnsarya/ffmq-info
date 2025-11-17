@@ -4228,17 +4228,17 @@ Game_FinalUpdate:
 Math_ProcessingSystem:
 	lda.b $ed	   ;02AA5A|A5ED    |0004ED; Read mathematical parameter
 	and.b #$03	  ;02AA5C|2903    |      ; Mask to 2 bits
-	sta.l $7ec460,x ;02AA5E|9F60C47E|7EC460; Store in extended memory
+	sta.l !gfx_pattern_index,x ;02AA5E|9F60C47E|7EC460; Store in extended memory
 	beq Math_ZeroValue ; Branch if zero
 	rts ;02AA64|60      |      ; Return with value
 ;      |        |      ;
 
 ; Zero Value Processing Branch
 Math_ZeroValue:
-	lda.l $7ec440,x ;02AA65|BF40C47E|7EC440; Read coordinate data
+	lda.l !gfx_base_addr,x ;02AA65|BF40C47E|7EC440; Read coordinate data
 	inc a;02AA69|1A      |      ; Increment value
 	and.b #$03	  ;02AA6A|2903    |      ; Mask to 2 bits
-	sta.l $7ec440,x ;02AA6C|9F40C47E|7EC440; Store back to memory
+	sta.l !gfx_base_addr,x ;02AA6C|9F40C47E|7EC440; Store back to memory
 	beq Math_FinalResult ; Branch if zero result
 	rts ;02AA72|60      |      ; Return with value
 ;      |        |      ;
@@ -4291,7 +4291,7 @@ Graphics_MemoryCoord:
 	rep #$10		;02AACB|C210    |      ; 16-bit index mode
 	lda.w #$0000	;02AACD|A90000  |      ; Clear accumulator
 	xba ;02AAD0|EB      |      ; Swap bytes
-	lda.l $7ec360,x ;02AAD1|BF60C37E|7EC360; Read graphics parameter
+	lda.l !sprite_frame_array,x ;02AAD1|BF60C37E|7EC360; Read graphics parameter
 	jsl.l ExecuteAudioCall ;02AAD5|22839700|009783; Call extended graphics routine
 	rts ;02AAD9|60      |      ; Return
 
@@ -4306,10 +4306,10 @@ Graphics_StateTable:
 ;----------------------------------------------------------------------------
 Graphics_CommandInterpreter:
 	lda.b #$fe	  ;02AAE4|A9FE    |      ; Set graphics mode
-	sta.l $7ec340,x ;02AAE6|9F40C37E|7EC340; Store graphics mode
-	lda.l $7ec240,x ;02AAEA|BF40C27E|7EC240; Read current graphics state
+	sta.l !gfx_mode_buffer,x ;02AAE6|9F40C37E|7EC340; Store graphics mode
+	lda.l !gfx_state_control,x ;02AAEA|BF40C27E|7EC240; Read current graphics state
 	and.b #$bf	  ;02AAEE|29BF    |      ; Mask graphics bits
-	sta.l $7ec240,x ;02AAF0|9F40C27E|7EC240; Store modified state
+	sta.l !gfx_state_control,x ;02AAF0|9F40C27E|7EC240; Store modified state
 	lda.b #$02	  ;02AAF4|A902    |      ; Set graphics command
 	sta.b $f0	   ;02AAF6|85F0    |0004F0; Store command register
 	lda.b #$0a	  ;02AAF8|A90A    |      ; Set command parameter
@@ -4327,18 +4327,18 @@ Graphics_AlternateCode:
 	lda.b #$60	  ;02AB0E|A960    |      ; Set alternate code
 
 Graphics_StoreResult:
-	sta.l $7ec280,x ;02AB10|9F80C27E|7EC280; Store result code
+	sta.l !gfx_result_data,x ;02AB10|9F80C27E|7EC280; Store result code
 	lda.b #$2c	  ;02AB14|A92C    |      ; Set graphics parameter
-	sta.l $7ec2a0,x ;02AB16|9FA0C27E|7EC2A0; Store graphics parameter
+	sta.l !gfx_param_buffer,x ;02AB16|9FA0C27E|7EC2A0; Store graphics parameter
 	lda.b #$03	  ;02AB1A|A903    |      ; Set graphics mode
-	sta.l $7ec300,x ;02AB1C|9F00C37E|7EC300; Store graphics mode
+	sta.l !gfx_mode_register,x ;02AB1C|9F00C37E|7EC300; Store graphics mode
 	lda.b #$06	  ;02AB20|A906    |      ; Set graphics channel
-	sta.l $7ec480,x ;02AB22|9F80C47E|7EC480; Store graphics channel
+	sta.l !sprite_tile_id_array,x ;02AB22|9F80C47E|7EC480; Store graphics channel
 	lda.b #$01	  ;02AB26|A901    |      ; Set graphics state
-	sta.l $7ec360,x ;02AB28|9F60C37E|7EC360; Store graphics state
-	lda.l $7ec240,x ;02AB2C|BF40C27E|7EC240; Read graphics control
+	sta.l !sprite_frame_array,x ;02AB28|9F60C37E|7EC360; Store graphics state
+	lda.l !gfx_state_control,x ;02AB2C|BF40C27E|7EC240; Read graphics control
 	ora.b #$40	  ;02AB30|0940    |      ; Set control bit
-	sta.l $7ec240,x ;02AB32|9F40C27E|7EC240; Store modified control
+	sta.l !gfx_state_control,x ;02AB32|9F40C27E|7EC240; Store modified control
 	rts ;02AB36|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4346,20 +4346,20 @@ Graphics_StoreResult:
 ; Advanced channel coordination with error handling
 ;----------------------------------------------------------------------------
 Graphics_ChannelManager:
-	lda.l $7ec480,x ;02AB37|BF80C47E|7EC480; Read graphics channel
+	lda.l !sprite_tile_id_array,x ;02AB37|BF80C47E|7EC480; Read graphics channel
 	dec a;02AB3B|3A      |      ; Decrement channel
-	sta.l $7ec480,x ;02AB3C|9F80C47E|7EC480; Store decremented channel
+	sta.l !sprite_tile_id_array,x ;02AB3C|9F80C47E|7EC480; Store decremented channel
 	beq Graphics_ChannelReset ;02AB40|F001    |02AB43; Branch if channel zero
 	rts ;02AB42|60      |      ; Return if channel active
 
 Graphics_ChannelReset:
 	lda.b #$06	  ;02AB43|A906    |      ; Reset channel count
-	sta.l $7ec480,x ;02AB45|9F80C47E|7EC480; Store channel count
-	lda.l $7ec2e0,x ;02AB49|BFE0C27E|7EC2E0; Read channel state
+	sta.l !sprite_tile_id_array,x ;02AB45|9F80C47E|7EC480; Store channel count
+	lda.l !gfx_channel_state,x ;02AB49|BFE0C27E|7EC2E0; Read channel state
 	cmp.b #$04	  ;02AB4D|C904    |      ; Compare to limit
 	beq Graphics_ChannelLimitReached ;02AB4F|F004    |02AB55; Branch if at limit
 	inc a;02AB51|1A      |      ; Increment state
-	sta.l $7ec2e0,x ;02AB52|9FE0C27E|7EC2E0; Store incremented state
+	sta.l !gfx_channel_state,x ;02AB52|9FE0C27E|7EC2E0; Store incremented state
 	rts ;02AB56|60      |      ; Return
 
 ; Channel Limit Reached Processing
@@ -4368,7 +4368,7 @@ Graphics_ChannelLimitReached:
 
 Graphics_SetChannelMode:
 	lda.b #$02	  ;02AB57|A902    |      ; Set channel mode
-	sta.l $7ec360,x ;02AB59|9F60C37E|7EC360; Store channel mode
+	sta.l !sprite_frame_array,x ;02AB59|9F60C37E|7EC360; Store channel mode
 	lda.b #$19	  ;02AB5D|A919    |      ; Set channel parameter
 	sta.w !audio_coord_register	 ;02AB5F|8D0505  |020505; Store in system register
 	rts ;02AB62|60      |      ; Return
@@ -4378,7 +4378,7 @@ Graphics_SetChannelMode:
 ; Complex state management with multiple validation points
 ;----------------------------------------------------------------------------
 Graphics_ChannelStateProcessor:
-	lda.l $7ec2a0,x ;02AB63|BFA0C27E|7EC2A0; Read channel configuration
+	lda.l !gfx_param_buffer,x ;02AB63|BFA0C27E|7EC2A0; Read channel configuration
 	asl a;02AB67|0A      |      ; Shift left for indexing
 	asl a;02AB68|0A      |      ; Double shift for word access
 	asl a;02AB69|0A      |      ; Triple shift for complex index
@@ -4386,24 +4386,24 @@ Graphics_ChannelStateProcessor:
 	cmp.b #$80	  ;02AB6B|C980    |      ; Compare to threshold
 	bcc Graphics_BelowThreshold ;02AB6D|9008    |02AB79; Branch if below threshold
 	lda.b #$03	  ;02AB6F|A903    |      ; Set overflow state
-	sta.l $7ec360,x ;02AB71|9F60C37E|7EC360; Store overflow state
+	sta.l !sprite_frame_array,x ;02AB71|9F60C37E|7EC360; Store overflow state
 	lda.b #$80	  ;02AB75|A980    |      ; Set maximum value
 	bra Graphics_StoreProcessed ;02AB77|8002    |02AB7B; Continue processing
 
 Graphics_BelowThreshold:
-	lda.l $7ec2a0,x ;02AB79|BFA0C27E|7EC2A0; Read channel configuration again
+	lda.l !gfx_param_buffer,x ;02AB79|BFA0C27E|7EC2A0; Read channel configuration again
 
 Graphics_StoreProcessed:
-	sta.l $7ec2a0,x ;02AB7B|9FA0C27E|7EC2A0; Store processed value
+	sta.l !gfx_param_buffer,x ;02AB7B|9FA0C27E|7EC2A0; Store processed value
 	lda.w !sys_state_counter	 ;02AB7F|AD8D04  |02048D; Read system state
 	bne Graphics_ProcessShift ;02AB82|D001    |02AB86; Branch if state set
 	rts ;02AB84|60      |      ; Return if no state
 
 Graphics_ProcessShift:
-	lda.l $7ec280,x ;02AB86|BF80C27E|7EC280; Read channel data
+	lda.l !gfx_result_data,x ;02AB86|BF80C27E|7EC280; Read channel data
 	asl a;02AB8A|0A      |      ; Shift for processing
 	asl a;02AB8B|0A      |      ; Double shift
-	sta.l $7ec280,x ;02AB8C|9F80C27E|7EC280; Store shifted data
+	sta.l !gfx_result_data,x ;02AB8C|9F80C27E|7EC280; Store shifted data
 	rts ;02AB90|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4411,22 +4411,22 @@ Graphics_ProcessShift:
 ; Advanced memory management with buffer coordination
 ;----------------------------------------------------------------------------
 Graphics_MemoryCoordinator:
-	lda.l $7ec380,x ;02AB91|BF80C37E|7EC380; Read graphics buffer
+	lda.l !gfx_buffer_main,x ;02AB91|BF80C37E|7EC380; Read graphics buffer
 	sta.w !sys_work_register	 ;02AB95|8DA704  |0204A7; Store in working register
-	lda.l $7ec320,x ;02AB98|BF20C37E|7EC320; Read graphics control
+	lda.l !sprite_base_array,x ;02AB98|BF20C37E|7EC320; Read graphics control
 	sta.w !sys_work_control	 ;02AB9C|8DA504  |0204A5; Store control value
-	lda.l $7ec240,x ;02AB9F|BF40C27E|7EC240; Read graphics state
+	lda.l !gfx_state_control,x ;02AB9F|BF40C27E|7EC240; Read graphics state
 	and.b #$bf	  ;02ABA3|29BF    |      ; Mask state bits
-	sta.l $7ec240,x ;02ABA5|9F40C27E|7EC240; Store masked state
+	sta.l !gfx_state_control,x ;02ABA5|9F40C27E|7EC240; Store masked state
 	lda.b #$14	  ;02ABA9|A914    |      ; Set buffer size
-	sta.l $7ec340,x ;02ABAB|9F40C37E|7EC340; Store buffer size
+	sta.l !gfx_mode_buffer,x ;02ABAB|9F40C37E|7EC340; Store buffer size
 	lda.b #$00	  ;02ABAF|A900    |      ; Clear accumulator
-	sta.l $7ec380,x ;02ABB1|9F80C37E|7EC380; Clear graphics buffer
+	sta.l !gfx_buffer_main,x ;02ABB1|9F80C37E|7EC380; Clear graphics buffer
 	lda.b #$08	  ;02ABB5|A908    |      ; Set buffer parameter
 	sta.w !sys_work_buffer_count	 ;02ABB7|8DA404  |0204A4; Store buffer parameter
 	jsr.w CallBufferProcessor ;02ABBA|2038FE  |02FE38; Call buffer processor
 	lda.w !sys_work_register	 ;02ABBD|ADA704  |0204A7; Read working register
-	sta.l $7ec380,x ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
+	sta.l !gfx_buffer_main,x ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
 	lda.w !sys_state_counter	 ;02ABC4|AD8D04  |02048D; Read system state
 	beq Graphics_InactiveState ;02ABC7|F004    |02ABD2; Branch if state clear
 	lda.b #$94	  ;02ABC9|A994    |      ; Set active state value
@@ -4436,25 +4436,25 @@ Graphics_InactiveState:
 	lda.b #$64	  ;02ABD2|A964    |      ; Set inactive state value
 
 Graphics_StoreStateValue:
-	sta.l $7ec280,x ;02ABD4|9F80C27E|7EC280; Store state value
+	sta.l !gfx_result_data,x ;02ABD4|9F80C27E|7EC280; Store state value
 	lda.b #$88	  ;02ABD8|A988    |      ; Set buffer control
-	sta.l $7ec2a0,x ;02ABDA|9FA0C27E|7EC2A0; Store buffer control
+	sta.l !gfx_param_buffer,x ;02ABDA|9FA0C27E|7EC2A0; Store buffer control
 	lda.b #$03	  ;02ABDE|A903    |      ; Set buffer mode
-	sta.l $7ec300,x ;02ABE0|9F00C37E|7EC300; Store buffer mode
+	sta.l !gfx_mode_register,x ;02ABE0|9F00C37E|7EC300; Store buffer mode
 	lda.w !sys_work_control	 ;02ABE4|ADA504  |0204A5; Read control value
-	sta.l $7ec320,x ;02ABE7|9F20C37E|7EC320; Store in graphics control
+	sta.l !sprite_base_array,x ;02ABE7|9F20C37E|7EC320; Store in graphics control
 	lda.b #$04	  ;02ABEB|A904    |      ; Set processing mode
-	sta.l $7ec360,x ;02ABED|9F60C37E|7EC360; Store processing mode
-	lda.l $7ec240,x ;02ABF1|BF40C27E|7EC240; Read graphics state
+	sta.l !sprite_frame_array,x ;02ABED|9F60C37E|7EC360; Store processing mode
+	lda.l !gfx_state_control,x ;02ABF1|BF40C27E|7EC240; Read graphics state
 	ora.b #$40	  ;02ABF5|0940    |      ; Set active bit
-	sta.l $7ec240,x ;02ABF7|9F40C27E|7EC240; Store active state
+	sta.l !gfx_state_control,x ;02ABF7|9F40C27E|7EC240; Store active state
 
 ;----------------------------------------------------------------------------
 ; Sound System Integration
 ; Complex sound coordination with graphics synchronization
 ;----------------------------------------------------------------------------
 	lda.b #$10	  ;02ABFB|A910    |      ; Set sound parameter
-	sta.l $7ec580,x ;02ABFD|9F80C57E|7EC580; Store sound parameter
+	sta.l !sound_param,x ;02ABFD|9F80C57E|7EC580; Store sound parameter
 	lda.b #$03	  ;02AC01|A903    |      ; Set sound channel
 	sta.w !rng_seed_alt	 ;02AC03|8DA800  |0200A8; Store sound channel
 	jsl.l ExecuteAudioCall ;02AC06|22839700|009783; Call sound system
@@ -4463,13 +4463,13 @@ Graphics_StoreStateValue:
 	adc.b #$02	  ;02AC0E|6902    |      ; Add sound offset
 	eor.b #$ff	  ;02AC10|49FF    |      ; Invert result
 	asl a;02AC12|0A      |      ; Shift for processing
-	sta.l $7ec5a0,x ;02AC13|9FA0C57E|7EC5A0; Store sound result
+	sta.l !sound_result,x ;02AC13|9FA0C57E|7EC5A0; Store sound result
 	lda.b #$07	  ;02AC17|A907    |      ; Set sound effect
 	sta.w !rng_seed_alt	 ;02AC19|8DA800  |0200A8; Store sound effect
 	jsl.l ExecuteAudioCall ;02AC1C|22839700|009783; Call sound system
 	lda.b #$03	  ;02AC20|A903    |      ; Set sound mode
 	sbc.w !rng_result	 ;02AC22|EDA900  |0200A9; Subtract sound result
-	sta.l $7ec5c0,x ;02AC25|9FC0C57E|7EC5C0; Store processed sound
+	sta.l !sound_processed,x ;02AC25|9FC0C57E|7EC5C0; Store processed sound
 	dec.w !sys_work_buffer_count	 ;02AC29|CEA404  |0204A4; Decrement buffer counter
 	bne Graphics_ContinueLoop ;02AC2C|D001    |02AC2F; Continue if not zero
 	rts ;02AC2E|60      |      ; Return when complete
@@ -4493,18 +4493,18 @@ Graphics_ContinueLoop:
 ; Complex color pattern processing and graphics coordinate management
 ;----------------------------------------------------------------------------
 Graphics_PatternManager:
-	lda.l $7ec460,x ;02AC32|BF60C47E|7EC460; Read graphics pattern index
+	lda.l !gfx_pattern_index,x ;02AC32|BF60C47E|7EC460; Read graphics pattern index
 	and.b #$03	  ;02AC36|2903    |      ; Mask to valid pattern range
-	sta.l $7ec460,x ;02AC38|9F60C47E|7EC460; Store pattern index
+	sta.l !gfx_pattern_index,x ;02AC38|9F60C47E|7EC460; Store pattern index
 	beq Graphics_PatternZero ;02AC3C|F001    |02AC3F; Branch if pattern zero
 	rts ;02AC3E|60      |      ; Return with pattern set
 
 ; Pattern Zero Processing Branch
 Graphics_PatternZero:
-	lda.l $7ec440,x ;02AC3F|BF40C47E|7EC440; Read graphics base address
+	lda.l !gfx_base_addr,x ;02AC3F|BF40C47E|7EC440; Read graphics base address
 	inc a;02AC43|1A      |      ; Increment base
 	and.b #$03	  ;02AC44|2903    |      ; Mask to valid range
-	sta.l $7ec440,x ;02AC46|9F40C47E|7EC440; Store incremented base
+	sta.l !gfx_base_addr,x ;02AC46|9F40C47E|7EC440; Store incremented base
 	beq Graphics_SystemReset ;02AC4A|F001    |02AC4D; Branch if base zero
 	rts ;02AC4C|60      |      ; Return with base set
 
@@ -4556,7 +4556,7 @@ Graphics_ProcessingEngine:
 	rep #$10		;02ACA5|C210    |      ; 16-bit index mode
 	lda.w #$0000	;02ACA7|A90000  |      ; Clear accumulator
 	xba ;02ACAA|EB      |      ; Swap bytes for processing
-	lda.l $7ec360,x ;02ACAB|BF60C37E|7EC360; Read graphics parameter
+	lda.l !sprite_frame_array,x ;02ACAB|BF60C37E|7EC360; Read graphics parameter
 	tay ;02ACAF|A8      |      ; Transfer to Y for indexing
 	lda.w Graphics_StateJumpTable,y ;02ACB0|B9B7AC  |02ACB7; Read jump table entry
 	jsl.l ExecuteAudioCall ;02ACB3|22839700|009783; Call graphics engine
@@ -4576,10 +4576,10 @@ Graphics_StateJumpTable:
 ;----------------------------------------------------------------------------
 Graphics_CommandInit:
 	lda.b #$fe	  ;02ACC1|A9FE    |      ; Set graphics initialization mode
-	sta.l $7ec340,x ;02ACC3|9F40C37E|7EC340; Store graphics mode
-	lda.l $7ec240,x ;02ACC7|BF40C27E|7EC240; Read current graphics state
+	sta.l !gfx_mode_buffer,x ;02ACC3|9F40C37E|7EC340; Store graphics mode
+	lda.l !gfx_state_control,x ;02ACC7|BF40C27E|7EC240; Read current graphics state
 	and.b #$bf	  ;02ACCB|29BF    |      ; Clear state bit
-	sta.l $7ec240,x ;02ACCD|9F40C27E|7EC240; Store modified state
+	sta.l !gfx_state_control,x ;02ACCD|9F40C27E|7EC240; Store modified state
 	lda.b #$02	  ;02ACD1|A902    |      ; Set graphics command type
 	sta.b $f0	   ;02ACD3|85F0    |0004F0; Store command register
 	lda.b #$0a	  ;02ACD5|A90A    |      ; Set command parameter
@@ -4597,18 +4597,18 @@ Graphics_CommandAltCode:
 	lda.b #$60	  ;02ACEB|A960    |      ; Set alternate code
 
 Graphics_CommandStoreCode:
-	sta.l $7ec280,x ;02ACED|9F80C27E|7EC280; Store result code
+	sta.l !gfx_result_data,x ;02ACED|9F80C27E|7EC280; Store result code
 	lda.b #$2c	  ;02ACF1|A92C    |      ; Set graphics parameter
-	sta.l $7ec2a0,x ;02ACF3|9FA0C27E|7EC2A0; Store graphics parameter
+	sta.l !gfx_param_buffer,x ;02ACF3|9FA0C27E|7EC2A0; Store graphics parameter
 	lda.b #$03	  ;02ACF7|A903    |      ; Set graphics mode
-	sta.l $7ec300,x ;02ACF9|9F00C37E|7EC300; Store graphics mode
+	sta.l !gfx_mode_register,x ;02ACF9|9F00C37E|7EC300; Store graphics mode
 	lda.b #$06	  ;02ACFD|A906    |      ; Set graphics channel
-	sta.l $7ec480,x ;02ACFF|9F80C47E|7EC480; Store graphics channel
+	sta.l !sprite_tile_id_array,x ;02ACFF|9F80C47E|7EC480; Store graphics channel
 	lda.b #$01	  ;02AD03|A901    |      ; Set graphics state
-	sta.l $7ec360,x ;02AD05|9F60C37E|7EC360; Store graphics state
-	lda.l $7ec240,x ;02AD09|BF40C27E|7EC240; Read graphics control
+	sta.l !sprite_frame_array,x ;02AD05|9F60C37E|7EC360; Store graphics state
+	lda.l !gfx_state_control,x ;02AD09|BF40C27E|7EC240; Read graphics control
 	ora.b #$40	  ;02AD0D|0940    |      ; Set control bit
-	sta.l $7ec240,x ;02AD0F|9F40C27E|7EC240; Store modified control
+	sta.l !gfx_state_control,x ;02AD0F|9F40C27E|7EC240; Store modified control
 	rts ;02AD13|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4616,21 +4616,21 @@ Graphics_CommandStoreCode:
 ; Complex color calculations and palette management
 ;----------------------------------------------------------------------------
 Color_ChannelProcessor:
-	lda.l $7ec480,x ;02AD14|BF80C47E|7EC480; Read color channel
+	lda.l !sprite_tile_id_array,x ;02AD14|BF80C47E|7EC480; Read color channel
 	dec a;02AD18|3A      |      ; Decrement channel
-	sta.l $7ec480,x ;02AD19|9F80C47E|7EC480; Store decremented channel
+	sta.l !sprite_tile_id_array,x ;02AD19|9F80C47E|7EC480; Store decremented channel
 	beq Color_ChannelReset ;02AD1D|F001    |02AD20; Branch if channel zero
 	rts ;02AD1F|60      |      ; Return if channel active
 
 ; Color Channel Reset Processing
 Color_ChannelReset:
 	lda.b #$06	  ;02AD20|A906    |      ; Reset channel count
-	sta.l $7ec480,x ;02AD22|9F80C47E|7EC480; Store channel count
-	lda.l $7ec2e0,x ;02AD26|BFE0C27E|7EC2E0; Read color state
+	sta.l !sprite_tile_id_array,x ;02AD22|9F80C47E|7EC480; Store channel count
+	lda.l !gfx_channel_state,x ;02AD26|BFE0C27E|7EC2E0; Read color state
 	cmp.b #$04	  ;02AD2A|C904    |      ; Compare to maximum
 	beq Color_StateMaxReached ;02AD2C|F004    |02AD32; Branch if at maximum
 	inc a;02AD2E|1A      |      ; Increment state
-	sta.l $7ec2e0,x ;02AD2F|9FE0C27E|7EC2E0; Store incremented state
+	sta.l !gfx_channel_state,x ;02AD2F|9FE0C27E|7EC2E0; Store incremented state
 
 Color_StateMaxReached:
 	rts ;02AD32|60      |      ; Return
@@ -4638,7 +4638,7 @@ Color_StateMaxReached:
 ; Advanced Color Mode Processing
 Color_ModeProcessor:
 	lda.b #$02	  ;02AD33|A902    |      ; Set color mode
-	sta.l $7ec360,x ;02AD35|9F60C37E|7EC360; Store color mode
+	sta.l !sprite_frame_array,x ;02AD35|9F60C37E|7EC360; Store color mode
 	lda.b #$19	  ;02AD39|A919    |      ; Set color parameter
 	sta.w !audio_coord_register	 ;02AD3B|8D0505  |020505; Store in system register
 	rts ;02AD3E|60      |      ; Return
@@ -4648,7 +4648,7 @@ Color_ModeProcessor:
 ; Complex data manipulation and transformation systems
 ;----------------------------------------------------------------------------
 Graphics_DataProcessor:
-	lda.l $7ec2a0,x ;02AD3F|BFA0C27E|7EC2A0; Read graphics data
+	lda.l !gfx_param_buffer,x ;02AD3F|BFA0C27E|7EC2A0; Read graphics data
 	asl a;02AD43|0A      |      ; Shift left for indexing
 	asl a;02AD44|0A      |      ; Double shift
 	asl a;02AD45|0A      |      ; Triple shift
@@ -4656,25 +4656,25 @@ Graphics_DataProcessor:
 	cmp.b #$80	  ;02AD47|C980    |      ; Compare to threshold
 	bcc Graphics_DataBelowThreshold ;02AD49|9008    |02AD55; Branch if below threshold
 	lda.b #$03	  ;02AD4B|A903    |      ; Set overflow state
-	sta.l $7ec360,x ;02AD4D|9F60C37E|7EC360; Store overflow state
+	sta.l !sprite_frame_array,x ;02AD4D|9F60C37E|7EC360; Store overflow state
 	lda.b #$80	  ;02AD51|A980    |      ; Set maximum value
 	bra Graphics_DataStoreValue ;02AD53|8002    |02AD57; Continue processing
 
 Graphics_DataBelowThreshold:
-	lda.l $7ec2a0,x ;02AD55|BFA0C27E|7EC2A0; Read graphics data again
+	lda.l !gfx_param_buffer,x ;02AD55|BFA0C27E|7EC2A0; Read graphics data again
 
 Graphics_DataStoreValue:
-	sta.l $7ec2a0,x ;02AD57|9FA0C27E|7EC2A0; Store processed value
+	sta.l !gfx_param_buffer,x ;02AD57|9FA0C27E|7EC2A0; Store processed value
 	lda.w !sys_state_counter	 ;02AD5B|AD8D04  |02048D; Read system state
 	bne Graphics_DataShift ;02AD5E|D001    |02AD62; Branch if state set
 	rts ;02AD60|60      |      ; Return if no state
 
 ; Graphics Data Shift Processing
 Graphics_DataShift:
-	lda.l $7ec280,x ;02AD62|BF80C27E|7EC280; Read graphics channel data
+	lda.l !gfx_result_data,x ;02AD62|BF80C27E|7EC280; Read graphics channel data
 	asl a;02AD66|0A      |      ; Shift for processing
 	asl a;02AD67|0A      |      ; Double shift
-	sta.l $7ec280,x ;02AD68|9F80C27E|7EC280; Store shifted data
+	sta.l !gfx_result_data,x ;02AD68|9F80C27E|7EC280; Store shifted data
 	rts ;02AD6C|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4682,22 +4682,22 @@ Graphics_DataShift:
 ; Advanced memory management with comprehensive buffer control
 ;----------------------------------------------------------------------------
 Buffer_MemoryCoordinator:
-	lda.l $7ec380,x ;02AD6D|BF80C37E|7EC380; Read buffer address
+	lda.l !gfx_buffer_main,x ;02AD6D|BF80C37E|7EC380; Read buffer address
 	sta.w !sys_work_register	 ;02AD71|8DA704  |0204A7; Store in working register
-	lda.l $7ec320,x ;02AD74|BF20C37E|7EC320; Read buffer control
+	lda.l !sprite_base_array,x ;02AD74|BF20C37E|7EC320; Read buffer control
 	sta.w !sys_work_control	 ;02AD78|8DA504  |0204A5; Store control value
-	lda.l $7ec240,x ;02AD7B|BF40C27E|7EC240; Read buffer state
+	lda.l !gfx_state_control,x ;02AD7B|BF40C27E|7EC240; Read buffer state
 	and.b #$bf	  ;02AD7F|29BF    |      ; Mask state bits
-	sta.l $7ec240,x ;02AD81|9F40C27E|7EC240; Store masked state
+	sta.l !gfx_state_control,x ;02AD81|9F40C27E|7EC240; Store masked state
 	lda.b #$14	  ;02AD85|A914    |      ; Set buffer size
-	sta.l $7ec340,x ;02AD87|9F40C37E|7EC340; Store buffer size
+	sta.l !gfx_mode_buffer,x ;02AD87|9F40C37E|7EC340; Store buffer size
 	lda.b #$00	  ;02AD8B|A900    |      ; Clear accumulator
-	sta.l $7ec380,x ;02AD8D|9F80C37E|7EC380; Clear buffer address
+	sta.l !gfx_buffer_main,x ;02AD8D|9F80C37E|7EC380; Clear buffer address
 	lda.b #$08	  ;02AD91|A908    |      ; Set buffer parameter
 	sta.w !sys_work_buffer_count	 ;02AD93|8DA404  |0204A4; Store buffer parameter
 	jsr.w CallBufferProcessor ;02AD96|2038FE  |02FE38; Call buffer processor
 	lda.w !sys_work_register	 ;02AD99|ADA704  |0204A7; Read working register
-	sta.l $7ec380,x ;02AD9C|9F80C37E|7EC380; Store in buffer address
+	sta.l !gfx_buffer_main,x ;02AD9C|9F80C37E|7EC380; Store in buffer address
 	lda.w !sys_state_counter	 ;02ADA0|AD8D04  |02048D; Read system state
 	beq Buffer_InactiveState ;02ADA3|F004    |02ADAE; Branch if state clear
 	lda.b #$94	  ;02ADA5|A994    |      ; Set active state value
@@ -4707,18 +4707,18 @@ Buffer_InactiveState:
 	lda.b #$64	  ;02ADAE|A964    |      ; Set inactive state value
 
 Buffer_StoreState:
-	sta.l $7ec280,x ;02ADB0|9F80C27E|7EC280; Store state value
+	sta.l !gfx_result_data,x ;02ADB0|9F80C27E|7EC280; Store state value
 	lda.b #$88	  ;02ADB4|A988    |      ; Set buffer control
-	sta.l $7ec2a0,x ;02ADB6|9FA0C27E|7EC2A0; Store buffer control
+	sta.l !gfx_param_buffer,x ;02ADB6|9FA0C27E|7EC2A0; Store buffer control
 	lda.b #$03	  ;02ADBA|A903    |      ; Set buffer mode
-	sta.l $7ec300,x ;02ADBC|9F00C37E|7EC300; Store buffer mode
+	sta.l !gfx_mode_register,x ;02ADBC|9F00C37E|7EC300; Store buffer mode
 	lda.w !sys_work_control	 ;02ADC0|ADA504  |0204A5; Read control value
-	sta.l $7ec320,x ;02ADC3|9F20C37E|7EC320; Store in buffer control
+	sta.l !sprite_base_array,x ;02ADC3|9F20C37E|7EC320; Store in buffer control
 	lda.b #$04	  ;02ADC7|A904    |      ; Set processing mode
-	sta.l $7ec360,x ;02ADC9|9F60C37E|7EC360; Store processing mode
-	lda.l $7ec240,x ;02ADCD|BF40C27E|7EC240; Read buffer state
+	sta.l !sprite_frame_array,x ;02ADC9|9F60C37E|7EC360; Store processing mode
+	lda.l !gfx_state_control,x ;02ADCD|BF40C27E|7EC240; Read buffer state
 	ora.b #$40	  ;02ADD1|0940    |      ; Set active bit
-	sta.l $7ec240,x ;02ADD3|9F40C27E|7EC240; Store active state
+	sta.l !gfx_state_control,x ;02ADD3|9F40C27E|7EC240; Store active state
 	rts ;02ADD7|60      |      ; Return
 
 ; ===========================================================================
@@ -4753,13 +4753,13 @@ Stack_ContextManager:
 Entity_ProcessingLoop:
 	jsr.w DB_Label_02EA60 ;02D230|2060EA  |02EA60; Call entity processing
 	lda.b #$1c	  ;02D233|A91C    |      ;
-	sta.l $7ec380,x ;02D235|9F80C37E|7EC380; Store entity data
+	sta.l !gfx_buffer_main,x ;02D235|9F80C37E|7EC380; Store entity data
 	tya ;02D239|98      |      ;
 	clc ;02D23A|18      |      ;
 	adc.b #$02	  ;02D23B|6902    |      ;
 	sta.l $7ec3a0,x ;02D23D|9FA0C37E|7EC3A0; Store offset data
 	lda.b #$c5	  ;02D241|A9C5    |      ;
-	sta.l $7ec240,x ;02D243|9F40C27E|7EC240; Store entity flags
+	sta.l !gfx_state_control,x ;02D243|9F40C27E|7EC240; Store entity flags
 	iny ;02D247|C8      |      ; Increment counter
 	cpy.b #$03	  ;02D248|C003    |      ; Check entity limit
 	bne Entity_ProcessingLoop ;02D24A|D0E4    |02D230; Continue if not done
@@ -4801,22 +4801,22 @@ Stack_WaitLoop:
 Graphics_DataSetup:
 	jsr.w DB_Label_02EA60                    ;02D269|2060EA  |02EA60
 	lda.b #$20                           ;02D26C|A920    |
-	sta.l $7ec380,X                      ;02D26E|9F80C37E|7EC380
+	sta.l !gfx_buffer_main,x                      ;02D26E|9F80C37E|7EC380
 	lda.b #$00                           ;02D272|A900    |
-	sta.l $7ec360,X                      ;02D274|9F60C37E|7EC360
+	sta.l !sprite_frame_array,x                      ;02D274|9F60C37E|7EC360
 	lda.b #$c5                           ;02D278|A9C5    |
-	sta.l $7ec240,X                      ;02D27A|9F40C27E|7EC240
+	sta.l !gfx_state_control,x                      ;02D27A|9F40C27E|7EC240
 	ldy.w #$0000                         ;02D27E|A00000  |
 	jsr.w DB_Label_02EA60                    ;02D281|2060EA  |02EA60
 	lda.w Graphics_DataSetup.data,Y      ;02D284|B9E2D2  |02D2E2
-	sta.l $7ec440,X                      ;02D287|9F40C47E|7EC440
+	sta.l !gfx_base_addr,x                      ;02D287|9F40C47E|7EC440
 	iny ;02D28B|C8      |
 	lda.w Graphics_DataSetup.data,Y      ;02D28C|B9E2D2  |02D2E2
-	sta.l $7ec460,X                      ;02D28F|9F60C47E|7EC460
+	sta.l !gfx_pattern_index,x                      ;02D28F|9F60C47E|7EC460
 	iny ;02D293|C8      |
 	lda.b #$00                           ;02D294|A900    |
-	sta.l $7ec480,X                      ;02D296|9F80C47E|7EC480
-	sta.l $7ec360,X                      ;02D29A|9F60C37E|7EC360
+	sta.l !sprite_tile_id_array,x                      ;02D296|9F80C47E|7EC480
+	sta.l !sprite_frame_array,x                      ;02D29A|9F60C37E|7EC360
 	lda.w Graphics_DataSetup.data,Y      ;02D29E|B9E2D2  |02D2E2
 	sta.l $7ec4a0,X                      ;02D2A1|9FA0C47E|7EC4A0
 	iny ;02D2A5|C8      |
@@ -4824,9 +4824,9 @@ Graphics_DataSetup:
 	sta.l $7ec4c0,X                      ;02D2A9|9FC0C47E|7EC4C0
 	iny ;02D2AD|C8      |
 	lda.b #$21                           ;02D2AE|A921    |
-	sta.l $7ec380,X                      ;02D2B0|9F80C37E|7EC380
+	sta.l !gfx_buffer_main,x                      ;02D2B0|9F80C37E|7EC380
 	lda.b #$c5                           ;02D2B4|A9C5    |
-	sta.l $7ec240,X                      ;02D2B6|9F40C27E|7EC240
+	sta.l !gfx_state_control,x                      ;02D2B6|9F40C27E|7EC240
 	cpy.w #$0020                         ;02D2BA|C02000  |
 	bne Graphics_DataSetup               ;02D2BD|D0C3    |02D269
 	php ;02D2BF|08      |
@@ -6289,12 +6289,12 @@ Object_ManagementEngine:
 
 ; Primary Object Configuration
 	lda.b #$00	  ;02DBCB|A900    |      ; Clear flags
-	sta.l $7ec320,x ;02DBCD|9F20C37E|7EC320; Clear object state 1
+	sta.l !sprite_base_array,x ;02DBCD|9F20C37E|7EC320; Clear object state 1
 	lda.b #$00	  ;02DBD1|A900    |      ; Clear value
 	sta.l $7ec400,x ;02DBD3|9F00C47E|7EC400; Clear object state 2
-	sta.l $7ec340,x ;02DBD7|9F40C37E|7EC340; Clear object state 3
+	sta.l !gfx_mode_buffer,x ;02DBD7|9F40C37E|7EC340; Clear object state 3
 	lda.b #$81	  ;02DBDB|A981    |      ; Set object flags
-	sta.l $7ec240,x ;02DBDD|9F40C27E|7EC240; Store object flags
+	sta.l !gfx_state_control,x ;02DBDD|9F40C27E|7EC240; Store object flags
 	ldy.b #$0c	  ;02DBE1|A00C    |      ; Parameter value
 	jsr.w DB_Label_02EA7F ;02DBE3|207FEA  |02EA7F; Call parameter processor
 	sta.l $7ec260,x ;02DBE6|9F60C27E|7EC260; Store parameter result
@@ -6353,21 +6353,21 @@ Object_ManagementEngine:
 	pla ;02DC2E|68      |      ; Restore tile number
 	pld ;02DC2F|2B      |      ; Restore direct page
 	plx ;02DC30|FA      |      ; Restore object index
-	sta.l $7ec480,x ;02DC31|9F80C47E|7EC480; Store tile configuration
+	sta.l !sprite_tile_id_array,x ;02DC31|9F80C47E|7EC480; Store tile configuration
 
 ; Secondary Object Management System
 	stz.w !processing_flag_3	 ;02DC35|9CF50A  |020AF5; Clear secondary flag
 	jsr.w DB_Label_02EA60 ;02DC38|2060EA  |02EA60; Call object allocator
 	lda.b #$02	  ;02DC3B|A902    |      ; Secondary object type
-	sta.l $7ec320,x ;02DC3D|9F20C37E|7EC320; Set object type
+	sta.l !sprite_base_array,x ;02DC3D|9F20C37E|7EC320; Set object type
 	stx.w !sprite_obj_index_2	 ;02DC41|8EDF0A  |020ADF; Store secondary object index
 
 ; Secondary Object Configuration
 	lda.b #$00	  ;02DC44|A900    |      ; Clear flags
 	sta.l $7ec400,x ;02DC46|9F00C47E|7EC400; Clear object state 1
-	sta.l $7ec340,x ;02DC4A|9F40C37E|7EC340; Clear object state 2
+	sta.l !gfx_mode_buffer,x ;02DC4A|9F40C37E|7EC340; Clear object state 2
 	lda.b #$81	  ;02DC4E|A981    |      ; Set object flags
-	sta.l $7ec240,x ;02DC50|9F40C27E|7EC240; Store object flags
+	sta.l !gfx_state_control,x ;02DC50|9F40C27E|7EC240; Store object flags
 	ldy.b #$0c	  ;02DC54|A00C    |      ; Parameter value
 	jsr.w DB_Label_02EA7F ;02DC56|207FEA  |02EA7F; Call parameter processor
 	sta.l $7ec260,x ;02DC59|9F60C27E|7EC260; Store parameter result
@@ -6436,7 +6436,7 @@ Object_ManagementEngine:
 	pld ;02DCB0|2B      |      ; Restore direct page
 	pla ;02DCB1|68      |      ; Restore tile number
 	plx ;02DCB2|FA      |      ; Restore object index
-	sta.l $7ec480,x ;02DCB3|9F80C47E|7EC480; Store tile configuration
+	sta.l !sprite_tile_id_array,x ;02DCB3|9F80C47E|7EC480; Store tile configuration
 
 ; Final System Coordination
 	jsl.l Battle_Field_Background_Graphics_Loader ;02DCB7|225F930B|0B935F; Call system coordinator
@@ -7275,7 +7275,7 @@ Thread_ActiveProcess:
 	lsr a;02E868|4A      |      ;  Shift thread priority (divide by 2)
 	lsr a;02E869|4A      |      ;  Shift again (divide by 4)
 	lsr a;02E86A|4A      |      ;  Final shift (divide by 8)
-	sta.l $7ec300,x ;02E86B|9F00C37E|7EC300;  Store thread priority
+	sta.l !gfx_mode_register,x ;02E86B|9F00C37E|7EC300;  Store thread priority
 	stz.b $cc	   ;02E86F|64CC    |000ACC;  Clear thread status flag
 	lda.l $7ec420,x ;02E871|BF20C47E|7EC420;  Load thread execution time
 	sta.b $ca	   ;02E875|85CA    |000ACA;  Store to working variable
@@ -7426,11 +7426,11 @@ DB_Label_02E930:
 	phy ;02E937|5A      |      ;  Preserve Y register
 	txy ;02E938|9B      |      ;  Transfer source to Y
 	ldx.b $c1,y	 ;02E939|B6C1    |000AC1;  Load source entity ID
-	lda.l $7ec320,x ;02E93B|BF20C37E|7EC320;  Load source entity state
+	lda.l !sprite_base_array,x ;02E93B|BF20C37E|7EC320;  Load source entity state
 	pha ;02E93F|48      |      ;  Preserve source state
 	lda.l $7ec2c0,x ;02E940|BFC0C27E|7EC2C0;  Load source entity memory
 	pha ;02E944|48      |      ;  Preserve source memory
-	lda.l $7ec300,x ;02E945|BF00C37E|7EC300;  Load source entity priority
+	lda.l !gfx_mode_register,x ;02E945|BF00C37E|7EC300;  Load source entity priority
 	pha ;02E949|48      |      ;  Preserve source priority
 	lda.b $04,s	 ;02E94A|A304    |000004;  Load target index from stack
 	tay ;02E94C|A8      |      ;  Transfer to Y
@@ -7438,13 +7438,13 @@ DB_Label_02E930:
 
 ; State Transfer and Synchronization
 	pla ;02E94F|68      |      ;  Restore source priority
-	sta.l $7ec300,x ;02E950|9F00C37E|7EC300;  Transfer priority to target
+	sta.l !gfx_mode_register,x ;02E950|9F00C37E|7EC300;  Transfer priority to target
 	pla ;02E954|68      |      ;  Restore source memory
 	sta.l $7ec2c0,x ;02E955|9FC0C27E|7EC2C0;  Transfer memory to target
 	pla ;02E959|68      |      ;  Restore source state
-	sta.l $7ec320,x ;02E95A|9F20C37E|7EC320;  Transfer state to target
+	sta.l !sprite_base_array,x ;02E95A|9F20C37E|7EC320;  Transfer state to target
 	lda.b #$00	  ;02E95E|A900    |      ;  Load synchronization flag
-	sta.l $7ec2e0,x ;02E960|9FE0C27E|7EC2E0;  Clear target sync flag
+	sta.l !gfx_channel_state,x ;02E960|9FE0C27E|7EC2E0;  Clear target sync flag
 	ply ;02E964|7A      |      ;  Restore Y register
 	plx ;02E965|FA      |      ;  Restore X register
 	pla ;02E966|68      |      ;  Restore source index
@@ -7566,9 +7566,9 @@ DB_Label_02E9F7:
 	php ;02E9F9|08      |      ;  Preserve processor status
 	jsr.w DB_Label_02EA60 ;02E9FA|2060EA  |02EA60;  Call entity slot allocation
 	lda.b #$00	  ;02E9FD|A900    |      ;  Load initialization value
-	sta.l $7ec300,x ;02E9FF|9F00C37E|7EC300;  Initialize entity priority
-	sta.l $7ec2e0,x ;02EA03|9FE0C27E|7EC2E0;  Initialize entity synchronization
-	sta.l $7ec380,x ;02EA07|9F80C37E|7EC380;  Initialize entity validation state
+	sta.l !gfx_mode_register,x ;02E9FF|9F00C37E|7EC300;  Initialize entity priority
+	sta.l !gfx_channel_state,x ;02EA03|9FE0C27E|7EC2E0;  Initialize entity synchronization
+	sta.l !gfx_buffer_main,x ;02EA07|9F80C37E|7EC380;  Initialize entity validation state
 	lda.b #$ff	  ;02EA0B|A9FF    |      ;  Load invalid marker
 	sta.l $7ec2c0,x ;02EA0D|9FC0C27E|7EC2C0;  Mark entity memory as uninitialized
 	phx ;02EA11|DA      |      ;  Preserve entity slot
@@ -7587,7 +7587,7 @@ DB_Label_02E9F7:
 	asl a;02EA22|0A      |      ;  Multiply by 2
 	asl a;02EA23|0A      |      ;  Multiply by 4
 	asl a;02EA24|0A      |      ;  Multiply by 8 (final X position)
-	sta.l $7ec280,x ;02EA25|9F80C27E|7EC280;  Store entity X position
+	sta.l !gfx_result_data,x ;02EA25|9F80C27E|7EC280;  Store entity X position
 	lda.w $0a28,y   ;02EA29|B9280A  |020A28;  Load entity height
 	sec ;02EA2C|38      |      ;  Set carry
 	sbc.b #$08	  ;02EA2D|E908    |      ;  Subtract height offset
@@ -7612,13 +7612,13 @@ DB_Label_02EA42:
 	asl a;02EA42|0A      |      ;  Multiply by 2
 	asl a;02EA43|0A      |      ;  Multiply by 4
 	asl a;02EA44|0A      |      ;  Multiply by 8 (final Y position)
-	sta.l $7ec2a0,x ;02EA45|9FA0C27E|7EC2A0;  Store entity Y position
+	sta.l !gfx_param_buffer,x ;02EA45|9FA0C27E|7EC2A0;  Store entity Y position
 	ldy.b #$01	  ;02EA49|A001    |      ;  Load validation flag
 	jsr.w DB_Label_02EA7F ;02EA4B|207FEA  |02EA7F;  Validate entity configuration
 	jsr.w DB_Label_02EB14 ;02EA4E|2014EB  |02EB14;  Process entity bit validation
 	sta.l $7ec260,x ;02EA51|9F60C27E|7EC260;  Store validation result
 	lda.b #$c0	  ;02EA55|A9C0    |      ;  Load entity active flag
-	sta.l $7ec240,x ;02EA57|9F40C27E|7EC240;  Mark entity as active
+	sta.l !gfx_state_control,x ;02EA57|9F40C27E|7EC240;  Mark entity as active
 	pla ;02EA5B|68      |      ;  Restore entity slot
 	plp ;02EA5C|28      |      ;  Restore processor status
 	ply ;02EA5D|7A      |      ;  Restore Y register
@@ -7651,7 +7651,7 @@ DB_Label_02EA60:
 
 ; Entity Slot Search Loop with Validation
 DB_Load_02EA66:
-	lda.l $7ec240,x ;02EA66|BF40C27E|7EC240;  Check entity slot status
+	lda.l !gfx_state_control,x ;02EA66|BF40C27E|7EC240;  Check entity slot status
 	bpl DB_Load_02EA72 ;02EA6A|1006    |02EA72;  Branch if slot available (positive)
 	inx ;02EA6C|E8      |      ;  Increment to next slot
 	dey ;02EA6D|88      |      ;  Decrement remaining slots
@@ -7661,8 +7661,8 @@ DB_Load_02EA66:
 ; Entity Slot Initialization and Validation
 DB_Load_02EA72:
 	lda.b #$00	  ;02EA72|A900    |      ;  Load initialization value
-	sta.l $7ec2e0,x ;02EA74|9FE0C27E|7EC2E0;  Clear entity synchronization state
-	sta.l $7ec360,x ;02EA78|9F60C37E|7EC360;  Clear entity validation flags
+	sta.l !gfx_channel_state,x ;02EA74|9FE0C27E|7EC2E0;  Clear entity synchronization state
+	sta.l !sprite_frame_array,x ;02EA78|9F60C37E|7EC360;  Clear entity validation flags
 	ply ;02EA7C|7A      |      ;  Restore Y register
 	pla ;02EA7D|68      |      ;  Restore entity request
 	rts ;02EA7E|60      |      ;  Return with slot index in X
@@ -8768,12 +8768,12 @@ DB_Memory_ConfigTable4:
 ; Advanced entity cleanup with comprehensive sprite management and validation
 DB_Label_02F670:
 	php ;02F670|08      |      ;  Preserve processor status
-	lda.l $7ec240,x ;02F671|BF40C27E|7EC240;  Load entity state flags
+	lda.l !gfx_state_control,x ;02F671|BF40C27E|7EC240;  Load entity state flags
 	bpl DB_Label_02F6C0 ;02F675|1049    |02F6C0;  Skip cleanup if entity inactive
 	lda.b #$00	  ;02F677|A900    |      ;  Load cleanup initialization value
-	sta.l $7ec240,x ;02F679|9F40C27E|7EC240;  Clear entity state flags
+	sta.l !gfx_state_control,x ;02F679|9F40C27E|7EC240;  Clear entity state flags
 	lda.b #$ff	  ;02F67D|A9FF    |      ;  Load cleanup marker value
-	sta.l $7ec340,x ;02F67F|9F40C37E|7EC340;  Clear entity animation state
+	sta.l !gfx_mode_buffer,x ;02F67F|9F40C37E|7EC340;  Clear entity animation state
 	sta.l $7ec400,x ;02F683|9F00C47E|7EC400;  Clear entity command state
 	sta.l $7ec420,x ;02F687|9F20C47E|7EC420;  Clear entity backup command
 	sta.l $7ec3c0,x ;02F68B|9FC0C37E|7EC3C0;  Clear entity pointer low
@@ -8821,7 +8821,7 @@ DB_Load_02F6C3:
 	lda.b #$e6	  ;02F6C8|A9E6    |      ;  Load intensity value
 	sta.w !COLDATA	 ;02F6CA|8D3221  |022132;  Set color data register
 	lda.b #$00	  ;02F6CD|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F6CF|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F6CF|9F80C37E|7EC380;  Store entity state
 	rts ;02F6D3|60      |      ;  Return from color mode A
 
 ; Color Mode Configuration B - Standard
@@ -8830,7 +8830,7 @@ DB_Store_02F6D4:
 	lda.b #$e0	  ;02F6D7|A9E0    |      ;  Load standard intensity value
 	sta.w !COLDATA	 ;02F6D9|8D3221  |022132;  Set standard color data
 	lda.b #$00	  ;02F6DC|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F6DE|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F6DE|9F80C37E|7EC380;  Store entity state
 	rts ;02F6E2|60      |      ;  Return from color mode B
 
 ; Color Mode Configuration C - Enhanced
@@ -8840,7 +8840,7 @@ DB_Load_02F6E3:
 	lda.b #$ed	  ;02F6E8|A9ED    |      ;  Load enhanced intensity value
 	sta.w !COLDATA	 ;02F6EA|8D3221  |022132;  Set enhanced color data
 	lda.b #$00	  ;02F6ED|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F6EF|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F6EF|9F80C37E|7EC380;  Store entity state
 	rts ;02F6F3|60      |      ;  Return from color mode C
 
 ; ------------------------------------------------------------------------------
@@ -8850,10 +8850,10 @@ DB_Load_02F6E3:
 DB_Label_02F6F4:
 	clc ;02F6F4|18      |      ;  Clear carry for addition
 	lda.l $7ec420,x ;02F6F5|BF20C47E|7EC420;  Load entity movement vector
-	adc.l $7ec280,x ;02F6F9|7F80C27E|7EC280;  Add to entity X coordinate
-	sta.l $7ec280,x ;02F6FD|9F80C27E|7EC280;  Store updated X coordinate
+	adc.l !gfx_result_data,x ;02F6F9|7F80C27E|7EC280;  Add to entity X coordinate
+	sta.l !gfx_result_data,x ;02F6FD|9F80C27E|7EC280;  Store updated X coordinate
 	lda.b #$00	  ;02F701|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F703|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F703|9F80C37E|7EC380;  Store entity state
 	rts ;02F707|60      |      ;  Return from movement processing
 
 ; Advanced Window Processing and Mode Management
@@ -8866,7 +8866,7 @@ DB_Load_02F708:
 	lda.b #$50	  ;02F715|A950    |      ;  Load window color configuration
 	sta.w !CGADSUB	 ;02F717|8D3121  |022131;  Set window color addition
 	lda.b #$00	  ;02F71A|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F71C|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F71C|9F80C37E|7EC380;  Store entity state
 	rts ;02F720|60      |      ;  Return from window processing
 
 ; Window Processing Reset and Cleanup
@@ -8877,7 +8877,7 @@ DB_Store_02F721:
 	lda.b #$e0	  ;02F72A|A9E0    |      ;  Load default color value
 	sta.w !COLDATA	 ;02F72C|8D3221  |022132;  Set default color data
 	lda.b #$00	  ;02F72F|A900    |      ;  Clear entity processing state
-	sta.l $7ec380,x ;02F731|9F80C37E|7EC380;  Store entity state
+	sta.l !gfx_buffer_main,x ;02F731|9F80C37E|7EC380;  Store entity state
 	rts ;02F735|60      |      ;  Return from window reset
 
 ; Advanced Color Configuration with Entity Coordination
@@ -8903,7 +8903,7 @@ DB_Label_02F736:
 	db $a9,$01	 ;02FAEA|        |      ; Load immediate value $01 for entity reset
 
 Entity_AnimationLoop:
-	sta.l $7ec360,x ;02FAEC|9F60C37E|7EC360; Store entity animation state in extended memory
+	sta.l !sprite_frame_array,x ;02FAEC|9F60C37E|7EC360; Store entity animation state in extended memory
 	sep #$20		;02FAF0|E220    |      ; Set 8-bit accumulator mode for byte operations
 	rep #$10		;02FAF2|C210    |      ; Set 16-bit index registers for address calculations
 	jsr.w Sprite_Processor ;02FAF4|2009FB  |02FB09; Call advanced sprite processing routine
@@ -8988,7 +8988,7 @@ Sprite_DefaultGraphics:
 
 	lda.l $7ec420,x ;02FB50|BF20C47E|7EC420; Load entity Z-coordinate from extended memory
 	xba ;02FB54|EB      |      ; Exchange A and B registers for high byte access
-	lda.l $7ec320,x ;02FB55|BF20C37E|7EC320; Load entity X-coordinate from memory
+	lda.l !sprite_base_array,x ;02FB55|BF20C37E|7EC320; Load entity X-coordinate from memory
 	clc ;02FB59|18      |      ; Clear carry flag for addition
 	adc.b #$08	  ;02FB5A|6908    |      ; Add offset for sprite positioning
 	jsl.l DB_Label_0B92D6 ;02FB5C|22D6920B|0B92D6; Call cross-bank coordinate processing routine
@@ -9082,7 +9082,7 @@ Sprite_DefaultGraphics:
 
 	phx ;02FDAA|DA      |      ; Preserve X register for entity index
 	php ;02FDAB|08      |      ; Preserve processor status flags
-	lda.l $7ec380,x ;02FDAC|BF80C37E|7EC380; Load entity animation state from extended memory
+	lda.l !gfx_buffer_main,x ;02FDAC|BF80C37E|7EC380; Load entity animation state from extended memory
 	pea.w DB_Memory_ConfigTable4 ;02FDB0|F42CF6  |02F62C; Push animation data table address
 	jsl.l CallSpriteInitializer ;02FDB3|22BE9700|0097BE; Call cross-bank animation processing routine
 	plp ;02FDB7|28      |      ; Restore processor status flags
@@ -9095,7 +9095,7 @@ Sprite_DefaultGraphics:
 ; ============================================================================
 
 	phx ;02FDBD|DA      |      ; Preserve X register for entity management
-	lda.l $7ec380,x ;02FDBE|BF80C37E|7EC380; Load entity animation state from memory
+	lda.l !gfx_buffer_main,x ;02FDBE|BF80C37E|7EC380; Load entity animation state from memory
 	pea.w DB_Memory_ConfigTable4 ;02FDC2|F42CF6  |02F62C; Push animation table reference
 	jsl.l CallSpriteInitializer ;02FDC5|22BE9700|0097BE; Call cross-bank animation coordinator
 	plx ;02FDC9|FA      |      ; Restore X register (entity index)
@@ -9130,7 +9130,7 @@ Entity_InitBoundary:
 	lda.l $7ec2c0,x ;02FE21|BFC0C27E|7EC2C0; Load entity graphics state from memory
 	sta.b $cb	   ;02FE25|85CB    |000ACB; Store in direct page for fast access
 	lda.b #$00	  ;02FE27|A900    |      ; Clear accumulator for initialization
-	sta.l $7ec2e0,x ;02FE29|9FE0C27E|7EC2E0; Clear entity animation counter
+	sta.l !gfx_channel_state,x ;02FE29|9FE0C27E|7EC2E0; Clear entity animation counter
 	jsr.w DB_Label_02EB55 ;02FE2D|2055EB  |02EB55; Call entity initialization routine
 	lda.b #$03	  ;02FE30|A903    |      ; Load entity processing priority level
 	sta.w $0ae4	 ;02FE32|8DE40A  |020AE4; Store priority in memory
@@ -9149,7 +9149,7 @@ Entity_GraphicsCreator:
 	phy ;02FE3D|5A      |      ; Preserve Y register for restoration
 	php ;02FE3E|08      |      ; Preserve processor status flags
 	sep #$30		;02FE3F|E230    |      ; Set 8-bit accumulator and index registers
-	lda.l $7ec320,x ;02FE41|BF20C37E|7EC320; Load entity X-coordinate from memory
+	lda.l !sprite_base_array,x ;02FE41|BF20C37E|7EC320; Load entity X-coordinate from memory
 	pha ;02FE45|48      |      ; Push X-coordinate to stack for preservation
 	lda.l $7ec2c0,x ;02FE46|BFC0C27E|7EC2C0; Load entity graphics state from memory
 	pha ;02FE4A|48      |      ; Push graphics state to stack for preservation
@@ -9165,13 +9165,13 @@ Entity_GraphicsCreator:
 	pla ;02FE61|68      |      ; Pull graphics state from stack
 	sta.l $7ec2c0,x ;02FE62|9FC0C27E|7EC2C0; Restore entity graphics state
 	pla ;02FE66|68      |      ; Pull X-coordinate from stack
-	sta.l $7ec320,x ;02FE67|9F20C37E|7EC320; Restore entity X-coordinate
+	sta.l !sprite_base_array,x ;02FE67|9F20C37E|7EC320; Restore entity X-coordinate
 	lda.b #$00	  ;02FE6B|A900    |      ; Clear accumulator for initialization
-	sta.l $7ec2e0,x ;02FE6D|9FE0C27E|7EC2E0; Clear entity animation counter
-	sta.l $7ec360,x ;02FE71|9F60C37E|7EC360; Clear entity state flags
-	sta.l $7ec380,x ;02FE75|9F80C37E|7EC380; Clear entity animation state
+	sta.l !gfx_channel_state,x ;02FE6D|9FE0C27E|7EC2E0; Clear entity animation counter
+	sta.l !sprite_frame_array,x ;02FE71|9F60C37E|7EC360; Clear entity state flags
+	sta.l !gfx_buffer_main,x ;02FE75|9F80C37E|7EC380; Clear entity animation state
 	lda.b #$84	  ;02FE79|A984    |      ; Load default entity status code
-	sta.l $7ec240,x ;02FE7B|9F40C27E|7EC240; Store entity status in memory
+	sta.l !gfx_state_control,x ;02FE7B|9F40C27E|7EC240; Store entity status in memory
 	plp ;02FE7F|28      |      ; Restore processor status flags
 	ply ;02FE80|7A      |      ; Restore Y register
 	pld ;02FE81|2B      |      ; Restore direct page register
@@ -9187,9 +9187,9 @@ Entity_Cleanup:
 	php ;02FE85|08      |      ; Preserve processor status flags
 	sep #$30		;02FE86|E230    |      ; Set 8-bit accumulator and index registers
 	lda.b #$00	  ;02FE88|A900    |      ; Clear accumulator for initialization
-	sta.l $7ec340,x ;02FE8A|9F40C37E|7EC340; Clear entity interaction state
-	sta.l $7ec360,x ;02FE8E|9F60C37E|7EC360; Clear entity animation flags
-	sta.l $7ec380,x ;02FE92|9F80C37E|7EC380; Clear entity animation state
+	sta.l !gfx_mode_buffer,x ;02FE8A|9F40C37E|7EC340; Clear entity interaction state
+	sta.l !sprite_frame_array,x ;02FE8E|9F60C37E|7EC360; Clear entity animation flags
+	sta.l !gfx_buffer_main,x ;02FE92|9F80C37E|7EC380; Clear entity animation state
 	lda.l $7ec260,x ;02FE96|BF60C27E|7EC260; Load entity type from memory
 	jsr.w Entity_Deactivator ;02FE9A|20ABFE  |02FEAB; Call entity deactivation routine
 	phd ;02FE9D|0B      |      ; Preserve direct page register
