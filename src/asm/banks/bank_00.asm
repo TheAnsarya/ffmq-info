@@ -11166,7 +11166,7 @@ Party_LoadCharacterData_Return:
 	inc.B $17                            ;00A281|E617    |000017;
 	inc.B $17                            ;00A283|E617    |000017;
 	sep #$20                             ;00A285|E220    |      ;
-	sta.W $0513                          ;00A287|8D1305  |000513;
+	sta.W !sys_operation_type                          ;00A287|8D1305  |000513;
 	xba                                  ;00A28A|EB      |      ;
 	sta.W $0a9c                          ;00A28B|8D9C0A  |000A9C;
 	ldx.B $17                            ;00A28E|A617    |000017;
@@ -15622,7 +15622,7 @@ Input_ProcessButtons:
 	php                                  ;00BE83|08      |      ;
 	sep #$20                             ;00BE84|E220    |      ;
 	rep #$10                             ;00BE86|C210    |      ;
-	sta.W $04e0                          ;00BE88|8DE004  |0004E0;
+	sta.W !sys_state_ptr                          ;00BE88|8DE004  |0004E0;
 	lda.B #$04                           ;00BE8B|A904    |      ;
 	tsb.w !system_flags_5                          ;00BE8D|0CDA00  |0000DA;
 	pei.B ($8e)                          ;00BE90|D48E    |00008E;
@@ -15654,7 +15654,7 @@ Menu_DeadCode_CompanionCheck:  ; Dead code - companion validation (BMI never tru
 	db $ad,$e0,$04,$29,$20,$d0,$0d,$80,$07;00BEC0|        |0004E0;
 ;      |        |      ;
 Input_HandleUp:
-	lda.W $04e0                          ;00BEC9|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00BEC9|ADE004  |0004E0;
 	and.B #$10                           ;00BECC|2910    |      ;
 	beq Menu_DeadCode_SelectDefault                   ;00BECE|F004    |00BED4;
 ;      |        |      ;
@@ -15697,7 +15697,7 @@ Input_UpdatePosition:
 	bne Input_ValidateRange                      ;00BF0A|D015    |00BF21;
 	bit.B #$0c                           ;00BF0C|890C    |      ;
 	beq Input_UpdatePosition                      ;00BF0E|F0E5    |00BEF5;
-	lda.W $04e0                          ;00BF10|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00BF10|ADE004  |0004E0;
 	and.B #$30                           ;00BF13|2930    |      ;
 	cmp.B #$30                           ;00BF15|C930    |      ;
 	bne Input_UpdatePosition                      ;00BF17|D0DC    |00BEF5;
@@ -15846,7 +15846,7 @@ Sprite_SetPosition:
 Menu_ProcessItemSelection:
 	phx                                  ;00C012|DA      |      ;
 	sep #$20                             ;00C013|E220    |      ;
-	sta.W $043a                          ;00C015|8D3A04  |00043A;
+	sta.W !sys_temp_param                          ;00C015|8D3A04  |00043A;
 	jsl.L Sub_028AE0                    ;00C018|22E08A02|028AE0;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00C01C|2008B9  |00B908;
 	rep #$30                             ;00C01F|C230    |      ;
@@ -16056,10 +16056,10 @@ Menu_ConfirmItemUse:
 	lda.B $02                            ;00C1B4|A502    |000002;
 	clc                                  ;00C1B6|18      |      ;
 	adc.B #$14                           ;00C1B7|6914    |      ;
-	sta.W $043a                          ;00C1B9|8D3A04  |00043A;
+	sta.W !sys_temp_param                          ;00C1B9|8D3A04  |00043A;
 	jsl.L Sub_028AE0                    ;00C1BC|22E08A02|028AE0;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00C1C0|2008B9  |00B908;
-	lda.W $04e0                          ;00C1C3|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00C1C3|ADE004  |0004E0;
 	rep #$30                             ;00C1C6|C230    |      ;
 	jsr.W Input_ProcessButtons                    ;00C1C8|2083BE  |00BE83;
 	plx                                  ;00C1CB|FA      |      ;
@@ -19377,7 +19377,7 @@ Character_Confirm:
 	bcc Character_ShowWeapon                      ;00D48E|9033    |00D4C3;
 	beq Character_ShowAbilities                      ;00D490|F024    |00D4B6;
 	lda.B #$04                           ;00D492|A904    |      ;
-	sta.W $04e0                          ;00D494|8DE004  |0004E0;
+	sta.W !sys_state_ptr                          ;00D494|8DE004  |0004E0;
 	jsr.W Equipment_ShowConfirmDialog                    ;00D497|2022D7  |00D722;
 	lda.B $16                            ;00D49A|A516    |000016;
 	bit.B #$80                           ;00D49C|8980    |      ;
@@ -19466,7 +19466,7 @@ Character_LoadCharacter:
 	lda.w !ram_1031,x                        ;00D513|BD3110  |001031;
 	cmp.B #$ff                           ;00D516|C9FF    |      ;
 	beq Character_SetUnavailable                   ;00D518|F018    |00D532;
-	sta.W $043a                          ;00D51A|8D3A04  |00043A;
+	sta.W !sys_temp_param                          ;00D51A|8D3A04  |00043A;
 	pha                                  ;00D51D|48      |      ;
 	phx                                  ;00D51E|DA      |      ;
 	jsl.L Sub_028AE0                    ;00D51F|22E08A02|028AE0;
@@ -19591,7 +19591,7 @@ Abilities_LoadCharacterAbility:
 Abilities_PlayConfirm:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D5F9|2008B9  |00B908;
 	lda.B #$04                           ;00D5FC|A904    |      ;
-	sta.W $04e0                          ;00D5FE|8DE004  |0004E0;
+	sta.W !sys_state_ptr                          ;00D5FE|8DE004  |0004E0;
 	phx                                  ;00D601|DA      |      ;
 	jsr.W Equipment_ShowConfirmDialog                    ;00D602|2022D7  |00D722;
 	plx                                  ;00D605|FA      |      ;
@@ -19723,7 +19723,7 @@ Weapon_ValidWeapon:
 	lda.W !control_region_3,x                        ;00D6DA|BD5210  |001052;
 	jsr.W Item_RemoveWeapon                    ;00D6DD|2016DC  |00DC16;
 	lda.W !control_region_3,x                        ;00D6E0|BD5210  |001052;
-	sta.W $043a                          ;00D6E3|8D3A04  |00043A;
+	sta.W !sys_temp_param                          ;00D6E3|8D3A04  |00043A;
 	phx                                  ;00D6E6|DA      |      ;
 	jsl.L Sub_028AE0                    ;00D6E7|22E08A02|028AE0;
 	jsr.W Equipment_ShowConfirmDialog                    ;00D6EB|2022D7  |00D722;
@@ -19787,7 +19787,7 @@ Equipment_InitializeDialog:
 	ldy.W !SNES_RDMPYL                    ;00D75B|AC1642  |004216;
 	cmp.B #$02                           ;00D75E|C902    |      ;
 	bcc Equipment_CheckCharacterAlive                      ;00D760|9026    |00D788;
-	lda.W $04e0                          ;00D762|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D762|ADE004  |0004E0;
 	bit.B #$01                           ;00D765|8901    |      ;
 	beq Equipment_DefaultState                      ;00D767|F050    |00D7B9;
 	lda.W $1010,y                        ;00D769|B91010  |001010;
@@ -19807,7 +19807,7 @@ Equipment_InitializeDialog:
 ;      |        |      ;
 ;      |        |      ;
 Equipment_CheckCharacterAlive:
-	lda.W $04e0                          ;00D788|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D788|ADE004  |0004E0;
 	bit.B #$04                           ;00D78B|8904    |      ;
 	beq Equipment_DefaultState                      ;00D78D|F02A    |00D7B9;
 	lda.W $1010,y                        ;00D78F|B91010  |001010;
@@ -19824,7 +19824,7 @@ Equipment_CheckCharacterAlive:
 Equipment_CheckNegativeFlag:
 	bit.B #$01                           ;00D7A5|8901    |      ;
 	beq Equipment_DeadCode_DirectionCheck                   ;00D7A7|F009    |00D7B2;
-	lda.W $04e0                          ;00D7A9|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D7A9|ADE004  |0004E0;
 	bit.B #$02                           ;00D7AC|8902    |      ;
 	bne Equipment_NoEquipment                      ;00D7AE|D049    |00D7F9;
 	bra Equipment_DefaultState                      ;00D7B0|8007    |00D7B9;
@@ -19834,10 +19834,10 @@ Equipment_DeadCode_DirectionCheck:  ; Dead code - D-pad check (never reached)
 	db $ad,$e0,$04,$89,$08,$d0,$13       ;00D7B2|        |0004E0;
 ;      |        |      ;
 Equipment_DefaultState:
-	lda.W $04e0                          ;00D7B9|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D7B9|ADE004  |0004E0;
 	bit.B #$80                           ;00D7BC|8980    |      ;
 	bne Equipment_CheckUnequip                      ;00D7BE|D011    |00D7D1;
-	lda.W $04e0                          ;00D7C0|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D7C0|ADE004  |0004E0;
 	bit.B #$04                           ;00D7C3|8904    |      ;
 	beq Equipment_DeadCode_PointerHigh                   ;00D7C5|F005    |00D7CC;
 	ldx.W #$0200                         ;00D7C7|A20002  |      ;
@@ -19848,7 +19848,7 @@ Equipment_DeadCode_PointerHigh:  ; Dead code - high pointer value (never reached
 	db $a2,$00,$03,$80,$2b               ;00D7CC|        |      ;
 ;      |        |      ;
 Equipment_CheckUnequip:
-	lda.W $04e0                          ;00D7D1|ADE004  |0004E0;
+	lda.W !sys_state_ptr                          ;00D7D1|ADE004  |0004E0;
 	bit.B #$01                           ;00D7D4|8901    |      ;
 	beq Equipment_NoEquipment                      ;00D7D6|F021    |00D7F9;
 	ldx.W #$0100                         ;00D7D8|A20001  |      ;
@@ -19903,7 +19903,7 @@ Equipment_ProcessDPad:
 ;      |        |      ;
 Equipment_ProcessConfirm:
 	lda.B #$02                           ;00D84C|A902    |      ;
-	and.W $04e0                          ;00D84E|2DE004  |0004E0;
+	and.W !sys_state_ptr                          ;00D84E|2DE004  |0004E0;
 	beq Equipment_WaitFrame                      ;00D851|F01D    |00D870;
 	lda.B #$00                           ;00D853|A900    |      ;
 	sta.B $02                            ;00D855|8502    |000002;

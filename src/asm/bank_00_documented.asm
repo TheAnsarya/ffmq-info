@@ -5266,7 +5266,7 @@ Status_RenderIcon:
 	pea.w !JOY_DOWN	 ; Push $0400
 	pld ; Direct Page = $0400
 
-	sta.b $3a	   ; Save icon ID to $043a
+	sta.b $3a	   ; Save icon ID to !sys_temp_param
 	jsl.l BankRoutine ; Process icon type
 
 	lda.b $3a	   ; Get icon ID
@@ -7897,7 +7897,7 @@ Cmd_MultiCommandSeq:
 	inc.b $17	   ; Advance stream
 	inc.b $17	   ; (2 bytes)
 	sep #$20		; 8-bit A
-	sta.w $0513	 ; Store parameter
+	sta.w !sys_operation_type	 ; Store parameter
 	xba ; Swap bytes
 	sta.w $0a9c	 ; Store parameter
 
@@ -12925,7 +12925,7 @@ Menu_PartySelection:
 	php ; Save processor status
 	sep #$20		; 8-bit accumulator
 	rep #$10		; 16-bit index
-	sta.w $04e0	 ; Store menu parameter
+	sta.w !sys_state_ptr	 ; Store menu parameter
 	lda.b #$04	  ; Menu active flag
 	tsb.w !system_flags_5	 ; Set bit 2 in flags
 	pei.b ($8e)	 ; Save position
@@ -12955,23 +12955,23 @@ Menu_PartySelection_Init:
 ; ------------------------------------------------------------------------------
 ; Menu Party Selection - Battle Mode Check
 ; ------------------------------------------------------------------------------
-; Purpose: Check if in battle mode and skip if bit 5 of $04e0 is set
+; Purpose: Check if in battle mode and skip if bit 5 of !sys_state_ptr is set
 ; Reachability: Reachable via conditional branch (bmi above)
 ; Analysis: Battle mode alternate path in party selection
-;   - Loads $04e0 (battle flags)
+;   - Loads !sys_state_ptr (battle flags)
 ;   - Tests bit 5 ($20)
 ;   - If set, skips to Menu_PartySelection_GetOption
 ;   - Otherwise continues to next check
 ; Technical: Originally labeled UNREACH_00BEC0
 ; ------------------------------------------------------------------------------
 Menu_PartySelection_BattleCheck:
-	lda.w $04e0                          ;00BEC0|ADE004  |0004E0; Load battle flags
+	lda.w !sys_state_ptr                          ;00BEC0|ADE004  |0004E0; Load battle flags
 	and.b #$20                           ;00BEC3|2920    |      ; Test bit 5 (battle mode)
 	bne Menu_PartySelection_GetOption    ;00BEC5|D00D    |00BED4; If set, get option directly
 	bra Menu_PartySelection_Start        ;00BEC7|8007    |00BED0; Otherwise continue
 
 Menu_PartySelection_Start:
-	lda.w $04e0	 ; Load parameter
+	lda.w !sys_state_ptr	 ; Load parameter
 	and.b #$10	  ; Check bit 4
 	beq Menu_PartySelection_DefaultOption ; Branch if clear
 
@@ -12984,7 +12984,7 @@ Menu_PartySelection_GetOption:
 ; ------------------------------------------------------------------------------
 ; Purpose: Set default option to $80 (cancel/back)
 ; Reachability: Reachable via conditional branch (beq above)
-; Analysis: Sets default menu option when bit 4 of $04e0 is clear
+; Analysis: Sets default menu option when bit 4 of !sys_state_ptr is clear
 ;   - Loads $80 (cancel code)
 ;   - Implicit fall-through to Menu_PartySelection_Update
 ; Technical: Originally labeled UNREACH_00BED4
@@ -13307,12 +13307,12 @@ Menu_Item_StoreHP:
 ; Entry: A = item ID
 ; Exit: Carry clear if confirmed (A=1), carry set if cancelled
 ; Calls: BankRoutine, NormalPositionCallB908, CallsCodeCodeCode
-; Notes: Uses $04e0 for input tracking
+; Notes: Uses !sys_state_ptr for input tracking
 ;-------------------------------------------------------------------------------
 Menu_Item_ConfirmDiscard:
 	phx ; Save X
 	sep #$20		; 8-bit accumulator
-	sta.w $043a	 ; Store item ID
+	sta.w !sys_temp_param	 ; Store item ID
 	jsl.l BankRoutine ; External routine
 	jsr.w NormalPositionCallB908 ; Set sprite mode $2d
 	rep #$30		; 16-bit A/X/Y
@@ -13381,7 +13381,7 @@ Menu_Spell_Slot0Handler:
 	dec.w !char1_current_mp,x                        ;00C074|DE1810  |011018; Decrement MP
 	sep #$20                             ;00C077|E220    |      ; 8-bit accumulator
 	lda.b #$14                           ;00C079|A914    |      ; Load spell effect ID
-	sta.w $043a                          ;00C07B|8D3A04  |01043A; Store effect
+	sta.w !sys_temp_param                          ;00C07B|8D3A04  |01043A; Store effect
 	jsl.l BankRoutine                    ;00C07E|22E08A02|028AE0; Call effect handler
 	lda.w $04df                          ;00C082|ADDF04  |0104DF; Load character ID
 	sta.w !audio_coord_register                          ;00C085|8D0505  |010505; Store for update
@@ -13576,10 +13576,10 @@ Menu_Spell_ConfirmUse:
 	lda.b $02	   ; Load spell slot
 	clc ; Clear carry
 	adc.b #$14	  ; Add $14 (spell offset)
-	sta.w $043a	 ; Store spell ID
+	sta.w !sys_temp_param	 ; Store spell ID
 	jsl.l BankRoutine ; External routine
 	jsr.w NormalPositionCallB908 ; Set sprite mode $2d
-	lda.w $04e0	 ; Load input flags
+	lda.w !sys_state_ptr	 ; Load input flags
 	rep #$30		; 16-bit A/X/Y
 	jsr.w CallsCodeCodeCode ; Show confirmation menu
 	plx ; Restore X

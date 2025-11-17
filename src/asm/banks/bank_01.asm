@@ -11439,7 +11439,7 @@ Field_UpdateCameraPosition:
 	jsr.W MapEvent_InitializeSprite                    ;01E031|20CD94  |0194CD;
 	jsr.W Field_UpdateAndWait                    ;01E034|20D982  |0182D9;
 	lda.w !battle_entity_data_ref                          ;01E037|ADE619  |0119E6;
-	sta.W $0513                          ;01E03A|8D1305  |010513;
+	sta.W !sys_operation_type                          ;01E03A|8D1305  |010513;
 	jsr.W Field_CameraCalculate                    ;01E03D|20908B  |018B90;
 	lda.B #$27                           ;01E040|A927    |      ;
 	jsr.W Sound_PlayEffect                    ;01E042|20ADBA  |01BAAD;
@@ -13821,7 +13821,7 @@ Field_ProcessLoadGame:
 ;      |        |      ;
 ;      |        |      ;
 Field_ReadSaveData:
-	sta.W $0513                          ;01F1C3|8D1305  |010513;
+	sta.W !sys_operation_type                          ;01F1C3|8D1305  |010513;
 	tax                                  ;01F1C6|AA      |      ;
 	lda.L DATA8_01f437,x                 ;01F1C7|BF37F401|01F437;
 	sep #$10                             ;01F1CB|E210    |      ;

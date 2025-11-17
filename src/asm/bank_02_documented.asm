@@ -72,7 +72,7 @@ Bank_Context_Restoration:
 ; Advanced Configuration Validation System
 ; Sophisticated configuration validation with error checking
 Advanced_Configuration_Validation:
-	lda.w $0513	 ; Load system configuration register
+	lda.w !sys_operation_type	 ; Load system configuration register
 	cmp.b #$ff	  ; Compare with configuration validation marker
 	beq Configuration_Validation_Complete ; Branch if configuration valid
 	sta.w $0514	 ; Store validated configuration
@@ -610,14 +610,14 @@ standard_math_operations:
 	lda.b $51	   ;02844D|A551    |001051; Load calculation param 3
 	pha ;02844F|48      |      ; Preserve on stack
 	lda.b $52	   ;028450|A552    |001052; Load calculation param 4
-	sta.w $043a	 ;028452|8D3A04  |02043A; Store in temp area
+	sta.w !sys_temp_param	 ;028452|8D3A04  |02043A; Store in temp area
 	pla ;028455|68      |      ; Restore param 3
 	sta.w $0439	 ;028456|8D3904  |020439; Store in temp area
 	pla ;028459|68      |      ; Restore param 2
 	sta.w $0438	 ;02845A|8D3804  |020438; Store in temp area
 	bne param_validation ;02845D|D005    |028464; Validate if non-zero
 	pla ;02845F|68      |      ; Restore param 1
-	sta.w $043a	 ;028460|8D3A04  |02043A; Overwrite temp
+	sta.w !sys_temp_param	 ;028460|8D3A04  |02043A; Overwrite temp
 	pha ;028463|48      |      ; Preserve again
 
 ;--------------------------------------------------------------------
@@ -928,7 +928,7 @@ entity_lifecycle_management:
 	stz.b $8b	   ;028756|648B    |00048B; Clear entity ID
 	jsr.w ProcessEntity ;028758|20228F  |028F22; Access entity data
 	lda.b $10	   ;02875B|A510    |001010; Load entity base
-	sta.w $04a0	 ;02875D|8DA004  |0204A0; Store in temp area
+	sta.w !sys_temp_work_1	 ;02875D|8DA004  |0204A0; Store in temp area
 	inc a;028760|1A      |      ; Increment for test
 	cmp.b #$2a	  ;028761|C92A    |      ; Check against limit
 	bcc entity_valid_range ;028763|9002    |028767; Branch if valid
@@ -1004,10 +1004,10 @@ entity_parameter_management:
 	sep #$20		;0287A4|E220    |      ; Set 8-bit accumulator
 	rep #$10		;0287A6|C210    |      ; Set 16-bit index
 	lda.b $10	   ;0287A8|A510    |001010; Load entity parameter
-	sta.w $04a2	 ;0287AA|8DA204  |0204A2; Store parameter copy
+	sta.w !sys_temp_work_2	 ;0287AA|8DA204  |0204A2; Store parameter copy
 	lda.b $1b	   ;0287AD|A51B    |00101B; Load entity state 1
 	sec ;0287AF|38      |      ; Set carry for subtraction
-	sbc.w $04a0	 ;0287B0|EDA004  |0204A0; Subtract base value
+	sbc.w !sys_temp_work_1	 ;0287B0|EDA004  |0204A0; Subtract base value
 	clc ;0287B3|18      |      ; Clear carry for addition
 	adc.b $10	   ;0287B4|6510    |001010; Add current parameter
 	sta.b $1b	   ;0287B6|851B    |00101B; Store updated state
@@ -1022,13 +1022,13 @@ entity_parameter_management:
 ; Ensure parameter consistency across systems
 
 complex_parameter_calc:
-	lsr.w $04a0	 ;0287B8|4EA004  |0204A0; Shift base parameter
-	lsr.w $04a2	 ;0287BB|4EA204  |0204A2; Shift parameter copy
+	lsr.w !sys_temp_work_1	 ;0287B8|4EA004  |0204A0; Shift base parameter
+	lsr.w !sys_temp_work_2	 ;0287BB|4EA204  |0204A2; Shift parameter copy
 	lda.b $1c	   ;0287BE|A51C    |00101C; Load entity state 2
 	sec ;0287C0|38      |      ; Set carry for subtraction
-	sbc.w $04a0	 ;0287C1|EDA004  |0204A0; Subtract shifted base
+	sbc.w !sys_temp_work_1	 ;0287C1|EDA004  |0204A0; Subtract shifted base
 	clc ;0287C4|18      |      ; Clear carry for addition
-	adc.w $04a2	 ;0287C5|6DA204  |0204A2; Add shifted parameter
+	adc.w !sys_temp_work_2	 ;0287C5|6DA204  |0204A2; Add shifted parameter
 	sta.b $1c	   ;0287C8|851C    |00101C; Store updated state
 
 ;--------------------------------------------------------------------
@@ -1041,13 +1041,13 @@ complex_parameter_calc:
 ; Maintain parameter precision
 
 multi_level_scaling:
-	lsr.w $04a0	 ;0287CA|4EA004  |0204A0; Additional shift level 1
-	lsr.w $04a2	 ;0287CD|4EA204  |0204A2; Additional shift level 2
+	lsr.w !sys_temp_work_1	 ;0287CA|4EA004  |0204A0; Additional shift level 1
+	lsr.w !sys_temp_work_2	 ;0287CD|4EA204  |0204A2; Additional shift level 2
 	lda.b $1d	   ;0287D0|A51D    |00101D; Load entity state 3
 	sec ;0287D2|38      |      ; Set carry for subtraction
-	sbc.w $04a0	 ;0287D3|EDA004  |0204A0; Subtract scaled base
+	sbc.w !sys_temp_work_1	 ;0287D3|EDA004  |0204A0; Subtract scaled base
 	clc ;0287D6|18      |      ; Clear carry for addition
-	adc.w $04a2	 ;0287D7|6DA204  |0204A2; Add scaled parameter
+	adc.w !sys_temp_work_2	 ;0287D7|6DA204  |0204A2; Add scaled parameter
 	sta.b $1d	   ;0287DA|851D    |00101D; Store final state
 
 ;--------------------------------------------------------------------
@@ -1603,7 +1603,7 @@ advanced_audio_processing:
 complex_data_validation:
 	lda.b #$00	  ;028C17|A900    |      ; Clear high byte
 	xba ;028C19|EB      |      ; Exchange accumulator
-	lda.w $0513	 ;028C1A|AD1305  |020513; Load validation data
+	lda.w !sys_operation_type	 ;028C1A|AD1305  |020513; Load validation data
 	cmp.b #$ff	  ;028C1D|C9FF    |      ; Check for invalid marker
 	bne data_validation_continue ;028C1F|D003    |028C24; Continue if valid
 	jmp.w validation_complete ;028C21|4C6E8C  |028C6E; Jump to completion
@@ -1692,7 +1692,7 @@ validation_store:
 	lda.w DATA8_02ce12,x ;028C63|BD12CE  |02CE12; Load from data table
 	sta.w $0515	 ;028C66|8D1505  |020515; Store validation result
 	lda.b #$ff	  ;028C69|A9FF    |      ; Set completion marker
-	sta.w $0513	 ;028C6B|8D1305  |020513; Store completion flag
+	sta.w !sys_operation_type	 ;028C6B|8D1305  |020513; Store completion flag
 
 ;--------------------------------------------------------------------
 ; Validation Completion and System Coordination
@@ -3453,7 +3453,7 @@ Controller_ProcessData:
 	sta.w $0000,x   ;02A449|9D0000  |020000; Store processed data
 	sep #$20		;02A44C|E220    |      ; 8-bit accumulator
 	rep #$10		;02A44E|C210    |      ; 16-bit index
-	lda.w $048b	 ;02A450|AD8B04  |02048B; Check game mode
+	lda.w !sys_game_mode	 ;02A450|AD8B04  |02048B; Check game mode
 	cmp.b #$02	  ;02A453|C902    |      ; Compare to mode 2
 	bcc Controller_NextController ; Branch if less than
 	lda.b #$fe	  ;02A457|A9FE    |      ; Clear bit 0 mask
@@ -3484,7 +3484,7 @@ Controller_ButtonMapping:
 	asl a;02A470|0A      |      ; Shift left
 	asl a;02A471|0A      |      ; Shift left
 	asl a;02A472|0A      |      ; Shift left (multiply by 8)
-	sta.w $04a0	 ;02A473|8DA004  |0204A0; Store shifted value
+	sta.w !sys_temp_work_1	 ;02A473|8DA004  |0204A0; Store shifted value
 	pla ;02A476|68      |      ; Restore input
 	and.w #$0f00	;02A477|29000F  |      ; Mask high nibble
 	lsr a;02A47A|4A      |      ; Shift right
@@ -3495,8 +3495,8 @@ Controller_ButtonMapping:
 	lsr a;02A47F|4A      |      ; Shift right
 	lsr a;02A480|4A      |      ; Shift right
 	lsr a;02A481|4A      |      ; Shift right (divide by 256)
-	ora.w $04a0	 ;02A482|0DA004  |0204A0; Combine with shifted value
-	sta.w $04a0	 ;02A485|8DA004  |0204A0; Store combined result
+	ora.w !sys_temp_work_1	 ;02A482|0DA004  |0204A0; Combine with shifted value
+	sta.w !sys_temp_work_1	 ;02A485|8DA004  |0204A0; Store combined result
 	pla ;02A488|68      |      ; Restore original input
 	and.w #$f000	;02A489|2900F0  |      ; Mask upper nibble
 	lsr a;02A48C|4A      |      ; Shift right
@@ -3506,7 +3506,7 @@ Controller_ButtonMapping:
 	lsr a;02A490|4A      |      ; Shift right
 	lsr a;02A491|4A      |      ; Shift right
 	lsr a;02A492|4A      |      ; Shift right (divide by 128)
-	ora.w $04a0	 ;02A493|0DA004  |0204A0; Final combination
+	ora.w !sys_temp_work_1	 ;02A493|0DA004  |0204A0; Final combination
 	rts ;02A496|60      |      ; Return processed value
 ;      |        |      ;
 ;      |        |      ;
@@ -3529,33 +3529,33 @@ Controller_ResponseLoop:
 	lda.b $21	   ;02A4A4|A521    |001221; Check button state
 	and.w #$0080	;02A4A6|298000  |      ; Test specific button
 	beq Controller_ResponseEnd ; Exit loop if released
-	inc.w $04a0	 ;02A4AB|EEA004  |0204A0; Increment measurement
-	inc.w $048d	 ;02A4AE|EE8D04  |02048D; Increment counter
+	inc.w !sys_temp_work_1	 ;02A4AB|EEA004  |0204A0; Increment measurement
+	inc.w !sys_state_counter	 ;02A4AE|EE8D04  |02048D; Increment counter
 	bra Controller_ResponseLoop ; Continue measuring
 ;      |        |      ;
 ;      |        |      ;
 
 Controller_ResponseEnd:
 	lda.b $14	   ;02A4B3|A514    |001214; Read timing value
-	sta.w $04a2	 ;02A4B5|8DA204  |0204A2; Store timing reference
+	sta.w !sys_temp_work_2	 ;02A4B5|8DA204  |0204A2; Store timing reference
 ;      |        |      ;
 
 ; Timing Optimization Loop
 Controller_TimingOptimize:
-	inc.w $048d	 ;02A4B8|EE8D04  |02048D; Increment counter
+	inc.w !sys_state_counter	 ;02A4B8|EE8D04  |02048D; Increment counter
 	lda.w #$0005	;02A4BB|A90500  |      ; Set loop limit
-	cmp.w $048d	 ;02A4BE|CD8D04  |02048D; Compare to counter
+	cmp.w !sys_state_counter	 ;02A4BE|CD8D04  |02048D; Compare to counter
 	beq Controller_TimingResult ; Exit if limit reached
 	jsr.w SwitchInputProcessingContext ;02A4C3|202F8F  |028F2F; Read controller again
 	lda.b $21	   ;02A4C6|A521    |001221; Check button state
 	and.w #$0080	;02A4C8|298000  |      ; Test button
 	bne Controller_TimingOptimize ; Continue if pressed
 	lda.b $14	   ;02A4CD|A514    |001214; Read current timing
-	cmp.w $04a2	 ;02A4CF|CDA204  |0204A2; Compare to reference
+	cmp.w !sys_temp_work_2	 ;02A4CF|CDA204  |0204A2; Compare to reference
 	bcs Controller_TimingOptimize ; Continue if not improved
-	sta.w $04a2	 ;02A4D4|8DA204  |0204A2; Store new best time
-	lda.w $048d	 ;02A4D7|AD8D04  |02048D; Load counter
-	sta.w $04a0	 ;02A4DA|8DA004  |0204A0; Store optimal value
+	sta.w !sys_temp_work_2	 ;02A4D4|8DA204  |0204A2; Store new best time
+	lda.w !sys_state_counter	 ;02A4D7|AD8D04  |02048D; Load counter
+	sta.w !sys_temp_work_1	 ;02A4DA|8DA004  |0204A0; Store optimal value
 	bra Controller_TimingOptimize ; Continue optimization
 ;      |        |      ;
 ;      |        |      ;
@@ -3577,7 +3577,7 @@ Controller_TimingResult:
 ;      |        |      ;
 
 Controller_TimingStore:
-	lda.w $04a0	 ;02A4FA|ADA004  |0204A0; Load optimal value
+	lda.w !sys_temp_work_1	 ;02A4FA|ADA004  |0204A0; Load optimal value
 ;      |        |      ;
 
 Controller_TimingFinalize:
@@ -3710,7 +3710,7 @@ Menu_StandardPath:
 	lda.b $38	   ;02A663|A538    |001038; Read state flags
 	and.b #$0f	  ;02A665|290F    |      ; Mask low nibble
 	ora.b $39	   ;02A667|0539    |001039; Combine with state
-	sta.w $04a0	 ;02A669|8DA004  |0204A0; Store combined state
+	sta.w !sys_temp_work_1	 ;02A669|8DA004  |0204A0; Store combined state
 	pld ;02A66C|2B      |      ; Restore direct page
 	lda.b $a0	   ;02A66D|A5A0    |0004A0; Read state
 	beq Menu_SelectNoState ; Branch if zero
@@ -4011,7 +4011,7 @@ System_CommandProcessor:
 	lda.b $50	   ;02A954|A550    |001050; Read command parameter 1
 	sta.w $0438	 ;02A956|8D3804  |020438; Store in system memory
 	lda.b $52	   ;02A959|A552    |001052; Read command parameter 2
-	sta.w $043a	 ;02A95B|8D3A04  |02043A; Store in system memory
+	sta.w !sys_temp_param	 ;02A95B|8D3A04  |02043A; Store in system memory
 	pld ;02A95E|2B      |      ; Restore direct page
 	jsr.w ExecuteAdvancedCalc ;02A95F|200F8B  |028B0F; Process command state
 	lda.b $e0	   ;02A962|A5E0    |0004E0; Read error state
@@ -4139,7 +4139,7 @@ Sound_PriorityProcess:
 Sound_PriorityLoop:
 	lda.b $44,x	 ;02AA01|B544    |001244; Read state value
 	beq Sound_PriorityAdjust ; Skip if zero
-	cmp.w $04a0	 ;02AA05|CDA004  |0204A0; Compare to stored result
+	cmp.w !sys_temp_work_1	 ;02AA05|CDA004  |0204A0; Compare to stored result
 	bcc Sound_PriorityAdjust ; Skip if less
 	lda.b $58,x	 ;02AA0A|B558    |001258; Read corresponding value
 	inc a;02AA0C|1A      |      ; Test value
@@ -4150,7 +4150,7 @@ Sound_PriorityLoop:
 Game_Priority_Handler:
 	dec a;02AA0F|3A      |      ; Decrement value
 	sta.b $52	   ;02AA10|8552    |001252; Store result
-	sta.w $043a	 ;02AA12|8D3A04  |02043A; Store in system memory
+	sta.w !sys_temp_param	 ;02AA12|8D3A04  |02043A; Store in system memory
 	lda.b #$10	  ;02AA15|A910    |      ; Set command type
 	sta.b $50	   ;02AA17|8550    |001250; Store command type
 	sta.w $0438	 ;02AA19|8D3804  |020438; Store in system memory
@@ -4161,10 +4161,10 @@ Game_Priority_Handler:
 
 ; Priority Adjustment Loop
 Sound_PriorityAdjust:
-	lda.w $04a0	 ;02AA1F|ADA004  |0204A0; Read stored value
+	lda.w !sys_temp_work_1	 ;02AA1F|ADA004  |0204A0; Read stored value
 	sec ;02AA22|38      |      ; Set carry
 	sbc.b $44,x	 ;02AA23|F544    |001244; Subtract state value
-	sta.w $04a0	 ;02AA25|8DA004  |0204A0; Store result
+	sta.w !sys_temp_work_1	 ;02AA25|8DA004  |0204A0; Store result
 	dex ;02AA28|CA      |      ; Decrement index
 	bpl Sound_PriorityLoop ; Continue loop
 	pld ;02AA2B|2B      |      ; Restore direct page
@@ -4395,7 +4395,7 @@ Graphics_BelowThreshold:
 
 Graphics_StoreProcessed:
 	sta.l $7ec2a0,x ;02AB7B|9FA0C27E|7EC2A0; Store processed value
-	lda.w $048d	 ;02AB7F|AD8D04  |02048D; Read system state
+	lda.w !sys_state_counter	 ;02AB7F|AD8D04  |02048D; Read system state
 	bne Graphics_ProcessShift ;02AB82|D001    |02AB86; Branch if state set
 	rts ;02AB84|60      |      ; Return if no state
 
@@ -4427,7 +4427,7 @@ Graphics_MemoryCoordinator:
 	jsr.w CallBufferProcessor ;02ABBA|2038FE  |02FE38; Call buffer processor
 	lda.w $04a7	 ;02ABBD|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
-	lda.w $048d	 ;02ABC4|AD8D04  |02048D; Read system state
+	lda.w !sys_state_counter	 ;02ABC4|AD8D04  |02048D; Read system state
 	beq Graphics_InactiveState ;02ABC7|F004    |02ABD2; Branch if state clear
 	lda.b #$94	  ;02ABC9|A994    |      ; Set active state value
 	bra Graphics_StoreStateValue ;02ABCB|8002    |02ABD4; Continue processing
@@ -4665,7 +4665,7 @@ Graphics_DataBelowThreshold:
 
 Graphics_DataStoreValue:
 	sta.l $7ec2a0,x ;02AD57|9FA0C27E|7EC2A0; Store processed value
-	lda.w $048d	 ;02AD5B|AD8D04  |02048D; Read system state
+	lda.w !sys_state_counter	 ;02AD5B|AD8D04  |02048D; Read system state
 	bne Graphics_DataShift ;02AD5E|D001    |02AD62; Branch if state set
 	rts ;02AD60|60      |      ; Return if no state
 
@@ -4698,7 +4698,7 @@ Buffer_MemoryCoordinator:
 	jsr.w CallBufferProcessor ;02AD96|2038FE  |02FE38; Call buffer processor
 	lda.w $04a7	 ;02AD99|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02AD9C|9F80C37E|7EC380; Store in buffer address
-	lda.w $048d	 ;02ADA0|AD8D04  |02048D; Read system state
+	lda.w !sys_state_counter	 ;02ADA0|AD8D04  |02048D; Read system state
 	beq Buffer_InactiveState ;02ADA3|F004    |02ADAE; Branch if state clear
 	lda.b #$94	  ;02ADA5|A994    |      ; Set active state value
 	bra Buffer_StoreState ;02ADA7|8002    |02ADB0; Continue processing
@@ -6107,7 +6107,7 @@ Display_StateInit:
 	stz.w $0af0	 ;02DAB1|9CF00A  |020AF0; Clear frame counter
 	lda.b #$0f	  ;02DAB4|A90F    |      ; Set sprite limit
 	sta.w !battle_ready_flag	 ;02DAB6|8D1001  |020110; Store sprite count
-	lda.w $04af	 ;02DAB9|ADAF04  |0204AF; Load world state
+	lda.w !sys_temp_buffer	 ;02DAB9|ADAF04  |0204AF; Load world state
 	lsr a;02DABC|4A      |      ; Shift right
 	lsr a;02DABD|4A      |      ; Shift right again
 	inc a;02DABE|1A      |      ; Increment value
@@ -7299,7 +7299,7 @@ Thread_MemoryCoord:
 ; ------------------------------------------------------------------------------
 ; Sophisticated system state management with cross-bank synchronization
 State_SyncEngine:
-	lda.w $048b	 ;02E892|AD8B04  |02048B;  Load system state
+	lda.w !sys_game_mode	 ;02E892|AD8B04  |02048B;  Load system state
 	cmp.b #$02	  ;02E895|C902    |      ;  Check if state advanced
 	bpl DB_Load_02E8B5 ;02E897|101C    |02E8B5;  Branch if advanced state
 	tay ;02E899|A8      |      ;  Transfer state to Y
@@ -8907,7 +8907,7 @@ Entity_AnimationLoop:
 	sep #$20		;02FAF0|E220    |      ; Set 8-bit accumulator mode for byte operations
 	rep #$10		;02FAF2|C210    |      ; Set 16-bit index registers for address calculations
 	jsr.w Sprite_Processor ;02FAF4|2009FB  |02FB09; Call advanced sprite processing routine
-	lda.w $04af	 ;02FAF7|ADAF04  |0204AF; Load controller input state from memory
+	lda.w !sys_temp_buffer	 ;02FAF7|ADAF04  |0204AF; Load controller input state from memory
 	and.b #$20	  ;02FAFA|2920    |      ; Mask for specific button input (bit 5)
 	beq Entity_CoordDone ;02FAFC|F008    |02FB06; Branch if button not pressed (skip coordinate adjustment)
 	dec.b $00,x	 ;02FEFE|D600    |000C00; Decrement X coordinate (left movement)

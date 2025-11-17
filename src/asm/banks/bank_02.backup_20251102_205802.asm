@@ -37,7 +37,7 @@ Battle_Initialize:
 	plb                                  ;028051|AB      |      ;
 	sep #$20                             ;028052|E220    |      ;
 	rep #$10                             ;028054|C210    |      ;
-	lda.W $0513                          ;028056|AD1305  |020513;
+	lda.W !sys_operation_type                          ;028056|AD1305  |020513;
 	cmp.B #$ff                           ;028059|C9FF    |      ;
 	beq Battle_SetupEnvironment                      ;02805B|F003    |028060;
 	sta.W $0514                          ;02805D|8D1405  |020514;
@@ -631,14 +631,14 @@ Battle_UpdateStatusCounters:
 	lda.B $51                            ;02844D|A551    |001051;
 	pha                                  ;02844F|48      |      ;
 	lda.B $52                            ;028450|A552    |001052;
-	sta.W $043a                          ;028452|8D3A04  |02043A;
+	sta.W !sys_temp_param                          ;028452|8D3A04  |02043A;
 	pla                                  ;028455|68      |      ;
 	sta.W $0439                          ;028456|8D3904  |020439;
 	pla                                  ;028459|68      |      ;
 	sta.W $0438                          ;02845A|8D3804  |020438;
 	bne Battle_CheckPetrify                      ;02845D|D005    |028464;
 	pla                                  ;02845F|68      |      ;
-	sta.W $043a                          ;028460|8D3A04  |02043A;
+	sta.W !sys_temp_param                          ;028460|8D3A04  |02043A;
 	pha                                  ;028463|48      |      ;
 ;      |        |      ;
 Battle_CheckPetrify:
@@ -943,14 +943,14 @@ Battle_CheckFatal:
 	jsr.W Battle_SetEntityContextEnemy                    ;028634|202F8F  |028F2F;
 	lda.B $14                            ;028637|A514    |001014;
 	sec                                  ;028639|38      |      ;
-	sbc.W $04a0                          ;02863A|EDA004  |0204A0;
+	sbc.W !sys_temp_work_1                          ;02863A|EDA004  |0204A0;
 	sta.B $14                            ;02863D|8514    |001014;
 	pld                                  ;02863F|2B      |      ;
 	bra Battle_ProcessRegen                      ;028640|8061    |0286A3;
 ;      |        |      ;
 ;      |        |      ;
 Battle_ProcessFatal:
-	lda.W $04a0                          ;028642|ADA004  |0204A0;
+	lda.W !sys_temp_work_1                          ;028642|ADA004  |0204A0;
 	cmp.W #$7fff                         ;028645|C9FF7F  |      ;
 	beq Battle_RemoveMute                      ;028648|F0E0    |02862A;
 	cmp.W #$7ffe                         ;02864A|C9FE7F  |      ;
@@ -958,7 +958,7 @@ Battle_ProcessFatal:
 	phd                                  ;02864F|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;028650|202F8F  |028F2F;
 	lda.B $14                            ;028653|A514    |001214;
-	cmp.W $04a0                          ;028655|CDA004  |0204A0;
+	cmp.W !sys_temp_work_1                          ;028655|CDA004  |0204A0;
 	beq Battle_FatalCountdown                      ;028658|F004    |02865E;
 	bcc Battle_FatalCountdown                      ;02865A|9002    |02865E;
 	bra Battle_CheckRegen                      ;02865C|8037    |028695;
@@ -1002,7 +1002,7 @@ Battle_FatalComplete:
 Battle_CheckRegen:
 	lda.B $14                            ;028695|A514    |001014;
 	sec                                  ;028697|38      |      ;
-	sbc.W $04a0                          ;028698|EDA004  |0204A0;
+	sbc.W !sys_temp_work_1                          ;028698|EDA004  |0204A0;
 	sta.B $14                            ;02869B|8514    |001014;
 	lda.W #$0010                         ;02869D|A91000  |      ;
 	trb.B $21                            ;0286A0|1421    |001021;
@@ -1033,10 +1033,10 @@ Battle_ProcessRegen:
 	lda.B #$00                           ;0286D9|A900    |      ;
 ;      |        |      ;
 Battle_CalculateRegenHP:
-	sta.W $04a0                          ;0286DB|8DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;0286DB|8DA004  |0204A0;
 	lda.B #$00                           ;0286DE|A900    |      ;
 	xba                                  ;0286E0|EB      |      ;
-	lda.W $048d                          ;0286E1|AD8D04  |02048D;
+	lda.W !sys_state_counter                          ;0286E1|AD8D04  |02048D;
 	tax                                  ;0286E4|AA      |      ;
 	phx                                  ;0286E5|DA      |      ;
 	lda.B #$00                           ;0286E6|A900    |      ;
@@ -1045,7 +1045,7 @@ Battle_CalculateRegenHP:
 	asl a;0286EC|0A      |      ;
 	asl a;0286ED|0A      |      ;
 	clc                                  ;0286EE|18      |      ;
-	adc.W $04a0                          ;0286EF|6DA004  |0204A0;
+	adc.W !sys_temp_work_1                          ;0286EF|6DA004  |0204A0;
 	tax                                  ;0286F2|AA      |      ;
 	lda.W DB_DATA8_028715,x                 ;0286F3|BD1587  |028715;
 	plx                                  ;0286F6|FA      |      ;
@@ -1062,7 +1062,7 @@ Battle_ApplyRegenHP:
 	pla                                  ;028709|68      |      ;
 	lda.B $2f                            ;02870A|A52F    |00122F;
 	and.B #$fc                           ;02870C|29FC    |      ;
-	ora.W $04a0                          ;02870E|0DA004  |0204A0;
+	ora.W !sys_temp_work_1                          ;02870E|0DA004  |0204A0;
 	sta.B $2f                            ;028711|852F    |00122F;
 	pld                                  ;028713|2B      |      ;
 	rts                                  ;028714|60      |      ;
@@ -1108,7 +1108,7 @@ Battle_ProcessManualInput:
 	stz.B $8b                            ;028756|648B    |00048B;
 	jsr.W Battle_SetEntityContextParty                    ;028758|20228F  |028F22;
 	lda.B $10                            ;02875B|A510    |001010;
-	sta.W $04a0                          ;02875D|8DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;02875D|8DA004  |0204A0;
 	inc a;028760|1A      |      ;
 	cmp.B #$2a                           ;028761|C92A    |      ;
 	bcc Battle_WaitForInput                      ;028763|9002    |028767;
@@ -1142,28 +1142,28 @@ Battle_WaitForInput:
 	sep #$20                             ;0287A4|E220    |      ;
 	rep #$10                             ;0287A6|C210    |      ;
 	lda.B $10                            ;0287A8|A510    |001010;
-	sta.W $04a2                          ;0287AA|8DA204  |0204A2;
+	sta.W !sys_temp_work_2                          ;0287AA|8DA204  |0204A2;
 	lda.B $1b                            ;0287AD|A51B    |00101B;
 	sec                                  ;0287AF|38      |      ;
-	sbc.W $04a0                          ;0287B0|EDA004  |0204A0;
+	sbc.W !sys_temp_work_1                          ;0287B0|EDA004  |0204A0;
 	clc                                  ;0287B3|18      |      ;
 	adc.B $10                            ;0287B4|6510    |001010;
 	sta.B $1b                            ;0287B6|851B    |00101B;
-	lsr.W $04a0                          ;0287B8|4EA004  |0204A0;
-	lsr.W $04a2                          ;0287BB|4EA204  |0204A2;
+	lsr.W !sys_temp_work_1                          ;0287B8|4EA004  |0204A0;
+	lsr.W !sys_temp_work_2                          ;0287BB|4EA204  |0204A2;
 	lda.B $1c                            ;0287BE|A51C    |00101C;
 	sec                                  ;0287C0|38      |      ;
-	sbc.W $04a0                          ;0287C1|EDA004  |0204A0;
+	sbc.W !sys_temp_work_1                          ;0287C1|EDA004  |0204A0;
 	clc                                  ;0287C4|18      |      ;
-	adc.W $04a2                          ;0287C5|6DA204  |0204A2;
+	adc.W !sys_temp_work_2                          ;0287C5|6DA204  |0204A2;
 	sta.B $1c                            ;0287C8|851C    |00101C;
-	lsr.W $04a0                          ;0287CA|4EA004  |0204A0;
-	lsr.W $04a2                          ;0287CD|4EA204  |0204A2;
+	lsr.W !sys_temp_work_1                          ;0287CA|4EA004  |0204A0;
+	lsr.W !sys_temp_work_2                          ;0287CD|4EA204  |0204A2;
 	lda.B $1d                            ;0287D0|A51D    |00101D;
 	sec                                  ;0287D2|38      |      ;
-	sbc.W $04a0                          ;0287D3|EDA004  |0204A0;
+	sbc.W !sys_temp_work_1                          ;0287D3|EDA004  |0204A0;
 	clc                                  ;0287D6|18      |      ;
-	adc.W $04a2                          ;0287D7|6DA204  |0204A2;
+	adc.W !sys_temp_work_2                          ;0287D7|6DA204  |0204A2;
 	sta.B $1d                            ;0287DA|851D    |00101D;
 	inc.B $4c                            ;0287DC|E64C    |00104C;
 	inc.B $4c                            ;0287DE|E64C    |00104C;
@@ -1301,7 +1301,7 @@ Battle_ScanPartyLoop:
 Battle_AllDead:
 	pha                                  ;0288BC|48      |      ;
 	lda.W #$0000                         ;0288BD|A90000  |      ;
-	lda.W $048b                          ;0288C0|AD8B04  |02048B;
+	lda.W !sys_game_mode                          ;0288C0|AD8B04  |02048B;
 	and.W #$00ff                         ;0288C3|29FF00  |      ;
 	asl a;0288C6|0A      |      ;
 	tax                                  ;0288C7|AA      |      ;
@@ -1417,8 +1417,8 @@ Battle_MultiplyRewardByLevel:
 	rep #$30                             ;028978|C230    |      ;
 	lda.w !RDMPYL                          ;02897A|AD1642  |024216;
 	clc                                  ;02897D|18      |      ;
-	adc.W $04a2                          ;02897E|6DA204  |0204A2;
-	sta.W $04a2                          ;028981|8DA204  |0204A2;
+	adc.W !sys_temp_work_2                          ;02897E|6DA204  |0204A2;
+	sta.W !sys_temp_work_2                          ;028981|8DA204  |0204A2;
 	sep #$20                             ;028984|E220    |      ;
 	rep #$10                             ;028986|C210    |      ;
 	pla                                  ;028988|68      |      ;
@@ -1428,8 +1428,8 @@ Battle_MultiplyRewardByLevel:
 	rep #$30                             ;02898E|C230    |      ;
 	lda.w !RDMPYL                          ;028990|AD1642  |024216;
 	clc                                  ;028993|18      |      ;
-	adc.W $04a0                          ;028994|6DA004  |0204A0;
-	sta.W $04a0                          ;028997|8DA004  |0204A0;
+	adc.W !sys_temp_work_1                          ;028994|6DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;028997|8DA004  |0204A0;
 	sep #$20                             ;02899A|E220    |      ;
 	rep #$10                             ;02899C|C210    |      ;
 	pld                                  ;02899E|2B      |      ;
@@ -1773,7 +1773,7 @@ Battle_InitializeEnemies:
 	jsl.L ExecuteAudioCall                    ;028C13|22839700|009783;
 	lda.B #$00                           ;028C17|A900    |      ;
 	xba                                  ;028C19|EB      |      ;
-	lda.W $0513                          ;028C1A|AD1305  |020513;
+	lda.W !sys_operation_type                          ;028C1A|AD1305  |020513;
 	cmp.B #$ff                           ;028C1D|C9FF    |      ;
 	bne Battle_LoadEnemyData                      ;028C1F|D003    |028C24;
 	jmp.W Battle_CopyEnemyData                    ;028C21|4C6E8C  |028C6E;
@@ -1826,7 +1826,7 @@ Battle_InitEnemyStats:
 	lda.W DATA8_02ce12,x                 ;028C63|BD12CE  |02CE12;
 	sta.W $0515                          ;028C66|8D1505  |020515;
 	lda.B #$ff                           ;028C69|A9FF    |      ;
-	sta.W $0513                          ;028C6B|8D1305  |020513;
+	sta.W !sys_operation_type                          ;028C6B|8D1305  |020513;
 ;      |        |      ;
 Battle_CopyEnemyData:
 	jmp.W Battle_SetEnemyHP                    ;028C6E|4CC88C  |028CC8;
@@ -2209,7 +2209,7 @@ Battle_SetEntityContextParty:
 	php                                  ;028F25|08      |      ;
 	sep #$20                             ;028F26|E220    |      ;
 	rep #$10                             ;028F28|C210    |      ;
-	lda.W $048b                          ;028F2A|AD8B04  |02048B;
+	lda.W !sys_game_mode                          ;028F2A|AD8B04  |02048B;
 	bra Battle_GetBattleEntityData                      ;028F2D|800B    |028F3A;
 ;      |        |      ;
 ;      |        |      ;
@@ -2220,7 +2220,7 @@ Battle_SetEntityContextEnemy:
 	php                                  ;028F32|08      |      ;
 	sep #$20                             ;028F33|E220    |      ;
 	rep #$10                             ;028F35|C210    |      ;
-	lda.W $048d                          ;028F37|AD8D04  |02048D;
+	lda.W !sys_state_counter                          ;028F37|AD8D04  |02048D;
 ;      |        |      ;
 Battle_GetBattleEntityData:
 	asl a;028F3A|0A      |      ;
@@ -4865,7 +4865,7 @@ Battle_ProcessMPRestore:
 	sta.W $0000,x                        ;02A449|9D0000  |020000;
 	sep #$20                             ;02A44C|E220    |      ;
 	rep #$10                             ;02A44E|C210    |      ;
-	lda.W $048b                          ;02A450|AD8B04  |02048B;
+	lda.W !sys_game_mode                          ;02A450|AD8B04  |02048B;
 	cmp.B #$02                           ;02A453|C902    |      ;
 	bcc Battle_CalculateMPRestore                      ;02A455|9008    |02A45F;
 	lda.B #$fe                           ;02A457|A9FE    |      ;
@@ -4890,7 +4890,7 @@ Battle_ApplyMPRestore:
 	asl a;02A470|0A      |      ;
 	asl a;02A471|0A      |      ;
 	asl a;02A472|0A      |      ;
-	sta.W $04a0                          ;02A473|8DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;02A473|8DA004  |0204A0;
 	pla                                  ;02A476|68      |      ;
 	and.W #$0f00                         ;02A477|29000F  |      ;
 	lsr a;02A47A|4A      |      ;
@@ -4901,8 +4901,8 @@ Battle_ApplyMPRestore:
 	lsr a;02A47F|4A      |      ;
 	lsr a;02A480|4A      |      ;
 	lsr a;02A481|4A      |      ;
-	ora.W $04a0                          ;02A482|0DA004  |0204A0;
-	sta.W $04a0                          ;02A485|8DA004  |0204A0;
+	ora.W !sys_temp_work_1                          ;02A482|0DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;02A485|8DA004  |0204A0;
 	pla                                  ;02A488|68      |      ;
 	and.W #$f000                         ;02A489|2900F0  |      ;
 	lsr a;02A48C|4A      |      ;
@@ -4912,7 +4912,7 @@ Battle_ApplyMPRestore:
 	lsr a;02A490|4A      |      ;
 	lsr a;02A491|4A      |      ;
 	lsr a;02A492|4A      |      ;
-	ora.W $04a0                          ;02A493|0DA004  |0204A0;
+	ora.W !sys_temp_work_1                          ;02A493|0DA004  |0204A0;
 	rts                                  ;02A496|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -4928,30 +4928,30 @@ Battle_MPRestoreComplete:
 	lda.B $21                            ;02A4A4|A521    |001221;
 	and.W #$0080                         ;02A4A6|298000  |      ;
 	beq Battle_DisplayRestoredMP                      ;02A4A9|F008    |02A4B3;
-	inc.W $04a0                          ;02A4AB|EEA004  |0204A0;
-	inc.W $048d                          ;02A4AE|EE8D04  |02048D;
+	inc.W !sys_temp_work_1                          ;02A4AB|EEA004  |0204A0;
+	inc.W !sys_state_counter                          ;02A4AE|EE8D04  |02048D;
 	bra Battle_MPRestoreComplete                      ;02A4B1|80EE    |02A4A1;
 ;      |        |      ;
 ;      |        |      ;
 Battle_DisplayRestoredMP:
 	lda.B $14                            ;02A4B3|A514    |001214;
-	sta.W $04a2                          ;02A4B5|8DA204  |0204A2;
+	sta.W !sys_temp_work_2                          ;02A4B5|8DA204  |0204A2;
 ;      |        |      ;
 Battle_ProcessStatModifier:
-	inc.W $048d                          ;02A4B8|EE8D04  |02048D;
+	inc.W !sys_state_counter                          ;02A4B8|EE8D04  |02048D;
 	lda.W #$0005                         ;02A4BB|A90500  |      ;
-	cmp.W $048d                          ;02A4BE|CD8D04  |02048D;
+	cmp.W !sys_state_counter                          ;02A4BE|CD8D04  |02048D;
 	beq Battle_ApplyAttackModifier                      ;02A4C1|F01C    |02A4DF;
 	jsr.W Battle_SetEntityContextEnemy                    ;02A4C3|202F8F  |028F2F;
 	lda.B $21                            ;02A4C6|A521    |001221;
 	and.W #$0080                         ;02A4C8|298000  |      ;
 	bne Battle_ProcessStatModifier                      ;02A4CB|D0EB    |02A4B8;
 	lda.B $14                            ;02A4CD|A514    |001214;
-	cmp.W $04a2                          ;02A4CF|CDA204  |0204A2;
+	cmp.W !sys_temp_work_2                          ;02A4CF|CDA204  |0204A2;
 	bcs Battle_ProcessStatModifier                      ;02A4D2|B0E4    |02A4B8;
-	sta.W $04a2                          ;02A4D4|8DA204  |0204A2;
-	lda.W $048d                          ;02A4D7|AD8D04  |02048D;
-	sta.W $04a0                          ;02A4DA|8DA004  |0204A0;
+	sta.W !sys_temp_work_2                          ;02A4D4|8DA204  |0204A2;
+	lda.W !sys_state_counter                          ;02A4D7|AD8D04  |02048D;
+	sta.W !sys_temp_work_1                          ;02A4DA|8DA004  |0204A0;
 	bra Battle_ProcessStatModifier                      ;02A4DD|80D9    |02A4B8;
 ;      |        |      ;
 ;      |        |      ;
@@ -4970,7 +4970,7 @@ Battle_ApplyAttackModifier:
 ;      |        |      ;
 ;      |        |      ;
 Battle_AttackModifierApplied:
-	lda.W $04a0                          ;02A4FA|ADA004  |0204A0;
+	lda.W !sys_temp_work_1                          ;02A4FA|ADA004  |0204A0;
 ;      |        |      ;
 Battle_ApplyDefenseModifier:
 	sta.B $51                            ;02A4FD|8551    |001251;
@@ -5186,7 +5186,7 @@ Battle_BarrierAbsorbDamage:
 	lda.B $38                            ;02A663|A538    |001038;
 	and.B #$0f                           ;02A665|290F    |      ;
 	ora.B $39                            ;02A667|0539    |001039;
-	sta.W $04a0                          ;02A669|8DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;02A669|8DA004  |0204A0;
 	pld                                  ;02A66C|2B      |      ;
 	lda.B $a0                            ;02A66D|A5A0    |0004A0;
 	beq Battle_ReduceBarrier                      ;02A66F|F00E    |02A67F;
@@ -5585,7 +5585,7 @@ Battle_ProcessImmunity:
 	lda.B $51                            ;02A8FA|A551    |0010D1;
 	bit.B #$80                           ;02A8FC|8980    |      ;
 	bne Battle_ImmuneToEffect                      ;02A8FE|D02F    |02A92F;
-	sta.W $048d                          ;02A900|8D8D04  |02048D;
+	sta.W !sys_state_counter                          ;02A900|8D8D04  |02048D;
 	jsr.W Battle_SetEntityContextEnemy                    ;02A903|202F8F  |028F2F;
 	lda.B $2e                            ;02A906|A52E    |00122E;
 	xba                                  ;02A908|EB      |      ;
@@ -5652,7 +5652,7 @@ Battle_ImmunityComplete:
 	lda.B $50                            ;02A954|A550    |001050;
 	sta.W $0438                          ;02A956|8D3804  |020438;
 	lda.B $52                            ;02A959|A552    |001052;
-	sta.W $043a                          ;02A95B|8D3A04  |02043A;
+	sta.W !sys_temp_param                          ;02A95B|8D3A04  |02043A;
 	pld                                  ;02A95E|2B      |      ;
 	jsr.W Battle_SetupTargeting                    ;02A95F|200F8B  |028B0F;
 	lda.B $e0                            ;02A962|A5E0    |0004E0;
@@ -5757,7 +5757,7 @@ Battle_AbsorbEffectComplete:
 Battle_ProcessNullify:
 	lda.B $44,x                          ;02AA01|B544    |001244;
 	beq Battle_NullifyFound                      ;02AA03|F01A    |02AA1F;
-	cmp.W $04a0                          ;02AA05|CDA004  |0204A0;
+	cmp.W !sys_temp_work_1                          ;02AA05|CDA004  |0204A0;
 	bcc Battle_NullifyFound                      ;02AA08|9015    |02AA1F;
 	lda.B $58,x                          ;02AA0A|B558    |001258;
 	inc a;02AA0C|1A      |      ;
@@ -5766,7 +5766,7 @@ Battle_ProcessNullify:
 Battle_CheckNullifyFlags:
 	dec a;02AA0F|3A      |      ;
 	sta.B $52                            ;02AA10|8552    |001252;
-	sta.W $043a                          ;02AA12|8D3A04  |02043A;
+	sta.W !sys_temp_param                          ;02AA12|8D3A04  |02043A;
 	lda.B #$10                           ;02AA15|A910    |      ;
 	sta.B $50                            ;02AA17|8550    |001250;
 	sta.W $0438                          ;02AA19|8D3804  |020438;
@@ -5775,10 +5775,10 @@ Battle_CheckNullifyFlags:
 ;      |        |      ;
 ;      |        |      ;
 Battle_NullifyFound:
-	lda.W $04a0                          ;02AA1F|ADA004  |0204A0;
+	lda.W !sys_temp_work_1                          ;02AA1F|ADA004  |0204A0;
 	sec                                  ;02AA22|38      |      ;
 	sbc.B $44,x                          ;02AA23|F544    |001244;
-	sta.W $04a0                          ;02AA25|8DA004  |0204A0;
+	sta.W !sys_temp_work_1                          ;02AA25|8DA004  |0204A0;
 	dex                                  ;02AA28|CA      |      ;
 	bpl Battle_ProcessNullify                      ;02AA29|10D6    |02AA01;
 	pld                                  ;02AA2B|2B      |      ;
@@ -6045,7 +6045,7 @@ Battle_ProcessStatusDisplay:
 	and.B #$3f                           ;02AD52|293F    |      ;
 	beq Battle_DrawStatusIcon                      ;02AD54|F021    |02AD77;
 	sta.L $7ec4e0,x                      ;02AD56|9FE0C47E|7EC4E0;
-	lda.W $048d                          ;02AD5A|AD8D04  |02048D;
+	lda.W !sys_state_counter                          ;02AD5A|AD8D04  |02048D;
 	beq Battle_UpdateStatusIcons                      ;02AD5D|F00C    |02AD6B;
 	db $a9,$80,$18,$79,$f4,$ad,$9f,$a0,$c4,$7e,$80,$33;02AD5F|        |      ;
 ;      |        |      ;
@@ -6066,7 +6066,7 @@ Battle_DrawStatusIcon:
 	sta.L $7ec340,x                      ;02AD84|9F40C37E|7EC340;
 	lda.B #$67                           ;02AD88|A967    |      ;
 	sta.L $7ec2a0,x                      ;02AD8A|9FA0C27E|7EC2A0;
-	lda.W $048d                          ;02AD8E|AD8D04  |02048D;
+	lda.W !sys_state_counter                          ;02AD8E|AD8D04  |02048D;
 	beq Battle_ClearStatusIcon                      ;02AD91|F004    |02AD97;
 	db $a9,$78,$80,$02                   ;02AD93|        |      ;
 ;      |        |      ;
@@ -8227,7 +8227,7 @@ Battle_ProtectReducePhysical:
 	stz.W $0af0                          ;02DAB1|9CF00A  |020AF0;
 	lda.B #$0f                           ;02DAB4|A90F    |      ;
 	sta.w !battle_ready_flag                          ;02DAB6|8D1001  |020110;
-	lda.W $04af                          ;02DAB9|ADAF04  |0204AF;
+	lda.W !sys_temp_buffer                          ;02DAB9|ADAF04  |0204AF;
 	lsr a;02DABC|4A      |      ;
 	lsr a;02DABD|4A      |      ;
 	inc a;02DABE|1A      |      ;
@@ -9597,7 +9597,7 @@ Battle_ProcessRegenMP:
 Battle_ApplyRegenMP:
 	lda.B $e6                            ;02E795|A5E6    |000AE6;
 	bne Battle_ApplyRegenMP                      ;02E797|D0FC    |02E795;
-	lda.W $048b                          ;02E799|AD8B04  |02048B;
+	lda.W !sys_game_mode                          ;02E799|AD8B04  |02048B;
 	cmp.B #$02                           ;02E79C|C902    |      ;
 	bpl Battle_RegenMPComplete                      ;02E79E|102E    |02E7CE;
 	tay                                  ;02E7A0|A8      |      ;
@@ -9741,7 +9741,7 @@ Battle_ApplyInnocence:
 ;      |        |      ;
 ;      |        |      ;
 Battle_InnocenceReduceResist:
-	lda.W $048b                          ;02E892|AD8B04  |02048B;
+	lda.W !sys_game_mode                          ;02E892|AD8B04  |02048B;
 	cmp.B #$02                           ;02E895|C902    |      ;
 	bpl Battle_ProcessMartyr                      ;02E897|101C    |02E8B5;
 	tay                                  ;02E899|A8      |      ;
@@ -11078,7 +11078,7 @@ Battle_ProcessSummon:
 	adc.B #$40                           ;02F171|6940    |      ;
 	sta.B $ec                            ;02F173|85EC    |000AEC;
 	bne Battle_SummonAnimation                      ;02F175|D01F    |02F196;
-	lda.W $04af                          ;02F177|ADAF04  |0204AF;
+	lda.W !sys_temp_buffer                          ;02F177|ADAF04  |0204AF;
 	and.B #$20                           ;02F17A|2920    |      ;
 	beq Battle_SummonAnimation                      ;02F17C|F018    |02F196;
 	lda.B $eb                            ;02F17E|A5EB    |000AEB;
@@ -12178,7 +12178,7 @@ Battle_CharSpriteAddr:
 	sep #$20                             ;02FAC0|E220    |      ;
 	rep #$10                             ;02FAC2|C210    |      ;
 	jsr.W Battle_CharPaletteLoop                    ;02FAC4|2009FB  |02FB09;
-	lda.W $04af                          ;02FAC7|ADAF04  |0204AF;
+	lda.W !sys_temp_buffer                          ;02FAC7|ADAF04  |0204AF;
 	and.B #$20                           ;02FACA|2920    |      ;
 	beq Battle_LoadCharTiles                      ;02FACC|F008    |02FAD6;
 	inc.B $00,x                          ;02FACE|F600    |000C00;
@@ -12207,7 +12207,7 @@ Battle_CharTileTransfer:
 	sep #$20                             ;02FAF0|E220    |      ;
 	rep #$10                             ;02FAF2|C210    |      ;
 	jsr.W Battle_CharPaletteLoop                    ;02FAF4|2009FB  |02FB09;
-	lda.W $04af                          ;02FAF7|ADAF04  |0204AF;
+	lda.W !sys_temp_buffer                          ;02FAF7|ADAF04  |0204AF;
 	and.B #$20                           ;02FAFA|2920    |      ;
 	beq Battle_CharPaletteSetup                      ;02FAFC|F008    |02FB06;
 	dec.B $00,x                          ;02FAFE|D600    |000C00;

@@ -372,6 +372,19 @@
 !ram_0900                       = $0900     ; Legacy label
 
 ; ============================================================================
+; System State & Temporary Variables ($04xx)
+; ============================================================================
+; Multi-purpose temp storage, parameters, and system state tracking
+!sys_temp_param     = $043a     ; System temporary parameter (item ID, spell ID, effect ID) (19 uses)
+!sys_game_mode      = $048b     ; System game mode/state flag (12 uses)
+!sys_state_counter  = $048d     ; System state counter/flag (17 uses)
+!sys_temp_work_1    = $04a0     ; System temp working variable 1 (30 uses - highest in range)
+!sys_temp_work_2    = $04a2     ; System temp working variable 2 (11 uses)
+!sys_temp_buffer    = $04af     ; System temp buffer (10 uses)
+!sys_state_ptr      = $04e0     ; System state pointer/offset (16 uses)
+!sys_operation_type = $0513     ; System operation type (14 uses)
+
+; ============================================================================
 ; OAM Sprite Buffer ($0c00-$0c1f+)
 ; ============================================================================
 ; SNES OAM (Object Attribute Memory) sprite buffer - 128 sprites × 4 bytes
