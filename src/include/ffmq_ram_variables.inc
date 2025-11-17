@@ -616,6 +616,15 @@
 !battle_coord_w_lo      = $0c6c     ; Battle W coordinate (low byte)
 !battle_coord_w_hi      = $0c6d     ; Battle W coordinate (high byte)
 
+; ----------------------------------------------------------------------------
+; DMA Graphics Coordinate Addresses ($0cd0-$0cdc)
+; ----------------------------------------------------------------------------
+; Used in battle sprite DMA coordinate processing systems
+!dma_dest_addr          = $0cd0     ; DMA destination X coordinate
+!dma_source_addr        = $0cd4     ; DMA source X+8 coordinate
+!dma_dest_addr_alt      = $0cd8     ; DMA source high address (with VRAM offset)
+!dma_source_addr_alt    = $0cdc     ; DMA destination high address (with VRAM page offset)
+
 ; ============================================================================
 ; OAM Sprite Buffer ($0c00-$0c1f+)
 ; ============================================================================
