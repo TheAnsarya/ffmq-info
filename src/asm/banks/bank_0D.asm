@@ -12,16 +12,16 @@ SPC_SendCommand_Entry:
 ;      |        |      ;
 	db $ea                               ;0D8007|        |      ;
 ;      |        |      ;
-DATA8_0d8008:
+SPC_DriverVersion:
 	db $87                               ;0D8008|        |      ;
 ;      |        |      ;
-DATA8_0d8009:
+SPC_DriverChecksum:
 	db $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1;0D8009|        |      ;
 ;      |        |      ;
-DATA8_0d8014:
+SPC_InitialPorts:
 	db $00                               ;0D8014|        |      ;
 ;      |        |      ;
-DATA8_0d8015:
+SPC_JumpTable:
 	db $02,$00,$2c,$00,$48,$00,$1b,$80,$1a,$00,$1a;0D8015|        |      ;
 	db $ae,$bd,$ff,$bd,$35,$be,$7d,$be,$59,$be,$a1,$be;0D8020|        |00FFBD;
 ;      |        |      ;
@@ -974,7 +974,7 @@ SPC_CommandValid:
 	db $01,$08,$08,$0f,$01,$09,$08,$0f,$01,$0a,$08,$0f,$01,$0b,$08,$0f;0D8666|        |000008;
 	db $01,$0c,$08,$0f,$01,$0d,$08,$0f,$01,$0e,$08,$0f,$80,$10,$00,$00;0D8676|        |00000C;
 ;      |        |      ;
-DATA8_0d8686:
+SPC_DriverCodeData:
 	db $ff,$ef,$16,$20,$c0,$cd,$ff,$bd,$e8,$00,$5d,$af,$c8,$f0,$d0,$fb;0D8686|        |      ;
 	db $1a,$02,$1a,$ed,$e8,$00,$8d,$0c,$3f,$38,$06,$8d,$1c,$3f,$38,$06;0D8696|        |      ;
 	db $8d,$2c,$3f,$38,$06,$8d,$3c,$3f,$38,$06,$8d,$2d,$3f,$38,$06,$8d;0D86A6|        |      ;
@@ -1344,7 +1344,7 @@ DATA8_0d8686:
 	db $0d,$f2,$4c,$5c,$2d,$3d,$4d,$2c,$3c,$6c,$be,$bf,$c9,$c8,$c7,$b6;0D9D66|        |      ;
 	db $b6,$ca                           ;0D9D76|        |      ;
 ;      |        |      ;
-DATA8_0d9d78:
+Music_TrackData_Song:
 	db $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,$31,$ee;0D9D78|        |      ;
 	db $1e,$ce,$41,$f0,$86,$e5,$0d,$23,$00,$10,$23,$fd,$47,$96,$fd,$35;0D9D88|        |      ;
 	db $fd,$35,$fd,$35,$0f,$34,$9a,$e0,$21,$11,$00,$33,$f1,$42,$bd,$aa;0D9D98|        |      ;
@@ -1879,29 +1879,29 @@ Music_DeadCode_TrackTable:
 	db $73,$f4,$0e                       ;0DBDF9|        |0000F4;
 	db $d3,$fb,$0e                       ;0DBDFC|        |      ;
 ;      |        |      ;
-DATA8_0dbdff:
+Music_SequenceCount:
 	db $01                               ;0DBDFF|        |      ;
 ;      |        |      ;
-DATA8_0dbe00:
+Music_SequenceBaseIndex:
 	db $c2                               ;0DBE00|        |      ;
 ;      |        |      ;
-DATA8_0dbe01:
+Music_SequenceOffsetTable:
 	db $0d,$21,$c8,$0d,$2e,$cc,$0d,$08,$e8,$0d,$ff,$f5,$0d,$5d,$fa,$0d;0DBE01|        |      ;
 	db $fb,$00,$0e,$30,$0d,$0e,$16,$14,$0e,$4e,$14,$0e,$06,$22,$0e,$65;0DBE11|        |      ;
 	db $31,$0e,$a2,$4d,$0e,$84,$55,$0e,$c4,$5c,$0e,$6e,$69,$0e,$4a,$77;0DBE21|        |      ;
 	db $0e,$f3,$81,$0e                   ;0DBE31|        |      ;
 ;      |        |      ;
-DATA8_0dbe35:
+Music_InstrumentVolumeTable:
 	db $df,$05,$0b,$04,$26,$0d,$36,$09,$d5,$03,$81,$06,$fe,$04,$c9,$06;0DBE35|        |      ;
 	db $1b,$00,$a8,$0c,$7d,$07,$1b,$00,$59,$07,$ff,$06,$21,$0c,$a9,$05;0DBE45|        |      ;
 	db $c1,$08,$18,$03                   ;0DBE55|        |      ;
 ;      |        |      ;
-DATA8_0dbe59:
+Music_InstrumentPitchTable:
 	db $ef,$00,$00,$00,$80,$00,$80,$00,$80,$00,$cd,$00,$00,$00,$cd,$00;0DBE59|        |      ;
 	db $cd,$00,$00,$00,$00,$00,$e4,$00,$80,$00,$ef,$00,$00,$00,$00,$00;0DBE69|        |      ;
 	db $80,$00,$00,$00                   ;0DBE79|        |      ;
 ;      |        |      ;
-DATA8_0dbe7d:
+Music_InstrumentParameterTable:
 	db $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,$8f,$a4;0DBE7D|        |      ;
 	db $ff,$84,$cf,$68,$8f,$b8,$a7,$c0,$ff,$d4,$9f,$a4,$bf,$ac,$af,$11;0DBE8D|        |      ;
 	db $ff,$b2,$ff,$e0                   ;0DBE9D|        |      ;
