@@ -1,0 +1,15 @@
+{
+	"default": true,
+	"MD010": false,
+	"no-hard-tabs": false,
+	"MD032": true,
+	"blanks-around-lists": true,
+	"MD040": true,
+	"fenced-code-language": true,
+	"MD041": true,
+	"first-line-heading": true,
+	"MD047": true,
+	"single-trailing-newline": true,
+	"MD013": false,
+	"line-length": false
+}

@@ -17,6 +17,18 @@ indent_style = tab
 indent_size = 4
 trim_trailing_whitespace = false
 
+# Markdownlint configuration
+# MD010/no-hard-tabs: DISABLED - We use tabs everywhere
+markdownlint.MD010 = false
+# MD032/blanks-around-lists: Lists should be surrounded by blank lines
+markdownlint.MD032 = true
+# MD040/fenced-code-language: Fenced code blocks should have a language specified
+markdownlint.MD040 = true
+# MD041/first-line-heading: First line should be a top-level heading
+markdownlint.MD041 = true
+# MD047/single-trailing-newline: Files should end with a single newline
+markdownlint.MD047 = true
+
 # YAML files (CI/CD configurations)
 [*.{yml,yaml}]
 indent_style = tab
