@@ -1,7 +1,31 @@
 # FFMQ Project Completion Plan
 
 **Created:** 2025-01 Analysis Session
+**Updated:** 2025-01-10
 **Purpose:** Comprehensive plan to complete FFMQ disassembly, editors, and project format
+
+---
+
+## ⚠️ EXISTING INFRASTRUCTURE DISCOVERED
+
+**The .giproj project system and FFMQ extractor already exist in GameInfo!**
+
+### GameInfo Project System (Complete)
+- [Project.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/Project.cs) - 412 lines
+- [ProjectService.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/ProjectService.cs) - 515 lines
+- [IProjectService.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/IProjectService.cs) - 203 lines
+
+### FFMQ Extractor (Enhanced 2025-01-10)
+- [FfmqExtractor.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/Extractors/FfmqExtractor.cs) - 490+ lines
+- Extracts: Monster stats, items, weapons, armor, spells
+- **NEW:** All game text (806 entries): items, spells, monsters, locations, attacks
+- Generates: source/main.asm, symbols/ffmq.sym
+- Verified ROM detection via CRC32
+
+### FFMQLib C# Library (logsmall)
+- [FfmqTextDecoder.cs](../../../../logsmall/FFMQLib/FfmqTextDecoder.cs) - 336 lines
+- [FfmqMonster.cs](../../../../logsmall/FFMQLib/FfmqMonster.cs) - 141 lines
+- [FfmqItem.cs](../../../../logsmall/FFMQLib/FfmqItem.cs) - 260 lines
 
 ---
 

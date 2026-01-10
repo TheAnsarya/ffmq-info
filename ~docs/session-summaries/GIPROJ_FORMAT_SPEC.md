@@ -5,7 +5,26 @@
 **Purpose:** Define a universal project format for ROM hacking projects
 
 ---
+## ⚠️ EXISTING IMPLEMENTATION
 
+**The .giproj format is already implemented in GameInfo!**
+
+See the authoritative implementation at:
+- [Project.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/Project.cs) - Main project class (412 lines)
+- [ProjectService.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/ProjectService.cs) - Project management (515 lines)
+- [IProjectService.cs](../../../../GameInfo/src/GameInfoTools.Core/Project/IProjectService.cs) - Interface definition (203 lines)
+
+**Key Classes:**
+- `Project` - Main project container with assets and metadata
+- `ProjectMetadata` - Schema version, name, authors, game reference, ROM reference
+- `AssetManifest` - List of all extracted assets with ROM offsets
+- `BuildConfiguration` - Assembler settings, profiles, output config
+- `GameReference` - Game ID, name, platform, region
+- `RomReference` - Filename, size, CRC32, MD5, SHA1, SHA256, header info
+
+This document describes the FFMQ-specific requirements for the universal format.
+
+---
 ## Overview
 
 The `.giproj` (GameInfo Project) format is a self-contained project file that captures all modifications to a ROM without including the original copyrighted data. This allows sharing mods legally while maintaining full reproducibility.
